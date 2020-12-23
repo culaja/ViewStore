@@ -19,17 +19,17 @@ namespace Stores.MongoDb
             _mongoCollectionNameSupplier = mongoCollectionNameSupplier;
         }
 
-        private IMongoCollection<T> CollectionFor<T>() where T : IView
-            => _mongoDatabase.GetCollection<T>(_mongoCollectionNameSupplier(typeof(T).Name));
+        private IMongoCollection<T> CollectionFor<T>(string typeName) where T : IView
+            => _mongoDatabase.GetCollection<T>(_mongoCollectionNameSupplier(typeName));
         
         public async Task<T?> ReadAsync<T>(IViewId viewId) where T : IView =>
-            (T?)await CollectionFor<T>()
+            (T?)await CollectionFor<T>(typeof(T).Name)
                 .Find(Builders<T>.Filter.Eq("_id", viewId.ToString()))
                 .FirstOrDefaultAsync();
 
         public async Task SaveAsync<T>(IViewId viewId, T view) where T : IView
         {
-            var result = await CollectionFor<T>().ReplaceOneAsync(
+            var result = await CollectionFor<T>(view.GetType().Name).ReplaceOneAsync(
                 Builders<T>.Filter.Eq("_id", viewId.ToString()),
                 view,
                 new ReplaceOptions { IsUpsert = true });
