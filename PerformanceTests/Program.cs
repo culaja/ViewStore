@@ -11,25 +11,25 @@ namespace PerformanceTests
 {
     class Program
     {
-        static async Task Main()
+        static void Main()
         {
             //await ExecuteTest(ClotMongoViewStore());
-            await ExecuteTest(CachedMongoViewStore());
+            ExecuteTest(CachedMongoViewStore());
         }
 
-        private static async Task ExecuteTest(Tuple<IViewStore, IDisposable> tuple)
+        private static void ExecuteTest(Tuple<IViewStore, IDisposable> tuple)
         {
             var sw = new Stopwatch();
             sw.Start();
             using (tuple.Item2)
             {
-                for (var i = 0; i < 100000; i++)
+                for (var i = 0; i < 100; i++)
                 {
-                    await tuple.Item1.SaveAsync(new TestViewId(i.ToString()), new TestView("N/A"));
-                    for (var j = 0; j < 20; ++j)
+                    tuple.Item1.Save(new TestViewId(i.ToString()), new TestView("N/A"));
+                    for (var j = 0; j < 100000; ++j)
                     {
-                        await tuple.Item1.ReadAsync<TestView>(new TestViewId(i.ToString()));
-                        await tuple.Item1.SaveAsync(new TestViewId(i.ToString()), new TestView($"M{j}"));
+                        tuple.Item1.Read<TestView>(new TestViewId(i.ToString()));
+                        tuple.Item1.Save(new TestViewId(i.ToString()), new TestView($"M{j}"));
                     }
                 }
             }
@@ -58,7 +58,7 @@ namespace PerformanceTests
             return ViewStoreCacheFactory.New()
                 .WithCacheItemExpirationPeriod(TimeSpan.FromHours(1))
                 .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(100))
-                .WithCacheDrainBatchSize(200)
+                .WithCacheDrainBatchSize(500)
                 .For(ClotMongoViewStore().Item1)
                 .Build();
         }
