@@ -11,6 +11,7 @@ namespace Cache
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly TimeSpan _drainPeriod;
         private readonly Thread _worker;
+        private bool _isStopRequested;
 
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
         public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
@@ -23,11 +24,20 @@ namespace Cache
             _manualCacheDrainer = manualCacheDrainer;
             _drainPeriod = drainPeriod;
             _worker = new Thread(Work);
+            _worker.Start();
         }
 
         private void Work()
         {
             Thread.Sleep(_drainPeriod);
+            while (!_isStopRequested || _manualCacheDrainer.ItemsToDrain != 0)
+            {
+                TryDrainCache();
+            }
+        }
+
+        private void TryDrainCache()
+        {
             try
             {
                 var itemsToDrain = _manualCacheDrainer.ItemsToDrain;
@@ -42,6 +52,7 @@ namespace Cache
 
         public void Dispose()
         {
+            _isStopRequested = true;
             _worker.Join();
         }
     }

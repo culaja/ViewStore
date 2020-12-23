@@ -10,7 +10,7 @@ namespace Tests
         
         private readonly string _id;
 
-        private TestViewId(string id)
+        public TestViewId(string id)
         {
             _id = id;
         }
