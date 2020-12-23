@@ -6,7 +6,6 @@ using Cache;
 using MongoDB.Driver;
 using Stores.MongoDb;
 using Tests;
-using static Tests.TestView;
 
 namespace PerformanceTests
 {
@@ -26,7 +25,12 @@ namespace PerformanceTests
             {
                 for (var i = 0; i < 100000; i++)
                 {
-                    await tuple.Item1.SaveAsync(new TestViewId(i.ToString()), TestView1);
+                    await tuple.Item1.SaveAsync(new TestViewId(i.ToString()), new TestView("N/A"));
+                    for (var j = 0; j < 20; ++j)
+                    {
+                        await tuple.Item1.ReadAsync<TestView>(new TestViewId(i.ToString()));
+                        await tuple.Item1.SaveAsync(new TestViewId(i.ToString()), new TestView($"M{j}"));
+                    }
                 }
             }
             sw.Stop();

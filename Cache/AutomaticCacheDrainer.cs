@@ -22,6 +22,8 @@ namespace Cache
             )
         {
             _manualCacheDrainer = manualCacheDrainer;
+            manualCacheDrainer.OnSendingExceptionEvent += exception => OnSendingExceptionEvent?.Invoke(exception);
+            manualCacheDrainer.OnDrainFinishedEvent += count => OnDrainFinishedEvent?.Invoke(count);
             _drainPeriod = drainPeriod;
             _worker = new Thread(Work);
             _worker.Start();
@@ -29,24 +31,15 @@ namespace Cache
 
         private void Work()
         {
-            Thread.Sleep(_drainPeriod);
-            while (!_isStopRequested || _manualCacheDrainer.ItemsToDrain != 0)
+            while (true)
             {
-                TryDrainCache();
-            }
-        }
-
-        private void TryDrainCache()
-        {
-            try
-            {
-                var itemsToDrain = _manualCacheDrainer.ItemsToDrain;
-                _manualCacheDrainer.DrainCache();
-                OnDrainFinishedEvent?.Invoke(itemsToDrain);
-            }
-            catch (Exception e)
-            {
-                OnSendingExceptionEvent?.Invoke(e);
+                Thread.Sleep(_drainPeriod);
+                
+                var drainedItems = _manualCacheDrainer.TryDrainCache();
+                if (_isStopRequested && drainedItems == 0)
+                {
+                    break;
+                }
             }
         }
 

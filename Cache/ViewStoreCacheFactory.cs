@@ -49,17 +49,21 @@ namespace Cache
                 throw new ArgumentException(nameof(_realViewStore));
             }
             
-            var outgoingCache = new ConcurrentDictionary<IViewId, IView>();
+            var outgoingCache = new OutgoingCache();
+
+            var automaticCacheDrainer = new AutomaticCacheDrainer(
+                new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
+                _cacheDrainPeriod);
+
+            automaticCacheDrainer.OnDrainFinishedEvent += Console.WriteLine;
+            automaticCacheDrainer.OnSendingExceptionEvent += Console.WriteLine;
 
             return new Tuple<IViewStore, IDisposable>(
                 new ViewStoreCache(
                     _realViewStore,
                     outgoingCache,
                     _cacheItemExpirationPeriod),
-                new AutomaticCacheDrainer(
-                    new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
-                    _cacheDrainPeriod)
-            );
+                automaticCacheDrainer);
         }
     }
 }

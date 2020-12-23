@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Abstractions;
 using Cache;
 using FluentAssertions;
 using Xunit;
@@ -13,7 +11,7 @@ namespace Tests
     public sealed class StoreCacheTests
     {
         private readonly InMemoryStore _realStore = new();
-        private readonly ConcurrentDictionary<IViewId, IView> _outgoingCache = new();
+        private readonly OutgoingCache _outgoingCache = new();
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly ViewStoreCache _viewStoreCache;
 
@@ -27,7 +25,7 @@ namespace Tests
         public async Task saved_view_is_in_real_store_after_drain()
         {
             await _viewStoreCache.SaveAsync(TestViewId1, TestView1);
-            _manualCacheDrainer.DrainCache();
+            _manualCacheDrainer.TryDrainCache();
             var actualView = await _realStore.ReadAsync<TestView>(TestViewId1);
             actualView.Should().Be(TestView1);
         }

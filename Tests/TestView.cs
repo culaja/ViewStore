@@ -1,27 +1,28 @@
 ﻿using System;
 using Abstractions;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Tests
 {
+    [BsonIgnoreExtraElements]
     public sealed class TestView : IView, IEquatable<TestView>
     {
         public static TestView TestView1 = new TestView(nameof(TestView1));
         public static TestView TestView2 = new TestView(nameof(TestView2));
-        
-        private readonly string _id;
+        public string SomeInfo { get; }
 
-        private TestView(string id)
+        public TestView(string someInfo)
         {
-            _id = id;
+            SomeInfo = someInfo;
         }
-
-        public override string ToString() => _id;
+        
+        public override string ToString() => SomeInfo;
 
         public bool Equals(TestView? other)
         {
             if (other != null)
             {
-                return _id == other._id;
+                return SomeInfo == other.SomeInfo;
             }
 
             return false;

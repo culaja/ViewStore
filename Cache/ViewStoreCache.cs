@@ -10,12 +10,12 @@ namespace Cache
     {
         private readonly IViewStore _next;
         private readonly MemoryCache _readCache = MemoryCache.Default;
-        private readonly ConcurrentDictionary<IViewId, IView> _outgoingCache;
+        private readonly OutgoingCache _outgoingCache;
         private readonly TimeSpan _expirationPeriod;
 
         public ViewStoreCache(
             IViewStore next,
-            ConcurrentDictionary<IViewId, IView> outgoingCache,
+            OutgoingCache outgoingCache,
             TimeSpan expirationPeriod)
         {
             _next = next;
@@ -41,7 +41,7 @@ namespace Cache
 
         public Task SaveAsync<T>(IViewId viewId, T view) where T : IView
         {
-            _outgoingCache.AddOrUpdate(viewId, view, (_, _) => (IView)view);
+            _outgoingCache.AddOrUpdate(viewId, view);
             _readCache.Set(new CacheItem(viewId.ToString(), view), new CacheItemPolicy {SlidingExpiration = _expirationPeriod});
             return Task.CompletedTask;
         }

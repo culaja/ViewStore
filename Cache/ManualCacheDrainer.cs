@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abstractions;
@@ -8,12 +9,15 @@ namespace Cache
     public sealed class ManualCacheDrainer
     {
         private readonly IViewStore _destinationViewStore;
-        private readonly ConcurrentDictionary<IViewId, IView> _outgoingCache;
+        private readonly OutgoingCache _outgoingCache;
         private readonly int _batchSize;
+        
+        public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
+        public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public ManualCacheDrainer(
             IViewStore destinationViewStore,
-            ConcurrentDictionary<IViewId, IView> outgoingCache,
+            OutgoingCache outgoingCache,
             int batchSize)
         {
             _destinationViewStore = destinationViewStore;
@@ -21,25 +25,28 @@ namespace Cache
             _batchSize = batchSize;
         }
 
-        public int ItemsToDrain => _outgoingCache.Count;
-
-        public void DrainCache()
+        public int TryDrainCache()
         {
-            SendOutgoingCache();
-            ClearOutgoingCache();
+            var cachedItems = _outgoingCache.Clear();
+            DrainCache(cachedItems);
+            return cachedItems.Count;
         }
-        
-        private void SendOutgoingCache()
+
+        private void DrainCache(IReadOnlyList<KeyValuePair<IViewId, IView>> cachedItems)
         {
-            foreach (var batch in _outgoingCache.Batch(_batchSize))
+            try
             {
-                Task.WhenAll(batch.Select(kvp => _destinationViewStore.SaveAsync<IView>(kvp.Key, kvp.Value))).Wait();
+                foreach (var batch in cachedItems.Batch(_batchSize))
+                {
+                    Task.WhenAll(batch.Select(kvp => _destinationViewStore.SaveAsync(kvp.Key, kvp.Value))).Wait();
+                }
+                OnDrainFinishedEvent?.Invoke(cachedItems.Count);
             }
-        }
-
-        private void ClearOutgoingCache()
-        {
-            _outgoingCache.Clear();
+            catch (Exception e)
+            {
+                OnSendingExceptionEvent?.Invoke(e);
+                DrainCache(cachedItems);
+            }
         }
     }
 }

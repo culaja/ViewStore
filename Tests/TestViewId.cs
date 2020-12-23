@@ -19,12 +19,19 @@ namespace Tests
 
         public bool Equals(TestViewId? other)
         {
-            if (other != null)
-            {
-                return _id == other._id;
-            }
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return _id == other._id;
+        }
 
-            return false;
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TestViewId other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return _id.GetHashCode();
         }
     }
 }
