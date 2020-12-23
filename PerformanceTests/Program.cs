@@ -23,10 +23,10 @@ namespace PerformanceTests
             sw.Start();
             using (tuple.Item2)
             {
-                for (var i = 0; i < 100; i++)
+                for (var i = 0; i < 21900; i++)
                 {
                     tuple.Item1.Save(new TestViewId(i.ToString()), new TestView("N/A"));
-                    for (var j = 0; j < 100000; ++j)
+                    for (var j = 0; j < 100; ++j)
                     {
                         tuple.Item1.Read<TestView>(new TestViewId(i.ToString()));
                         tuple.Item1.Save(new TestViewId(i.ToString()), new TestView($"M{j}"));
