@@ -34,18 +34,23 @@ namespace Cache
 
         private void DrainCache(IReadOnlyList<KeyValuePair<IViewId, IView>> cachedItems)
         {
+            foreach (var batch in cachedItems.Batch(_batchSize))
+            {
+                SendBatch(batch.ToList());
+            }
+            OnDrainFinishedEvent?.Invoke(cachedItems.Count);
+        }
+
+        private void SendBatch(IReadOnlyList<KeyValuePair<IViewId, IView>> batch)
+        {
             try
             {
-                foreach (var batch in cachedItems.Batch(_batchSize))
-                {
-                    Task.WhenAll(batch.Select(kvp => _destinationViewStore.SaveAsync(kvp.Key, kvp.Value))).Wait();
-                }
-                OnDrainFinishedEvent?.Invoke(cachedItems.Count);
+                Task.WhenAll(batch.Select(kvp => _destinationViewStore.SaveAsync(kvp.Key, kvp.Value))).Wait();
             }
             catch (Exception e)
             {
                 OnSendingExceptionEvent?.Invoke(e);
-                DrainCache(cachedItems);
+                SendBatch(batch);
             }
         }
     }
