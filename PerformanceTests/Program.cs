@@ -21,18 +21,25 @@ namespace PerformanceTests
             sw.Start();
             using (tuple.Item2)
             {
-                for (var i = 0; i < 21900; i++)
+                var startGlobalVersion = tuple.Item1.ReadGlobalVersion<UsersLoggedInInHour>() ?? 1;
+                Console.WriteLine($"Start global version: {startGlobalVersion}");
+                var documentIdCounter = startGlobalVersion % 100;
+                
+                for (var nextGlobalVersion = startGlobalVersion; nextGlobalVersion <= 2190000; nextGlobalVersion++)
                 {
-                    for (var j = 0; j < 100; ++j)
+                    var documentId = new UsersLoggedInInHourId(documentIdCounter.ToString());
+                    if (nextGlobalVersion % 100 == 0)
                     {
-                        var optionalView = tuple.Item1.Read<UsersLoggedInInHour>(new UsersLoggedInInHourId(i.ToString()));
-                        if (optionalView == null)
-                        {
-                            optionalView = new UsersLoggedInInHour(i.ToString());
-                        }
-                    
-                        tuple.Item1.Save(new UsersLoggedInInHourId(i.ToString()), optionalView.Increment());
+                        documentIdCounter++;
                     }
+                    
+                    var optionalView = tuple.Item1.Read<UsersLoggedInInHour>(documentId);
+                    if (optionalView == null)
+                    {
+                        optionalView = new UsersLoggedInInHour(documentId.ToString(), nextGlobalVersion);
+                    }
+                    
+                    tuple.Item1.Save(documentId, optionalView.Increment(nextGlobalVersion));
                 }
             }
             sw.Stop();

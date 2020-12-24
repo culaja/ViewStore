@@ -2,5 +2,6 @@
 {
     public interface IView
     {
+        public long GlobalVersion { get; }
     }
 }

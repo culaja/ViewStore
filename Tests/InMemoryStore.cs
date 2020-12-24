@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abstractions;
 
@@ -7,6 +8,10 @@ namespace Tests
     internal sealed class InMemoryStore : IViewStore
     {
         private readonly Dictionary<IViewId, IView> _dictionary = new();
+
+        public long? ReadGlobalVersion<T>() where T: IView=> _dictionary.Values.Max(v => v.GlobalVersion);
+
+        public Task<long?> ReadGlobalVersionAsync<T>() where T: IView => Task.FromResult(ReadGlobalVersion<T>());
 
         public T? Read<T>(IViewId viewId) where T : IView
         {

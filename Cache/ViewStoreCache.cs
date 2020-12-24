@@ -22,6 +22,10 @@ namespace Cache
             _expirationPeriod = expirationPeriod;
         }
 
+        public long? ReadGlobalVersion<T>()  where T : IView => _next.ReadGlobalVersion<T>();
+
+        public Task<long?> ReadGlobalVersionAsync<T>() where T : IView => _next.ReadGlobalVersionAsync<T>();
+
         public T? Read<T>(IViewId viewId) where T : IView
         {
             CacheItem? optionalCacheItem = _readCache.GetCacheItem(viewId.ToString());

@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Abstractions;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Stores.MongoDb
 {
     public delegate string MongoCollectionNameSupplier(string viewName);
-    
+
     public sealed class MongoDbViewStore : IViewStore 
     {
         private readonly IMongoDatabase _mongoDatabase;
@@ -21,6 +23,21 @@ namespace Stores.MongoDb
 
         private IMongoCollection<T> CollectionFor<T>(string typeName) where T : IView
             => _mongoDatabase.GetCollection<T>(_mongoCollectionNameSupplier(typeName));
+
+        public long? ReadGlobalVersion<T>() where T : IView =>
+            CollectionFor<T>(typeof(T).Name)
+                .AsQueryable()
+                .OrderByDescending(t => t.GlobalVersion)
+                .FirstOrDefault()?.GlobalVersion;
+
+        public async Task<long?> ReadGlobalVersionAsync<T>() where T : IView
+        {
+            var lastT = await CollectionFor<T>(typeof(T).Name)
+                .AsQueryable()
+                .OrderByDescending(t => t.GlobalVersion)
+                .FirstOrDefaultAsync();
+            return lastT?.GlobalVersion;
+        }
 
         public T? Read<T>(IViewId viewId) where T : IView =>
             (T?) CollectionFor<T>(typeof(T).Name)
