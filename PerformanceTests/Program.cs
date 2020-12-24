@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Abstractions;
 using Cache;
 using MongoDB.Driver;
 using Stores.MongoDb;
-using Tests;
 
 namespace PerformanceTests
 {
@@ -13,7 +11,7 @@ namespace PerformanceTests
     {
         static void Main()
         {
-            //await ExecuteTest(ClotMongoViewStore());
+            //ExecuteTest(ClotMongoViewStore());
             ExecuteTest(CachedMongoViewStore());
         }
 
@@ -25,11 +23,15 @@ namespace PerformanceTests
             {
                 for (var i = 0; i < 21900; i++)
                 {
-                    tuple.Item1.Save(new TestViewId(i.ToString()), new TestView("N/A"));
                     for (var j = 0; j < 100; ++j)
                     {
-                        tuple.Item1.Read<TestView>(new TestViewId(i.ToString()));
-                        tuple.Item1.Save(new TestViewId(i.ToString()), new TestView($"M{j}"));
+                        var optionalView = tuple.Item1.Read<UsersLoggedInInHour>(new UsersLoggedInInHourId(i.ToString()));
+                        if (optionalView == null)
+                        {
+                            optionalView = new UsersLoggedInInHour(i.ToString());
+                        }
+                    
+                        tuple.Item1.Save(new UsersLoggedInInHourId(i.ToString()), optionalView.Increment());
                     }
                 }
             }
@@ -57,7 +59,7 @@ namespace PerformanceTests
         {
             return ViewStoreCacheFactory.New()
                 .WithCacheItemExpirationPeriod(TimeSpan.FromHours(1))
-                .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(100))
+                .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
                 .WithCacheDrainBatchSize(500)
                 .For(ClotMongoViewStore().Item1)
                 .Build();
