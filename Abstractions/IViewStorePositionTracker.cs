@@ -2,12 +2,12 @@
 
 namespace Abstractions
 {
-    public interface IViewStorePositionTracker<T> where T : IView
+    public interface IViewStorePositionTracker
     {
-        long ReadLastGlobalVersion();
-        Task<long> ReadLastGlobalVersionAsync();
+        long? ReadLastGlobalVersion();
+        Task<long?> ReadLastGlobalVersionAsync();
 
-        void StoreLastGlobalVersionFrom(T view);
-        Task StoreLastGlobalVersionFromAsync(T view);
+        void StoreLastGlobalVersion(long globalPosition);
+        Task StoreLastGlobalVersionFromAsync(long globalPosition);
     }
 }
