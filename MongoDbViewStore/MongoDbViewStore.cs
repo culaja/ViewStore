@@ -1,57 +1,31 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Abstractions;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 namespace Stores.MongoDb
 {
-    public delegate string MongoCollectionNameSupplier(string viewName);
-
     public sealed class MongoDbViewStore<T> : IViewStore<T> where T : IView 
     {
-        private readonly IMongoDatabase _mongoDatabase;
-        private readonly MongoCollectionNameSupplier _mongoCollectionNameSupplier;
+        private readonly IMongoCollection<T> _collection;
 
-        public MongoDbViewStore(
-            IMongoDatabase mongoDatabase,
-            MongoCollectionNameSupplier mongoCollectionNameSupplier)
+        public MongoDbViewStore(IMongoCollection<T> collection)
         {
-            _mongoDatabase = mongoDatabase;
-            _mongoCollectionNameSupplier = mongoCollectionNameSupplier;
+            _collection = collection;
         }
-
-        private IMongoCollection<T> Collection()
-            => _mongoDatabase.GetCollection<T>(_mongoCollectionNameSupplier(typeof(T).Name));
-
-        public long? ReadGlobalVersion() =>
-            Collection()
-                .AsQueryable()
-                .OrderByDescending(t => t.GlobalVersion)
-                .FirstOrDefault()?.GlobalVersion;
-
-        public async Task<long?> ReadGlobalVersionAsync()
-        {
-            var lastT = await Collection()
-                .AsQueryable()
-                .OrderByDescending(t => t.GlobalVersion)
-                .FirstOrDefaultAsync();
-            return lastT?.GlobalVersion;
-        }
-
+        
         public T? Read(string viewId) =>
-            (T?) Collection()
+            (T?) _collection
                 .Find(Builders<T>.Filter.Eq("_id", viewId))
                 .FirstOrDefault();
 
         public async Task<T?> ReadAsync(string viewId) =>
-            (T?)await Collection()
+            (T?)await _collection
                 .Find(Builders<T>.Filter.Eq("_id", viewId))
                 .FirstOrDefaultAsync();
 
         public void Save(T view)
         {
-            var result = Collection().ReplaceOne(
+            var result = _collection.ReplaceOne(
                 Builders<T>.Filter.Eq("_id", view.Id),
                 view,
                 new ReplaceOptions { IsUpsert = true });
@@ -64,7 +38,7 @@ namespace Stores.MongoDb
 
         public async Task SaveAsync(T view)
         {
-            var result = await Collection().ReplaceOneAsync(
+            var result = await _collection.ReplaceOneAsync(
                 Builders<T>.Filter.Eq("_id", view.Id),
                 view,
                 new ReplaceOptions { IsUpsert = true });

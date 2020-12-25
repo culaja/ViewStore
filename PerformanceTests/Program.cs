@@ -21,7 +21,7 @@ namespace PerformanceTests
             sw.Start();
             using (t.disposable)
             {
-                var startGlobalVersion = t.viewStore.ReadGlobalVersion() ?? 1;
+                var startGlobalVersion = 1;
                 Console.WriteLine($"Start global version: {startGlobalVersion}");
                 var documentIdCounter = startGlobalVersion % 100;
                 
@@ -58,7 +58,8 @@ namespace PerformanceTests
         {
             var mongoClient = new MongoClient("mongodb://localhost:27017/TestDb");
             return (
-                new MongoDbViewStore<UsersLoggedInInHour>(mongoClient.GetDatabase("TestDb"), viewName => viewName),
+                new MongoDbViewStore<UsersLoggedInInHour>(
+                    mongoClient.GetDatabase("TestDb").GetCollection<UsersLoggedInInHour>(nameof(UsersLoggedInInHour))),
                 new NoDisposable());
         }
 
