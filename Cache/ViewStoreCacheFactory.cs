@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Abstractions;
 
 namespace Cache
@@ -9,7 +10,9 @@ namespace Cache
         private TimeSpan _cacheItemExpirationPeriod = TimeSpan.Zero;
         private TimeSpan _cacheDrainPeriod = TimeSpan.Zero;
         private int _cacheDrainBatchSize;
-        
+        private Action<IReadOnlyList<T>>? _cacheDrainedCallback;
+        private Action<Exception>? _onDrainAttemptFailedCallback;
+
         public static ViewStoreCacheFactory<T> New() => new();
 
         public ViewStoreCacheFactory<T> For(IViewStore<T> viewStore)
@@ -41,6 +44,18 @@ namespace Cache
             return this;
         }
 
+        public ViewStoreCacheFactory<T> UseCallbackWhenDrainFinished(Action<IReadOnlyList<T>> callback)
+        {
+            _cacheDrainedCallback = callback;
+            return this;
+        }
+
+        public ViewStoreCacheFactory<T> UseCallbackOnDrainAttemptFailed(Action<Exception> callback)
+        {
+            _onDrainAttemptFailedCallback = callback;
+            return this;
+        }
+
         public (IViewStore<T>, IDisposable) Build()
         {
             if (_realViewStore == null)
@@ -54,8 +69,8 @@ namespace Cache
                 new ManualCacheDrainer<T>(_realViewStore, outgoingCache, _cacheDrainBatchSize),
                 _cacheDrainPeriod);
 
-            automaticCacheDrainer.OnDrainFinishedEvent += Console.WriteLine;
-            automaticCacheDrainer.OnSendingExceptionEvent += Console.WriteLine;
+            automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views);
+            automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
             return (
                 new ViewStoreCache<T>(

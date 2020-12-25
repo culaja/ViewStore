@@ -13,7 +13,7 @@ namespace Cache
         private readonly int _batchSize;
         
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
-        public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
+        public event OnDrainFinishedDelegate<T>? OnDrainFinishedEvent;
 
         public ManualCacheDrainer(
             IViewStore<T> destinationViewStore,
@@ -38,7 +38,11 @@ namespace Cache
             {
                 SendBatch(batch.ToList());
             }
-            OnDrainFinishedEvent?.Invoke(cachedItems.Count);
+
+            if (cachedItems.Count > 0)
+            {
+                OnDrainFinishedEvent?.Invoke(cachedItems);
+            }
         }
 
         private void SendBatch(IReadOnlyList<T> batch)

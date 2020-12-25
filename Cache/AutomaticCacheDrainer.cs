@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Abstractions;
 
 namespace Cache
 {
     public delegate void OnSendingExceptionDelegate(Exception exception);
-    public delegate void OnDrainFinishedDelegate(int count);
+    public delegate void OnDrainFinishedDelegate<T>(IReadOnlyList<T> views) where T : IView;
     
     public sealed class AutomaticCacheDrainer<T> : IDisposable where T : IView
     {
@@ -15,7 +16,7 @@ namespace Cache
         private bool _isStopRequested;
 
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
-        public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
+        public event OnDrainFinishedDelegate<T>? OnDrainFinishedEvent;
 
         public AutomaticCacheDrainer(
             ManualCacheDrainer<T> manualCacheDrainer,
@@ -24,7 +25,7 @@ namespace Cache
         {
             _manualCacheDrainer = manualCacheDrainer;
             manualCacheDrainer.OnSendingExceptionEvent += exception => OnSendingExceptionEvent?.Invoke(exception);
-            manualCacheDrainer.OnDrainFinishedEvent += count => OnDrainFinishedEvent?.Invoke(count);
+            manualCacheDrainer.OnDrainFinishedEvent += views => OnDrainFinishedEvent?.Invoke(views);
             _drainPeriod = drainPeriod;
             _worker = new Thread(Work);
             _worker.Start();

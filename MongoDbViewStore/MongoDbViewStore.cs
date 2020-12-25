@@ -8,9 +8,9 @@ namespace Stores.MongoDb
     {
         private readonly IMongoCollection<T> _collection;
 
-        public MongoDbViewStore(IMongoCollection<T> collection)
+        public MongoDbViewStore(IMongoDatabase mongoDatabase, string collectionName)
         {
-            _collection = collection;
+            _collection = mongoDatabase.GetCollection<T>(collectionName);
         }
         
         public T? Read(string viewId) =>
