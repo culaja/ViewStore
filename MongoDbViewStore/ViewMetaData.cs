@@ -5,12 +5,12 @@
         public const string VIewMetaDataId = nameof(VIewMetaDataId);
         
         public string Id { get; }
-        public long LastKnownGlobalVersion { get; }
+        public long LastKnownPosition { get; }
 
-        public ViewMetaData(string id, long lastKnownGlobalVersion)
+        public ViewMetaData(string id, long lastKnownPosition)
         {
             Id = id;
-            LastKnownGlobalVersion = lastKnownGlobalVersion;
+            LastKnownPosition = lastKnownPosition;
         }
 
         public static ViewMetaData ViewMetaDataFrom(long lastKnownGlobalVersion) =>

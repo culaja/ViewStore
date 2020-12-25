@@ -4,10 +4,10 @@ namespace Abstractions
 {
     public interface IViewStorePositionTracker
     {
-        long? ReadLastGlobalVersion();
-        Task<long?> ReadLastGlobalVersionAsync();
+        long? ReadLastKnownPosition();
+        Task<long?> ReadLastKnownPositionAsync();
 
-        void StoreLastGlobalVersion(long globalPosition);
-        Task StoreLastGlobalVersionFromAsync(long globalPosition);
+        void StoreLastKnownPosition(long position);
+        Task StoreLastKnownPositionAsync(long position);
     }
 }

@@ -14,23 +14,23 @@ namespace Stores.MongoDb
             _collection = mongoDatabase.GetCollection<ViewMetaData>(collectionName);
         }
         
-        public long? ReadLastGlobalVersion() =>
+        public long? ReadLastKnownPosition() =>
             _collection
                 .Find(Builders<ViewMetaData>.Filter.Eq("_id", VIewMetaDataId))
-                .FirstOrDefault()?.LastKnownGlobalVersion;
+                .FirstOrDefault()?.LastKnownPosition;
 
-        public async Task<long?> ReadLastGlobalVersionAsync()
+        public async Task<long?> ReadLastKnownPositionAsync()
         {
             var resultCollection = await _collection
                 .FindAsync(Builders<ViewMetaData>.Filter.Eq("_id", VIewMetaDataId));
-            return resultCollection.FirstOrDefault()?.LastKnownGlobalVersion;
+            return resultCollection.FirstOrDefault()?.LastKnownPosition;
         }
 
-        public void StoreLastGlobalVersion(long globalPosition)
+        public void StoreLastKnownPosition(long position)
         {
             var result = _collection.ReplaceOne(
                 Builders<ViewMetaData>.Filter.Eq("_id", VIewMetaDataId),
-                ViewMetaDataFrom(globalPosition),
+                ViewMetaDataFrom(position),
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
@@ -39,11 +39,11 @@ namespace Stores.MongoDb
             }
         }
 
-        public async Task StoreLastGlobalVersionFromAsync(long globalPosition)
+        public async Task StoreLastKnownPositionAsync(long position)
         {
             var result = await _collection.ReplaceOneAsync(
                 Builders<ViewMetaData>.Filter.Eq("_id", VIewMetaDataId),
-                ViewMetaDataFrom(globalPosition),
+                ViewMetaDataFrom(position),
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
