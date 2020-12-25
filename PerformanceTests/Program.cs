@@ -15,13 +15,13 @@ namespace PerformanceTests
             ExecuteTest(CachedMongoViewStore());
         }
 
-        private static void ExecuteTest(Tuple<IViewStore<UsersLoggedInInHour>, IDisposable> tuple)
+        private static void ExecuteTest((IViewStore<UsersLoggedInInHour> viewStore, IDisposable disposable) t)
         {
             var sw = new Stopwatch();
             sw.Start();
-            using (tuple.Item2)
+            using (t.disposable)
             {
-                var startGlobalVersion = tuple.Item1.ReadGlobalVersion() ?? 1;
+                var startGlobalVersion = t.viewStore.ReadGlobalVersion() ?? 1;
                 Console.WriteLine($"Start global version: {startGlobalVersion}");
                 var documentIdCounter = startGlobalVersion % 100;
                 
@@ -33,18 +33,18 @@ namespace PerformanceTests
                         documentIdCounter++;
                     }
                     
-                    var optionalView = tuple.Item1.Read(documentId);
+                    var optionalView = t.viewStore.Read(documentId);
                     if (optionalView == null)
                     {
                         optionalView = new UsersLoggedInInHour(documentId.ToString(), nextGlobalVersion);
                     }
                     
-                    tuple.Item1.Save(optionalView.Increment(nextGlobalVersion));
+                    t.viewStore.Save(optionalView.Increment(nextGlobalVersion));
                 }
             }
             sw.Stop();
             
-            Console.WriteLine($"[{tuple.Item1.GetType().Name}] {sw.ElapsedMilliseconds / 1000m}");
+            Console.WriteLine($"[{t.viewStore.GetType().Name}] {sw.ElapsedMilliseconds / 1000m}");
         }
 
         private class NoDisposable : IDisposable
@@ -54,15 +54,15 @@ namespace PerformanceTests
             }
         }
 
-        private static Tuple<IViewStore<UsersLoggedInInHour>, IDisposable> ClotMongoViewStore()
+        private static (IViewStore<UsersLoggedInInHour>, IDisposable) ClotMongoViewStore()
         {
             var mongoClient = new MongoClient("mongodb://localhost:27017/TestDb");
-            return new Tuple<IViewStore<UsersLoggedInInHour>, IDisposable>(
+            return (
                 new MongoDbViewStore<UsersLoggedInInHour>(mongoClient.GetDatabase("TestDb"), viewName => viewName),
                 new NoDisposable());
         }
 
-        private static Tuple<IViewStore<UsersLoggedInInHour>, IDisposable> CachedMongoViewStore()
+        private static (IViewStore<UsersLoggedInInHour>, IDisposable) CachedMongoViewStore()
         {
             return ViewStoreCacheFactory<UsersLoggedInInHour>.New()
                 .WithCacheItemExpirationPeriod(TimeSpan.FromHours(1))

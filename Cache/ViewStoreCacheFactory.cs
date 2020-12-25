@@ -41,7 +41,7 @@ namespace Cache
             return this;
         }
 
-        public Tuple<IViewStore<T>, IDisposable> Build()
+        public (IViewStore<T>, IDisposable) Build()
         {
             if (_realViewStore == null)
             {
@@ -57,7 +57,7 @@ namespace Cache
             automaticCacheDrainer.OnDrainFinishedEvent += Console.WriteLine;
             automaticCacheDrainer.OnSendingExceptionEvent += Console.WriteLine;
 
-            return new Tuple<IViewStore<T>, IDisposable>(
+            return (
                 new ViewStoreCache<T>(
                     _realViewStore,
                     outgoingCache,
