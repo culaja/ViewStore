@@ -2,6 +2,7 @@
 {
     public interface IView
     {
-        public long GlobalVersion { get; }
+        string Id { get; } 
+        long GlobalVersion { get; }
     }
 }

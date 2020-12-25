@@ -8,7 +8,10 @@ namespace PerformanceTests
         public long GlobalVersion { get; private set; }
         public int NumberOfLoggedIns { get; private set; }
 
-        public UsersLoggedInInHour(string id, long globalVersion, int numberOfLoggedIns = 0)
+        public UsersLoggedInInHour(
+            string id,
+            long globalVersion,
+            int numberOfLoggedIns = 0)
         {
             Id = id;
             GlobalVersion = globalVersion;

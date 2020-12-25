@@ -8,7 +8,7 @@ namespace Stores.MongoDb
 {
     public delegate string MongoCollectionNameSupplier(string viewName);
 
-    public sealed class MongoDbViewStore : IViewStore 
+    public sealed class MongoDbViewStore<T> : IViewStore<T> where T : IView 
     {
         private readonly IMongoDatabase _mongoDatabase;
         private readonly MongoCollectionNameSupplier _mongoCollectionNameSupplier;
@@ -21,57 +21,57 @@ namespace Stores.MongoDb
             _mongoCollectionNameSupplier = mongoCollectionNameSupplier;
         }
 
-        private IMongoCollection<T> CollectionFor<T>(string typeName) where T : IView
-            => _mongoDatabase.GetCollection<T>(_mongoCollectionNameSupplier(typeName));
+        private IMongoCollection<T> Collection()
+            => _mongoDatabase.GetCollection<T>(_mongoCollectionNameSupplier(typeof(T).Name));
 
-        public long? ReadGlobalVersion<T>() where T : IView =>
-            CollectionFor<T>(typeof(T).Name)
+        public long? ReadGlobalVersion() =>
+            Collection()
                 .AsQueryable()
                 .OrderByDescending(t => t.GlobalVersion)
                 .FirstOrDefault()?.GlobalVersion;
 
-        public async Task<long?> ReadGlobalVersionAsync<T>() where T : IView
+        public async Task<long?> ReadGlobalVersionAsync()
         {
-            var lastT = await CollectionFor<T>(typeof(T).Name)
+            var lastT = await Collection()
                 .AsQueryable()
                 .OrderByDescending(t => t.GlobalVersion)
                 .FirstOrDefaultAsync();
             return lastT?.GlobalVersion;
         }
 
-        public T? Read<T>(IViewId viewId) where T : IView =>
-            (T?) CollectionFor<T>(typeof(T).Name)
-                .Find(Builders<T>.Filter.Eq("_id", viewId.ToString()))
+        public T? Read(string viewId) =>
+            (T?) Collection()
+                .Find(Builders<T>.Filter.Eq("_id", viewId))
                 .FirstOrDefault();
 
-        public async Task<T?> ReadAsync<T>(IViewId viewId) where T : IView =>
-            (T?)await CollectionFor<T>(typeof(T).Name)
-                .Find(Builders<T>.Filter.Eq("_id", viewId.ToString()))
+        public async Task<T?> ReadAsync(string viewId) =>
+            (T?)await Collection()
+                .Find(Builders<T>.Filter.Eq("_id", viewId))
                 .FirstOrDefaultAsync();
 
-        public void Save<T>(IViewId viewId, T view) where T : IView
+        public void Save(T view)
         {
-            var result = CollectionFor<T>(view.GetType().Name).ReplaceOne(
-                Builders<T>.Filter.Eq("_id", viewId.ToString()),
+            var result = Collection().ReplaceOne(
+                Builders<T>.Filter.Eq("_id", view.Id),
                 view,
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
             {
-                throw new MongoDbWrongMatchedCountException(viewId, result.MatchedCount);
+                throw new MongoDbWrongMatchedCountException(view.Id, result.MatchedCount);
             }
         }
 
-        public async Task SaveAsync<T>(IViewId viewId, T view) where T : IView
+        public async Task SaveAsync(T view)
         {
-            var result = await CollectionFor<T>(view.GetType().Name).ReplaceOneAsync(
-                Builders<T>.Filter.Eq("_id", viewId.ToString()),
+            var result = await Collection().ReplaceOneAsync(
+                Builders<T>.Filter.Eq("_id", view.Id),
                 view,
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
             {
-                throw new MongoDbWrongMatchedCountException(viewId, result.MatchedCount);
+                throw new MongoDbWrongMatchedCountException(view.Id, result.MatchedCount);
             }
         }
     }

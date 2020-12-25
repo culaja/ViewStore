@@ -2,15 +2,15 @@
 
 namespace Abstractions
 {
-    public interface IViewStore
+    public interface IViewStore<T> where T : IView
     {
-        long? ReadGlobalVersion<T>() where T : IView;
-        Task<long?> ReadGlobalVersionAsync<T>() where T : IView;
-        
-        T? Read<T>(IViewId viewId) where T : IView;
-        Task<T?> ReadAsync<T>(IViewId viewId) where T : IView;
+        long? ReadGlobalVersion();
+        Task<long?> ReadGlobalVersionAsync();
 
-        void Save<T>(IViewId viewId, T view) where T : IView;
-        Task SaveAsync<T>(IViewId viewId, T view) where T : IView;
+        T? Read(string viewId);
+        Task<T?> ReadAsync(string viewId);
+
+        void Save(T view);
+        Task SaveAsync(T view);
     }
 }

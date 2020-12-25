@@ -5,16 +5,16 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class ViewStoreCache : IViewStore
+    public sealed class ViewStoreCache<T> : IViewStore<T> where T : IView
     {
-        private readonly IViewStore _next;
+        private readonly IViewStore<T> _next;
         private readonly MemoryCache _readCache = MemoryCache.Default;
-        private readonly OutgoingCache _outgoingCache;
+        private readonly OutgoingCache<T> _outgoingCache;
         private readonly TimeSpan _expirationPeriod;
 
         public ViewStoreCache(
-            IViewStore next,
-            OutgoingCache outgoingCache,
+            IViewStore<T> next,
+            OutgoingCache<T> outgoingCache,
             TimeSpan expirationPeriod)
         {
             _next = next;
@@ -22,13 +22,13 @@ namespace Cache
             _expirationPeriod = expirationPeriod;
         }
 
-        public long? ReadGlobalVersion<T>()  where T : IView => _next.ReadGlobalVersion<T>();
+        public long? ReadGlobalVersion() => _next.ReadGlobalVersion();
 
-        public Task<long?> ReadGlobalVersionAsync<T>() where T : IView => _next.ReadGlobalVersionAsync<T>();
+        public Task<long?> ReadGlobalVersionAsync() => _next.ReadGlobalVersionAsync();
 
-        public T? Read<T>(IViewId viewId) where T : IView
+        public T? Read(string viewId)
         {
-            CacheItem? optionalCacheItem = _readCache.GetCacheItem(viewId.ToString());
+            CacheItem? optionalCacheItem = _readCache.GetCacheItem(viewId);
             if (optionalCacheItem != null)
             {
                 return (T?) optionalCacheItem.Value;
@@ -39,20 +39,20 @@ namespace Cache
                 return (T?) view;
             }
             
-            return _next.Read<T>(viewId);
+            return _next.Read(viewId);
         }
 
-        public Task<T?> ReadAsync<T>(IViewId viewId) where T : IView => Task.FromResult(Read<T>(viewId));
+        public Task<T?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
 
-        public void Save<T>(IViewId viewId, T view) where T : IView
+        public void Save(T view)
         {
-            _outgoingCache.AddOrUpdate(viewId, view);
-            _readCache.Set(new CacheItem(viewId.ToString(), view), new CacheItemPolicy {SlidingExpiration = _expirationPeriod});
+            _outgoingCache.AddOrUpdate(view);
+            _readCache.Set(new CacheItem(view.Id, view), new CacheItemPolicy {SlidingExpiration = _expirationPeriod});
         }
 
-        public Task SaveAsync<T>(IViewId viewId, T view) where T : IView
+        public Task SaveAsync(T view)
         {
-            Save(viewId, view);
+            Save(view);
             return Task.CompletedTask;
         }
     }

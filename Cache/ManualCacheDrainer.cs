@@ -6,18 +6,18 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class ManualCacheDrainer
+    public sealed class ManualCacheDrainer<T> where T : IView
     {
-        private readonly IViewStore _destinationViewStore;
-        private readonly OutgoingCache _outgoingCache;
+        private readonly IViewStore<T> _destinationViewStore;
+        private readonly OutgoingCache<T> _outgoingCache;
         private readonly int _batchSize;
         
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
         public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public ManualCacheDrainer(
-            IViewStore destinationViewStore,
-            OutgoingCache outgoingCache,
+            IViewStore<T> destinationViewStore,
+            OutgoingCache<T> outgoingCache,
             int batchSize)
         {
             _destinationViewStore = destinationViewStore;
@@ -32,7 +32,7 @@ namespace Cache
             return cachedItems.Count;
         }
 
-        private void DrainCache(IReadOnlyList<KeyValuePair<IViewId, IView>> cachedItems)
+        private void DrainCache(IReadOnlyList<T> cachedItems)
         {
             foreach (var batch in cachedItems.Batch(_batchSize))
             {
@@ -41,11 +41,11 @@ namespace Cache
             OnDrainFinishedEvent?.Invoke(cachedItems.Count);
         }
 
-        private void SendBatch(IReadOnlyList<KeyValuePair<IViewId, IView>> batch)
+        private void SendBatch(IReadOnlyList<T> batch)
         {
             try
             {
-                Task.WhenAll(batch.Select(kvp => _destinationViewStore.SaveAsync(kvp.Key, kvp.Value))).Wait();
+                Task.WhenAll(batch.Select(view => _destinationViewStore.SaveAsync(view))).Wait();
             }
             catch (Exception e)
             {

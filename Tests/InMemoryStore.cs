@@ -5,15 +5,15 @@ using Abstractions;
 
 namespace Tests
 {
-    internal sealed class InMemoryStore : IViewStore
+    internal sealed class InMemoryStore<T> : IViewStore<T> where T : IView
     {
-        private readonly Dictionary<IViewId, IView> _dictionary = new();
+        private readonly Dictionary<string, T> _dictionary = new();
 
-        public long? ReadGlobalVersion<T>() where T: IView=> _dictionary.Values.Max(v => v.GlobalVersion);
+        public long? ReadGlobalVersion() => _dictionary.Values.Max(v => v.GlobalVersion);
 
-        public Task<long?> ReadGlobalVersionAsync<T>() where T: IView => Task.FromResult(ReadGlobalVersion<T>());
+        public Task<long?> ReadGlobalVersionAsync() => Task.FromResult(ReadGlobalVersion());
 
-        public T? Read<T>(IViewId viewId) where T : IView
+        public T? Read(string viewId)
         {
             if (_dictionary.TryGetValue(viewId, out var view))
             {
@@ -23,16 +23,16 @@ namespace Tests
             return default;
         }
 
-        public Task<T?> ReadAsync<T>(IViewId viewId) where T : IView => Task.FromResult(Read<T>(viewId));
+        public Task<T?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
 
-        public void Save<T>(IViewId viewId, T view) where T : IView
+        public void Save(T view)
         {
-            _dictionary[viewId] = view;
+            _dictionary[view.Id] = view;
         }
 
-        public Task SaveAsync<T>(IViewId viewId, T view) where T : IView
+        public Task SaveAsync(T view)
         {
-            Save(viewId, view);
+            Save(view);
             return Task.CompletedTask;
         }
     }

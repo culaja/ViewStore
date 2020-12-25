@@ -4,20 +4,20 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class OutgoingCache
+    public sealed class OutgoingCache<T> where T : IView
     {
         private object _sync = new();
-        private Dictionary<IViewId, IView> _cache = new();
+        private Dictionary<string, T> _cache = new();
 
-        public void AddOrUpdate(IViewId viewId, IView view)
+        public void AddOrUpdate(T view)
         {
             lock (_sync)
             {
-                _cache[viewId] = view;
+                _cache[view.Id] = view;
             }
         }
 
-        public bool TryGetValue(IViewId viewId, out IView view)
+        public bool TryGetValue(string viewId, out T view)
         {
             lock (_sync)
             {
@@ -25,12 +25,12 @@ namespace Cache
             }
         }
 
-        public IReadOnlyList<KeyValuePair<IViewId, IView>> Clear()
+        public IReadOnlyList<T> Clear()
         {
             lock (_sync)
             {
-                var cachedItems = _cache.ToList();
-                _cache = new Dictionary<IViewId, IView>();
+                var cachedItems = _cache.Values.ToList();
+                _cache = new Dictionary<string, T>();
                 return cachedItems;
             }   
         }
