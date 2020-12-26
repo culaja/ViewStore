@@ -57,7 +57,7 @@ namespace ViewStore.Cache
             return this;
         }
 
-        public (IViewStore, IDisposable) Build()
+        public ViewStoreCache Build()
         {
             if (_realViewStore == null)
             {
@@ -73,12 +73,14 @@ namespace ViewStore.Cache
             automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
-            return (
-                new ViewStoreCache(
-                    _realViewStore,
-                    MemoryCache.Default, 
-                    outgoingCache,
-                    _cacheItemExpirationPeriod),
+            var viewStoreCacheInternal = new ViewStoreCacheInternal(
+                _realViewStore,
+                MemoryCache.Default,
+                outgoingCache,
+                _cacheItemExpirationPeriod);
+
+            return new ViewStoreCache(
+                viewStoreCacheInternal,
                 automaticCacheDrainer);
         }
     }

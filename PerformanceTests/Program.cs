@@ -16,7 +16,7 @@ namespace ViewStore.PerformanceTestsnceTests
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(UsersLoggedInInHour));
 
 
-            var (viewStore, disposable) = ViewStoreCacheFactory.New()
+            var viewStoreCache = ViewStoreCacheFactory.New()
                 .WithCacheItemExpirationPeriod(TimeSpan.FromHours(1))
                 .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
                 .WithCacheDrainBatchSize(500)
@@ -24,41 +24,40 @@ namespace ViewStore.PerformanceTestsnceTests
                 .UseCallbackWhenDrainFinished(drainedViews => Console.WriteLine(drainedViews.Count))
                 .Build();
 
-            using (disposable)
-            {
-                ExecuteTest(viewStore);
-            }
+            ExecuteTest(viewStoreCache);
         }
 
-        private static void ExecuteTest(IViewStore viewStore)
+        private static void ExecuteTest(ViewStoreCache viewStoreCache)
         {
             var sw = new Stopwatch();
             sw.Start();
-            
-            var startGlobalVersion = viewStore.ReadLastKnownPosition() ?? 1;
-            Console.WriteLine($"Start global version: {startGlobalVersion}");
-            var documentIdCounter = startGlobalVersion % 100;
-            
-            for (var nextGlobalVersion = startGlobalVersion; nextGlobalVersion <= 2190000; nextGlobalVersion++)
+
+            using (viewStoreCache)
             {
-                var documentId = documentIdCounter.ToString();
-                if (nextGlobalVersion % 100 == 0)
+                var startGlobalVersion = viewStoreCache.ReadLastKnownPosition() ?? 1;
+                Console.WriteLine($"Start global version: {startGlobalVersion}");
+                var documentIdCounter = startGlobalVersion % 100;
+            
+                for (var nextGlobalVersion = startGlobalVersion; nextGlobalVersion <= 2190000; nextGlobalVersion++)
                 {
-                    documentIdCounter++;
-                }
+                    var documentId = documentIdCounter.ToString();
+                    if (nextGlobalVersion % 100 == 0)
+                    {
+                        documentIdCounter++;
+                    }
                 
-                var optionalView = viewStore.Read<UsersLoggedInInHour>(documentId);
-                if (optionalView == null)
-                {
-                    optionalView = new UsersLoggedInInHour(documentId, nextGlobalVersion);
-                }
+                    var optionalView = viewStoreCache.Read<UsersLoggedInInHour>(documentId);
+                    if (optionalView == null)
+                    {
+                        optionalView = new UsersLoggedInInHour(documentId, nextGlobalVersion);
+                    }
                 
-                viewStore.Save(optionalView.Increment(nextGlobalVersion));
+                    viewStoreCache.Save(optionalView.Increment(nextGlobalVersion));
+                }
             }
             
             sw.Stop();
-            
-            Console.WriteLine($"[{viewStore.GetType().Name}] {sw.ElapsedMilliseconds / 1000m}");
+            Console.WriteLine($"[Elapsed time] {sw.ElapsedMilliseconds / 1000m}");
         }
     }
 }
