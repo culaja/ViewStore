@@ -5,11 +5,11 @@ using Abstractions;
 
 namespace Cache
 {
-    public delegate void OnSendingExceptionDelegate(Exception exception);
+    internal delegate void OnSendingExceptionDelegate(Exception exception);
 
-    public delegate void OnDrainFinishedDelegate(IReadOnlyList<IView> views);
+    internal delegate void OnDrainFinishedDelegate(IReadOnlyList<IView> views);
     
-    public sealed class AutomaticCacheDrainer : IDisposable
+    internal sealed class AutomaticCacheDrainer : IDisposable
     {
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly TimeSpan _drainPeriod;

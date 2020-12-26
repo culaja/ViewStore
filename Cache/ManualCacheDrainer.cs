@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Abstractions;
 
 namespace Cache
 {
-    public sealed class ManualCacheDrainer
+    internal sealed class ManualCacheDrainer
     {
         private readonly IViewStore _destinationViewStore;
         private readonly OutgoingCache _outgoingCache;
@@ -55,6 +56,7 @@ namespace Cache
             catch (Exception e)
             {
                 OnSendingExceptionEvent?.Invoke(e);
+                Thread.Sleep(1000);
                 SendBatch(batch);
             }
         }
@@ -72,6 +74,7 @@ namespace Cache
             catch (Exception e)
             {
                 OnSendingExceptionEvent?.Invoke(e);
+                Thread.Sleep(1000);
                 StoreGlobalPosition(cachedItems);
             }
         }

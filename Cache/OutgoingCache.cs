@@ -4,7 +4,7 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class OutgoingCache
+    internal sealed class OutgoingCache
     {
         private readonly object _sync = new();
         private Dictionary<string, IView> _cache = new();

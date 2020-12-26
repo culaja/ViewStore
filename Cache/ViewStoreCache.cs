@@ -5,7 +5,7 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class ViewStoreCache : IViewStore
+    internal sealed class ViewStoreCache : IViewStore
     {
         private readonly IViewStore _next;
         private readonly MemoryCache _readCache = MemoryCache.Default;
