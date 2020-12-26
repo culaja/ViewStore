@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Abstractions;
+using ViewStore.Abstractions;
 
-namespace Cache
+namespace ViewStore.Cache
 {
     internal delegate void OnSendingExceptionDelegate(Exception exception);
 

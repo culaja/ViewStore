@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using Abstractions;
-using Cache;
 using MongoDB.Driver;
-using Stores.MongoDb;
+using ViewStore.Abstractions;
+using ViewStore.Cache;
+using ViewStore.MongoDb;
 
-namespace PerformanceTests
+namespace ViewStore.PerformanceTestsnceTests
 {
     class Program
     {

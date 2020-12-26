@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
-using Abstractions;
+using ViewStore.Abstractions;
 
-namespace Cache
+namespace ViewStore.Cache
 {
     public sealed class ViewStoreCacheFactory
     {

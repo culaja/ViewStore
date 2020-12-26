@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Abstractions;
+using ViewStore.Abstractions;
 
-namespace Cache
+namespace ViewStore.Cache
 {
     internal sealed class ManualCacheDrainer
     {

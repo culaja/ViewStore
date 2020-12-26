@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Abstractions;
+using ViewStore.Abstractions;
 
-namespace Tests
+namespace ViewStore.Tests
 {
     internal sealed class InMemoryStore : IViewStore
     {

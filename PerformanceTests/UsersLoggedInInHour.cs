@@ -1,6 +1,6 @@
-﻿using Abstractions;
+﻿using ViewStore.Abstractions;
 
-namespace PerformanceTests
+namespace ViewStore.PerformanceTestsnceTests
 {
     internal sealed class UsersLoggedInInHour : IView
     {

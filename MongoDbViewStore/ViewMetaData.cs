@@ -1,4 +1,4 @@
-﻿namespace Stores.MongoDb
+﻿namespace ViewStore.MongoDb
 {
     internal sealed class ViewMetaData
     {

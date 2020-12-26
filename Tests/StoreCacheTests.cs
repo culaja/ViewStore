@@ -1,12 +1,12 @@
 using System;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
-using Cache;
 using FluentAssertions;
+using ViewStore.Cache;
 using Xunit;
-using static Tests.TestView;
+using static ViewStore.Tests.TestView;
 
-namespace Tests
+namespace ViewStore.Tests
 {
     public sealed class StoreCacheTests
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Abstractions
+namespace ViewStore.Abstractions
 {
     public interface IViewStore
     {

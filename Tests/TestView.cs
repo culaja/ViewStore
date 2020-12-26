@@ -1,7 +1,7 @@
-﻿using Abstractions;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using ViewStore.Abstractions;
 
-namespace Tests
+namespace ViewStore.Tests
 {
     [BsonIgnoreExtraElements]
     public sealed class TestView : IView

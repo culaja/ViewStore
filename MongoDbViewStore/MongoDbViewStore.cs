@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Abstractions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using ViewStore.Abstractions;
 
-namespace Stores.MongoDb
+namespace ViewStore.MongoDb
 {
     public sealed class MongoDbViewStore : IViewStore
     {
