@@ -1,7 +1,10 @@
 name: .NET
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ published ]
+  pull_request:
+    branches: [ published ]
 
 jobs:
   build:
@@ -18,10 +21,26 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Publish to NuGet
+    - name: Test
+      run: dotnet test
+    - name: Publish ViewStore.Abstractions
       uses: brandedoutcast/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: Abstractions/Abstractions.csproj
+        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
+        TAG_FORMAT: '*'
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Publish ViewStore.Cache
+      uses: brandedoutcast/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: Cache/Cache.csproj
+        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
+        TAG_FORMAT: '*'
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Publish ViewStore.MongoDb
+      uses: brandedoutcast/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: MongoDb/MongoDb.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
