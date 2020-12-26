@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cache", "Cache\Cache.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{D9DE6D80-5DB8-4EAC-BDC9-6EDE9BA6F81C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDbViewStore", "MongoDbViewStore\MongoDbViewStore.csproj", "{816A7A48-3F1A-4DB6-B05F-585E35A84B44}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDb", "MongoDb\MongoDb.csproj", "{816A7A48-3F1A-4DB6-B05F-585E35A84B44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTests", "PerformanceTests\PerformanceTests.csproj", "{9AE92C92-4159-4664-950F-4EC1F111927B}"
 EndProject
