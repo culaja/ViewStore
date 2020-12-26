@@ -29,6 +29,7 @@ namespace Cache
         {
             var cachedItems = _outgoingCache.Clear();
             DrainCache(cachedItems);
+            StoreGlobalPosition(cachedItems);
             return cachedItems.Count;
         }
 
@@ -55,6 +56,23 @@ namespace Cache
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 SendBatch(batch);
+            }
+        }
+
+        private void StoreGlobalPosition(IReadOnlyList<IView> cachedItems)
+        {
+            try
+            {
+                var latestCachedView = cachedItems.OrderByDescending(v => v.GlobalVersion).FirstOrDefault();
+                if (latestCachedView != null)
+                {
+                    _destinationViewStore.Save(ViewMetaData.Of(latestCachedView.GlobalVersion));
+                }
+            }
+            catch (Exception e)
+            {
+                OnSendingExceptionEvent?.Invoke(e);
+                StoreGlobalPosition(cachedItems);
             }
         }
     }

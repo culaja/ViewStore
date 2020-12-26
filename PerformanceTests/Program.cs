@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using Abstractions;
 using Cache;
 using MongoDB.Driver;
@@ -27,16 +26,16 @@ namespace PerformanceTests
 
             using (disposable)
             {
-                ExecuteTest(viewStore, default);
+                ExecuteTest(viewStore);
             }
         }
 
-        private static void ExecuteTest(IViewStore viewStore, long? lastKnownViewPosition)
+        private static void ExecuteTest(IViewStore viewStore)
         {
             var sw = new Stopwatch();
             sw.Start();
             
-            var startGlobalVersion = lastKnownViewPosition ?? 1;
+            var startGlobalVersion = viewStore.ReadLastKnownPosition() ?? 1;
             Console.WriteLine($"Start global version: {startGlobalVersion}");
             var documentIdCounter = startGlobalVersion % 100;
             

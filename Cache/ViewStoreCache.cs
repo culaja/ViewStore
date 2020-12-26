@@ -22,9 +22,13 @@ namespace Cache
             _expirationPeriod = expirationPeriod;
         }
 
-        public long? ReadLastKnownPosition() => _next.ReadLastKnownPosition();
+        public long? ReadLastKnownPosition() => _next.Read<ViewMetaData>(ViewMetaData.MetaDataId)?.GlobalVersion;
 
-        public Task<long?> ReadLastKnownPositionAsync() => _next.ReadLastKnownPositionAsync();
+        public async Task<long?> ReadLastKnownPositionAsync()
+        {
+            var metadata = await  _next.ReadAsync<ViewMetaData>(ViewMetaData.MetaDataId);
+            return metadata?.GlobalVersion;
+        }
 
         public T? Read<T>(string viewId) where T : IView
         {
