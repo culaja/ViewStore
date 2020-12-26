@@ -6,20 +6,21 @@ using Abstractions;
 namespace Cache
 {
     public delegate void OnSendingExceptionDelegate(Exception exception);
-    public delegate void OnDrainFinishedDelegate<T>(IReadOnlyList<T> views) where T : IView;
+
+    public delegate void OnDrainFinishedDelegate(IReadOnlyList<IView> views);
     
-    public sealed class AutomaticCacheDrainer<T> : IDisposable where T : IView
+    public sealed class AutomaticCacheDrainer : IDisposable
     {
-        private readonly ManualCacheDrainer<T> _manualCacheDrainer;
+        private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly TimeSpan _drainPeriod;
         private readonly Thread _worker;
         private bool _isStopRequested;
 
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
-        public event OnDrainFinishedDelegate<T>? OnDrainFinishedEvent;
+        public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public AutomaticCacheDrainer(
-            ManualCacheDrainer<T> manualCacheDrainer,
+            ManualCacheDrainer manualCacheDrainer,
             TimeSpan drainPeriod
             )
         {

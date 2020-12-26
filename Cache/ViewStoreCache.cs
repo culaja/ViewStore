@@ -5,16 +5,16 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class ViewStoreCache<T> : IViewStore<T> where T : IView
+    public sealed class ViewStoreCache : IViewStore
     {
-        private readonly IViewStore<T> _next;
+        private readonly IViewStore _next;
         private readonly MemoryCache _readCache = MemoryCache.Default;
-        private readonly OutgoingCache<T> _outgoingCache;
+        private readonly OutgoingCache _outgoingCache;
         private readonly TimeSpan _expirationPeriod;
 
         public ViewStoreCache(
-            IViewStore<T> next,
-            OutgoingCache<T> outgoingCache,
+            IViewStore next,
+            OutgoingCache outgoingCache,
             TimeSpan expirationPeriod)
         {
             _next = next;
@@ -22,31 +22,35 @@ namespace Cache
             _expirationPeriod = expirationPeriod;
         }
 
-        public T? Read(string viewId)
+        public long? ReadLastKnownPosition() => _next.ReadLastKnownPosition();
+
+        public Task<long?> ReadLastKnownPositionAsync() => _next.ReadLastKnownPositionAsync();
+
+        public T? Read<T>(string viewId) where T : IView
         {
             CacheItem? optionalCacheItem = _readCache.GetCacheItem(viewId);
             if (optionalCacheItem != null)
             {
-                return (T?) optionalCacheItem.Value;
+                return (T)optionalCacheItem.Value;
             }
             
             if (_outgoingCache.TryGetValue(viewId, out var view))
             {
-                return (T?) view;
+                return (T)view;
             }
             
-            return _next.Read(viewId);
+            return _next.Read<T>(viewId);
         }
 
-        public Task<T?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
+        public Task<T?> ReadAsync<T>(string viewId) where T : IView  => Task.FromResult(Read<T>(viewId));
 
-        public void Save(T view)
+        public void Save(IView view)
         {
             _outgoingCache.AddOrUpdate(view);
             _readCache.Set(new CacheItem(view.Id, view), new CacheItemPolicy {SlidingExpiration = _expirationPeriod});
         }
 
-        public Task SaveAsync(T view)
+        public Task SaveAsync(IView view)
         {
             Save(view);
             return Task.CompletedTask;

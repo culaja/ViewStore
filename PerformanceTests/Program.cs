@@ -14,27 +14,24 @@ namespace PerformanceTests
         {
             var mongoClient = new MongoClient("mongodb://localhost:27017/TestDb");
             var mongoDatabase = mongoClient.GetDatabase("TestDb");
-            var mongoViewStore = new MongoDbViewStore<UsersLoggedInInHour>(mongoDatabase, nameof(UsersLoggedInInHour));
-            var mongoViewStorePositionTracker = new MongoViewStorePositionTracker(mongoDatabase, nameof(UsersLoggedInInHour));
+            var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(UsersLoggedInInHour));
 
 
-            var (viewStore, disposable) = ViewStoreCacheFactory<UsersLoggedInInHour>.New()
+            var (viewStore, disposable) = ViewStoreCacheFactory.New()
                 .WithCacheItemExpirationPeriod(TimeSpan.FromHours(1))
                 .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
                 .WithCacheDrainBatchSize(500)
                 .For(mongoViewStore)
-                .UseCallbackWhenDrainFinished(drainedViews => 
-                    mongoViewStorePositionTracker.StoreLastKnownPosition(
-                        drainedViews.OrderByDescending(t => t.GlobalVersion).First().GlobalVersion))
+                .UseCallbackWhenDrainFinished(drainedViews => Console.WriteLine(drainedViews.Count))
                 .Build();
 
             using (disposable)
             {
-                ExecuteTest(viewStore, mongoViewStorePositionTracker.ReadLastKnownPosition());
+                ExecuteTest(viewStore, default);
             }
         }
 
-        private static void ExecuteTest(IViewStore<UsersLoggedInInHour> viewStore, long? lastKnownViewPosition)
+        private static void ExecuteTest(IViewStore viewStore, long? lastKnownViewPosition)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -51,10 +48,10 @@ namespace PerformanceTests
                     documentIdCounter++;
                 }
                 
-                var optionalView = viewStore.Read(documentId);
+                var optionalView = viewStore.Read<UsersLoggedInInHour>(documentId);
                 if (optionalView == null)
                 {
-                    optionalView = new UsersLoggedInInHour(documentId.ToString(), nextGlobalVersion);
+                    optionalView = new UsersLoggedInInHour(documentId, nextGlobalVersion);
                 }
                 
                 viewStore.Save(optionalView.Increment(nextGlobalVersion));

@@ -4,36 +4,36 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class ViewStoreCacheFactory<T> where T : IView
+    public sealed class ViewStoreCacheFactory
     {
-        private IViewStore<T>? _realViewStore;
+        private IViewStore? _realViewStore;
         private TimeSpan _cacheItemExpirationPeriod = TimeSpan.Zero;
         private TimeSpan _cacheDrainPeriod = TimeSpan.Zero;
         private int _cacheDrainBatchSize;
-        private Action<IReadOnlyList<T>>? _cacheDrainedCallback;
+        private Action<IReadOnlyList<IView>>? _cacheDrainedCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
 
-        public static ViewStoreCacheFactory<T> New() => new();
+        public static ViewStoreCacheFactory New() => new();
 
-        public ViewStoreCacheFactory<T> For(IViewStore<T> viewStore)
+        public ViewStoreCacheFactory For(IViewStore viewStore)
         {
             _realViewStore = viewStore;
             return this;
         }
 
-        public ViewStoreCacheFactory<T> WithCacheItemExpirationPeriod(TimeSpan timeSpan)
+        public ViewStoreCacheFactory WithCacheItemExpirationPeriod(TimeSpan timeSpan)
         {
             _cacheItemExpirationPeriod = timeSpan;
             return this;
         }
 
-        public ViewStoreCacheFactory<T> WithCacheDrainPeriod(TimeSpan timeSpan)
+        public ViewStoreCacheFactory WithCacheDrainPeriod(TimeSpan timeSpan)
         {
             _cacheDrainPeriod = timeSpan;
             return this;
         }
 
-        public ViewStoreCacheFactory<T> WithCacheDrainBatchSize(int batchSize)
+        public ViewStoreCacheFactory WithCacheDrainBatchSize(int batchSize)
         {
             if (batchSize < 0)
             {
@@ -44,36 +44,36 @@ namespace Cache
             return this;
         }
 
-        public ViewStoreCacheFactory<T> UseCallbackWhenDrainFinished(Action<IReadOnlyList<T>> callback)
+        public ViewStoreCacheFactory UseCallbackWhenDrainFinished(Action<IReadOnlyList<IView>> callback)
         {
             _cacheDrainedCallback = callback;
             return this;
         }
 
-        public ViewStoreCacheFactory<T> UseCallbackOnDrainAttemptFailed(Action<Exception> callback)
+        public ViewStoreCacheFactory UseCallbackOnDrainAttemptFailed(Action<Exception> callback)
         {
             _onDrainAttemptFailedCallback = callback;
             return this;
         }
 
-        public (IViewStore<T>, IDisposable) Build()
+        public (IViewStore, IDisposable) Build()
         {
             if (_realViewStore == null)
             {
                 throw new ArgumentException(nameof(_realViewStore));
             }
             
-            var outgoingCache = new OutgoingCache<T>();
+            var outgoingCache = new OutgoingCache();
 
-            var automaticCacheDrainer = new AutomaticCacheDrainer<T>(
-                new ManualCacheDrainer<T>(_realViewStore, outgoingCache, _cacheDrainBatchSize),
+            var automaticCacheDrainer = new AutomaticCacheDrainer(
+                new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
                 _cacheDrainPeriod);
 
             automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
             return (
-                new ViewStoreCache<T>(
+                new ViewStoreCache(
                     _realViewStore,
                     outgoingCache,
                     _cacheItemExpirationPeriod),

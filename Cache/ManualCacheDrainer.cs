@@ -6,18 +6,18 @@ using Abstractions;
 
 namespace Cache
 {
-    public sealed class ManualCacheDrainer<T> where T : IView
+    public sealed class ManualCacheDrainer
     {
-        private readonly IViewStore<T> _destinationViewStore;
-        private readonly OutgoingCache<T> _outgoingCache;
+        private readonly IViewStore _destinationViewStore;
+        private readonly OutgoingCache _outgoingCache;
         private readonly int _batchSize;
         
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
-        public event OnDrainFinishedDelegate<T>? OnDrainFinishedEvent;
+        public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public ManualCacheDrainer(
-            IViewStore<T> destinationViewStore,
-            OutgoingCache<T> outgoingCache,
+            IViewStore destinationViewStore,
+            OutgoingCache outgoingCache,
             int batchSize)
         {
             _destinationViewStore = destinationViewStore;
@@ -32,7 +32,7 @@ namespace Cache
             return cachedItems.Count;
         }
 
-        private void DrainCache(IReadOnlyList<T> cachedItems)
+        private void DrainCache(IReadOnlyList<IView> cachedItems)
         {
             foreach (var batch in cachedItems.Batch(_batchSize))
             {
@@ -45,7 +45,7 @@ namespace Cache
             }
         }
 
-        private void SendBatch(IReadOnlyList<T> batch)
+        private void SendBatch(IReadOnlyList<IView> batch)
         {
             try
             {
