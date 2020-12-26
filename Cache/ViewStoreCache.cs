@@ -8,16 +8,18 @@ namespace Cache
     internal sealed class ViewStoreCache : IViewStore
     {
         private readonly IViewStore _next;
-        private readonly MemoryCache _readCache = MemoryCache.Default;
+        private readonly MemoryCache _readCache;
         private readonly OutgoingCache _outgoingCache;
         private readonly TimeSpan _expirationPeriod;
 
         public ViewStoreCache(
             IViewStore next,
+            MemoryCache readCache,
             OutgoingCache outgoingCache,
             TimeSpan expirationPeriod)
         {
             _next = next;
+            _readCache = readCache;
             _outgoingCache = outgoingCache;
             _expirationPeriod = expirationPeriod;
         }

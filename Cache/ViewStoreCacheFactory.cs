@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Caching;
 using Abstractions;
 
 namespace Cache
@@ -75,6 +76,7 @@ namespace Cache
             return (
                 new ViewStoreCache(
                     _realViewStore,
+                    MemoryCache.Default, 
                     outgoingCache,
                     _cacheItemExpirationPeriod),
                 automaticCacheDrainer);

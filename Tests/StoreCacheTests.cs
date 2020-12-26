@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Cache;
 using FluentAssertions;
@@ -17,7 +18,11 @@ namespace Tests
         public StoreCacheTests()
         {
             _manualCacheDrainer = new ManualCacheDrainer(_realStore, _outgoingCache, 10);
-            _viewStoreCache = new ViewStoreCache(_realStore, _outgoingCache, TimeSpan.Zero);
+            _viewStoreCache = new ViewStoreCache(
+                _realStore,
+                new MemoryCache(Guid.NewGuid().ToString()),
+                _outgoingCache,
+                TimeSpan.Zero);
         }
         
         [Fact]
