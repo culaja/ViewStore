@@ -30,7 +30,6 @@ jobs:
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        NUGET_SOURCE: https://api.nuget.org/v3/index.json
     - name: Publish ViewStore.Cache
       uses: brandedoutcast/publish-nuget@v2
       with:
@@ -38,7 +37,6 @@ jobs:
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        NUGET_SOURCE: https://api.nuget.org/v3/index.json
     - name: Publish ViewStore.MongoDb
       uses: brandedoutcast/publish-nuget@v2
       with:
@@ -46,4 +44,3 @@ jobs:
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        NUGET_SOURCE: https://api.nuget.org/v3/index.json
