@@ -24,23 +24,26 @@ jobs:
     - name: Test
       run: dotnet test
     - name: Publish ViewStore.Abstractions
-      uses: brandedoutcast/publish-nuget@v3
+      uses: brandedoutcast/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: Abstractions/Abstractions.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        NUGET_SOURCE: https://api.nuget.org/v3/index.json
     - name: Publish ViewStore.Cache
-      uses: brandedoutcast/publish-nuget@v3
+      uses: brandedoutcast/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: Cache/Cache.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        NUGET_SOURCE: https://api.nuget.org/v3/index.json
     - name: Publish ViewStore.MongoDb
-      uses: brandedoutcast/publish-nuget@v3
+      uses: brandedoutcast/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: MongoDb/MongoDb.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        NUGET_SOURCE: https://api.nuget.org/v3/index.json
