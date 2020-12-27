@@ -6,7 +6,7 @@ namespace ViewStore.PerformanceTestsnceTests
     {
         public string Id { get; }
 
-        public long GlobalVersion { get; }
+        public long GlobalVersion { get; private set; }
         public long NumberOfLikes { get; private set; }
 
         public StoryLikesPerHour(
@@ -19,9 +19,10 @@ namespace ViewStore.PerformanceTestsnceTests
             NumberOfLikes = numberOfLikes;
         }
 
-        public void Apply()
+        public void Apply(StoryIsLiked storyIsLiked)
         {
             NumberOfLikes++;
+            GlobalVersion = storyIsLiked.GlobalVersion;
         }
     }
 }
