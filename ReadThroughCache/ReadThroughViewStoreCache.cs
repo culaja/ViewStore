@@ -3,7 +3,7 @@ using System.Runtime.Caching;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ReadThroughCache
+namespace ViewStore.ReadThroughCache
 {
     internal sealed class ReadThroughViewStoreCache : IViewStore
     {
