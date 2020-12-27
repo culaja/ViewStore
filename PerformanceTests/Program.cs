@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using MongoDB.Driver;
-using ViewStore.Abstractions;
 using ViewStore.MongoDb;
 using ViewStore.WriteThroughCache;
 
@@ -13,7 +13,7 @@ namespace ViewStore.PerformanceTestsnceTests
         {
             var mongoClient = new MongoClient("mongodb://localhost:27017/TestDb");
             var mongoDatabase = mongoClient.GetDatabase("TestDb");
-            var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(UsersLoggedInInHour));
+            var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(StoryLikesPerHour));
             
             var viewStoreCache = ViewStoreCacheFactory.New()
                 .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
@@ -22,40 +22,47 @@ namespace ViewStore.PerformanceTestsnceTests
                 .UseCallbackWhenDrainFinished(Console.WriteLine)
                 .Build();
 
-            ExecuteTest(viewStoreCache);
-        }
+            var generatedEvents = GenerateEventsFor(
+                1,
+                new DateTime(2021, 1, 1),
+                new DateTime(2022, 1, 1),
+                TimeSpan.FromSeconds(2));
 
-        private static void ExecuteTest(ViewStoreCache viewStoreCache)
-        {
             var sw = new Stopwatch();
             sw.Start();
-
             using (viewStoreCache)
             {
-                var startGlobalVersion = viewStoreCache.ReadLastKnownPosition() ?? 1;
-                Console.WriteLine($"Start global version: {startGlobalVersion}");
-                var documentIdCounter = startGlobalVersion % 100;
-            
-                for (var nextGlobalVersion = startGlobalVersion; nextGlobalVersion <= 2190000; nextGlobalVersion++)
+                foreach (var storyIsLiked in generatedEvents)
                 {
-                    var documentId = documentIdCounter.ToString();
-                    if (nextGlobalVersion % 100 == 0)
+                    var view = viewStoreCache.Read<StoryLikesPerHour>(storyIsLiked.StoryLikesPerHourId)
+                        ?? new StoryLikesPerHour(storyIsLiked.StoryLikesPerHourId, storyIsLiked.GlobalVersion, 0L);
+
+                    if (view.GlobalVersion < storyIsLiked.GlobalVersion)
                     {
-                        documentIdCounter++;
+                        view.Apply();
+                        viewStoreCache.Save(view);
                     }
-                
-                    var optionalView = viewStoreCache.Read<UsersLoggedInInHour>(documentId);
-                    if (optionalView == null)
-                    {
-                        optionalView = new UsersLoggedInInHour(documentId, nextGlobalVersion);
-                    }
-                
-                    viewStoreCache.Save(optionalView.Increment(nextGlobalVersion));
                 }
             }
-            
             sw.Stop();
-            Console.WriteLine($"[Elapsed time] {sw.ElapsedMilliseconds / 1000m}");
+            
+            Console.WriteLine($"Elapsed: {sw.Elapsed.TotalSeconds}");
+        }
+
+        private static IEnumerable<StoryIsLiked> GenerateEventsFor(
+            int storyCount,
+            DateTime startDate,
+            DateTime endDate,
+            TimeSpan delta)
+        {
+            var globalVersion = 0L;
+            for (var timestamp = startDate; timestamp < endDate; timestamp += delta)
+            {
+                for (var i = 0; i < storyCount; ++i)
+                {
+                    yield return new StoryIsLiked($"Story{i}", startDate, globalVersion++);
+                }
+            }
         }
     }
 }
