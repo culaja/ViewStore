@@ -24,10 +24,10 @@ namespace ViewStore.PerformanceTestsnceTests
 
             var generatedEvents = GenerateEventsFor(
                 viewStoreCache.ReadLastKnownPosition(),
-                10,
+                10000,
                 new DateTime(2021, 1, 1),
                 new DateTime(2022, 1, 1),
-                TimeSpan.FromSeconds(2));
+                TimeSpan.FromSeconds(1000));
 
             var sw = new Stopwatch();
             sw.Start();
@@ -66,12 +66,12 @@ namespace ViewStore.PerformanceTestsnceTests
             {
                 for (var i = 0; i < storyCount; ++i)
                 {
+                    globalVersion++;
+                    
                     if (globalPosition == null || globalPosition < globalVersion)
                     {
-                        yield return new StoryIsLiked($"Story{i}", timestamp, globalVersion++);
+                        yield return new StoryIsLiked($"Story{i}", timestamp, globalVersion);
                     }
-
-                    globalVersion++;
                 }
             }
         }
