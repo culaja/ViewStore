@@ -17,7 +17,7 @@ namespace ViewStore.PerformanceTestsnceTests
 
 
             var viewStoreCache = ViewStoreCacheFactory.New()
-                .WithCacheItemExpirationPeriod(TimeSpan.FromHours(1))
+                .WithReadCacheExpirationPeriod(TimeSpan.FromHours(1))
                 .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
                 .WithCacheDrainBatchSize(500)
                 .For(mongoViewStore)

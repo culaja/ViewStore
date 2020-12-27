@@ -8,7 +8,7 @@ namespace ViewStore.Cache
     public sealed class ViewStoreCacheFactory
     {
         private IViewStore? _realViewStore;
-        private TimeSpan _cacheItemExpirationPeriod = TimeSpan.Zero;
+        private TimeSpan _readCacheExpirationPeriod = TimeSpan.Zero;
         private TimeSpan _cacheDrainPeriod = TimeSpan.Zero;
         private int _cacheDrainBatchSize;
         private Action<IReadOnlyList<IView>>? _cacheDrainedCallback;
@@ -22,9 +22,9 @@ namespace ViewStore.Cache
             return this;
         }
 
-        public ViewStoreCacheFactory WithCacheItemExpirationPeriod(TimeSpan timeSpan)
+        public ViewStoreCacheFactory WithReadCacheExpirationPeriod(TimeSpan timeSpan)
         {
-            _cacheItemExpirationPeriod = timeSpan;
+            _readCacheExpirationPeriod = timeSpan;
             return this;
         }
 
@@ -77,7 +77,7 @@ namespace ViewStore.Cache
                 _realViewStore,
                 MemoryCache.Default,
                 outgoingCache,
-                _cacheItemExpirationPeriod);
+                _readCacheExpirationPeriod);
 
             return new ViewStoreCache(
                 viewStoreCacheInternal,
