@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
-using ViewStore.Cache;
 using ViewStore.MongoDb;
+using ViewStore.WriteThroughCache;
 
 namespace ViewStore.PerformanceTestsnceTests
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using ViewStore.Abstractions;
 
-namespace ViewStore.Cache
+namespace ViewStore.WriteThroughCache
 {
     internal sealed class OutgoingCache
     {

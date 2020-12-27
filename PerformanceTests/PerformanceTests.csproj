@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cache\Cache.csproj" />
       <ProjectReference Include="..\MongoDb\MongoDb.csproj" />
+      <ProjectReference Include="..\WriteThroughCache\WriteThroughCache.csproj" />
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.Cache
+namespace ViewStore.WriteThroughCache
 {
     public sealed class ViewStoreCache : IViewStore, IDisposable
     {

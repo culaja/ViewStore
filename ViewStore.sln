@@ -2,13 +2,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abstractions", "Abstractions\Abstractions.csproj", "{720418CD-7D6E-454A-B34A-B1884C035D5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cache", "Cache\Cache.csproj", "{877395B0-6222-4B31-BC72-A2535DB9161D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteThroughCache", "WriteThroughCache\WriteThroughCache.csproj", "{877395B0-6222-4B31-BC72-A2535DB9161D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{D9DE6D80-5DB8-4EAC-BDC9-6EDE9BA6F81C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDb", "MongoDb\MongoDb.csproj", "{816A7A48-3F1A-4DB6-B05F-585E35A84B44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTests", "PerformanceTests\PerformanceTests.csproj", "{9AE92C92-4159-4664-950F-4EC1F111927B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadThroughCache", "ReadThroughCache\ReadThroughCache.csproj", "{2D21273D-FCE6-4BF1-BE27-434A8212C9AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +38,9 @@ Global
 		{9AE92C92-4159-4664-950F-4EC1F111927B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AE92C92-4159-4664-950F-4EC1F111927B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AE92C92-4159-4664-950F-4EC1F111927B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D21273D-FCE6-4BF1-BE27-434A8212C9AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D21273D-FCE6-4BF1-BE27-434A8212C9AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D21273D-FCE6-4BF1-BE27-434A8212C9AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D21273D-FCE6-4BF1-BE27-434A8212C9AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,8 +1,6 @@
-using System;
-using System.Runtime.Caching;
 using System.Threading.Tasks;
 using FluentAssertions;
-using ViewStore.Cache;
+using ViewStore.WriteThroughCache;
 using Xunit;
 using static ViewStore.Tests.TestView;
 
@@ -18,11 +16,7 @@ namespace ViewStore.Tests
         public StoreCacheTests()
         {
             _manualCacheDrainer = new ManualCacheDrainer(_realStore, _outgoingCache, 10);
-            _viewStoreCacheInternal = new ViewStoreCacheInternal(
-                _realStore,
-                new MemoryCache(Guid.NewGuid().ToString()),
-                _outgoingCache,
-                TimeSpan.Zero);
+            _viewStoreCacheInternal = new ViewStoreCacheInternal(_realStore, _outgoingCache);
         }
         
         [Fact]

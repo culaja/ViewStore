@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Caching;
 using ViewStore.Abstractions;
 
-namespace ViewStore.Cache
+namespace ViewStore.WriteThroughCache
 {
     public sealed class ViewStoreCacheFactory
     {
@@ -75,9 +74,7 @@ namespace ViewStore.Cache
 
             var viewStoreCacheInternal = new ViewStoreCacheInternal(
                 _realViewStore,
-                MemoryCache.Default,
-                outgoingCache,
-                _readCacheExpirationPeriod);
+                outgoingCache);
 
             return new ViewStoreCache(
                 viewStoreCacheInternal,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using ViewStore.Abstractions;
 
-namespace ViewStore.Cache
+namespace ViewStore.WriteThroughCache
 {
     internal delegate void OnSendingExceptionDelegate(Exception exception);
 

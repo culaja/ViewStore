@@ -29,7 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Abstractions\Abstractions.csproj" />
-      <ProjectReference Include="..\Cache\Cache.csproj" />
+      <ProjectReference Include="..\WriteThroughCache\WriteThroughCache.csproj" />
     </ItemGroup>
 
 </Project>

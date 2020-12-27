@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ViewStore.Cache
+namespace ViewStore.WriteThroughCache
 {
     internal static class EnumerableExtensions
     {

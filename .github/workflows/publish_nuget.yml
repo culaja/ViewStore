@@ -30,10 +30,10 @@ jobs:
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.Cache
+    - name: Publish ViewStore.WriteThroughCache
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: Cache/Cache.csproj
+        PROJECT_FILE_PATH: WriteThroughCache/WriteThroughCache.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
