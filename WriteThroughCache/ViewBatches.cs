@@ -61,6 +61,7 @@ namespace ViewStore.WriteThroughCache
             if (bucket != null && bucket.Count > 0)
             {
                 resultList.Add(bucket);
+                countOfAllViews += bucket.Count;
             }
 
             largestGlobalVersion = largestGlobalVersionTracker != -1 ? largestGlobalVersionTracker : null;
