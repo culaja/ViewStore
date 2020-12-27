@@ -7,6 +7,7 @@ namespace ViewStore.WriteThroughCache
     {
         private readonly object _sync = new();
         private Dictionary<string, IView> _cache = new();
+        private Dictionary<string, IView> _lastCache = new();
 
         public void AddOrUpdate(IView view)
         {
@@ -20,18 +21,18 @@ namespace ViewStore.WriteThroughCache
         {
             lock (_sync)
             {
-                return _cache.TryGetValue(viewId, out view);
+                return _cache.TryGetValue(viewId, out view) || _lastCache.TryGetValue(viewId, out view);
             }
         }
 
-        public IEnumerable<IView> Clear()
+        public IEnumerable<IView> Renew()
         {
             lock (_sync)
             {
-                var cachedItems = _cache.Values;
+                _lastCache = _cache;
                 _cache = new Dictionary<string, IView>();
-                return cachedItems;
-            }  
+                return _lastCache.Values;
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace ViewStore.WriteThroughCache
 
         public int TryDrainCache()
         {
-            var cachedItems = _outgoingCache.Clear();
+            var cachedItems = _outgoingCache.Renew();
             var viewBatches = new ViewBatches(cachedItems, _batchSize);
             DrainCache(viewBatches);
             StoreGlobalPosition(viewBatches.LargestGlobalVersion);
