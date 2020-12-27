@@ -24,10 +24,10 @@ namespace ViewStore.PerformanceTestsnceTests
 
             var generatedEvents = GenerateEventsFor(
                 viewStoreCache.ReadLastKnownPosition(),
-                10000,
+                100,
                 new DateTime(2021, 1, 1),
                 new DateTime(2022, 1, 1),
-                TimeSpan.FromSeconds(1000));
+                TimeSpan.FromSeconds(20));
 
             var sw = new Stopwatch();
             sw.Start();
