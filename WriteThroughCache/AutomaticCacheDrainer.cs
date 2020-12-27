@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
-using ViewStore.Abstractions;
 
 namespace ViewStore.WriteThroughCache
 {
     internal delegate void OnSendingExceptionDelegate(Exception exception);
 
-    internal delegate void OnDrainFinishedDelegate(IReadOnlyList<IView> views);
+    internal delegate void OnDrainFinishedDelegate(ViewBatches viewBatches);
     
     internal sealed class AutomaticCacheDrainer : IDisposable
     {

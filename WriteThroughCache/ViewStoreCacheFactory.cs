@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using ViewStore.Abstractions;
 
 namespace ViewStore.WriteThroughCache
@@ -7,10 +6,9 @@ namespace ViewStore.WriteThroughCache
     public sealed class ViewStoreCacheFactory
     {
         private IViewStore? _realViewStore;
-        private TimeSpan _readCacheExpirationPeriod = TimeSpan.Zero;
         private TimeSpan _cacheDrainPeriod = TimeSpan.Zero;
         private int _cacheDrainBatchSize;
-        private Action<IReadOnlyList<IView>>? _cacheDrainedCallback;
+        private Action<int>? _cacheDrainedCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
 
         public static ViewStoreCacheFactory New() => new();
@@ -18,12 +16,6 @@ namespace ViewStore.WriteThroughCache
         public ViewStoreCacheFactory For(IViewStore viewStore)
         {
             _realViewStore = viewStore;
-            return this;
-        }
-
-        public ViewStoreCacheFactory WithReadCacheExpirationPeriod(TimeSpan timeSpan)
-        {
-            _readCacheExpirationPeriod = timeSpan;
             return this;
         }
 
@@ -44,7 +36,7 @@ namespace ViewStore.WriteThroughCache
             return this;
         }
 
-        public ViewStoreCacheFactory UseCallbackWhenDrainFinished(Action<IReadOnlyList<IView>> callback)
+        public ViewStoreCacheFactory UseCallbackWhenDrainFinished(Action<int> callback)
         {
             _cacheDrainedCallback = callback;
             return this;
@@ -69,7 +61,7 @@ namespace ViewStore.WriteThroughCache
                 new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
                 _cacheDrainPeriod);
 
-            automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views);
+            automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views.CountOfAllViews);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
             var viewStoreCacheInternal = new ViewStoreCacheInternal(

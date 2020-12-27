@@ -14,14 +14,12 @@ namespace ViewStore.PerformanceTestsnceTests
             var mongoClient = new MongoClient("mongodb://localhost:27017/TestDb");
             var mongoDatabase = mongoClient.GetDatabase("TestDb");
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(UsersLoggedInInHour));
-
-
+            
             var viewStoreCache = ViewStoreCacheFactory.New()
-                .WithReadCacheExpirationPeriod(TimeSpan.FromHours(1))
                 .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
                 .WithCacheDrainBatchSize(500)
                 .For(mongoViewStore)
-                .UseCallbackWhenDrainFinished(drainedViews => Console.WriteLine(drainedViews.Count))
+                .UseCallbackWhenDrainFinished(Console.WriteLine)
                 .Build();
 
             ExecuteTest(viewStoreCache);

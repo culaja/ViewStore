@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using ViewStore.Abstractions;
 
 namespace ViewStore.WriteThroughCache
@@ -25,14 +24,14 @@ namespace ViewStore.WriteThroughCache
             }
         }
 
-        public IReadOnlyList<IView> Clear()
+        public IEnumerable<IView> Clear()
         {
             lock (_sync)
             {
-                var cachedItems = _cache.Values.ToList();
+                var cachedItems = _cache.Values;
                 _cache = new Dictionary<string, IView>();
                 return cachedItems;
-            }   
+            }  
         }
     }
 }

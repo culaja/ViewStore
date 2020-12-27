@@ -29,21 +29,22 @@ namespace ViewStore.WriteThroughCache
         public int TryDrainCache()
         {
             var cachedItems = _outgoingCache.Clear();
-            DrainCache(cachedItems);
-            StoreGlobalPosition(cachedItems);
-            return cachedItems.Count;
+            var viewBatches = new ViewBatches(cachedItems, _batchSize);
+            DrainCache(viewBatches);
+            StoreGlobalPosition(viewBatches.LargestGlobalVersion);
+            return viewBatches.CountOfAllViews;
         }
 
-        private void DrainCache(IReadOnlyList<IView> cachedItems)
+        private void DrainCache(ViewBatches viewBatches)
         {
-            foreach (var batch in cachedItems.Batch(_batchSize))
+            foreach (var batch in viewBatches)
             {
-                SendBatch(batch.ToList());
+                SendBatch(batch);
             }
 
-            if (cachedItems.Count > 0)
+            if (viewBatches.CountOfAllViews > 0)
             {
-                OnDrainFinishedEvent?.Invoke(cachedItems);
+                OnDrainFinishedEvent?.Invoke(viewBatches);
             }
         }
 
@@ -61,21 +62,20 @@ namespace ViewStore.WriteThroughCache
             }
         }
 
-        private void StoreGlobalPosition(IReadOnlyList<IView> cachedItems)
+        private void StoreGlobalPosition(long? largestGlobalPosition)
         {
             try
             {
-                var latestCachedView = cachedItems.OrderByDescending(v => v.GlobalVersion).FirstOrDefault();
-                if (latestCachedView != null)
+                if (largestGlobalPosition != null)
                 {
-                    _destinationViewStore.Save(ViewMetaData.Of(latestCachedView.GlobalVersion));
+                    _destinationViewStore.Save(ViewMetaData.Of(largestGlobalPosition.Value));
                 }
             }
             catch (Exception e)
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 Thread.Sleep(1000);
-                StoreGlobalPosition(cachedItems);
+                StoreGlobalPosition(largestGlobalPosition);
             }
         }
     }
