@@ -17,10 +17,15 @@ namespace ViewStore.PerformanceTests
             var mongoDatabase = mongoClient.GetDatabase("TestDb");
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(StoryLikesPerHour));
             
+            var mongoReadThroughViewStore = new ReadThroughViewStoreCache(
+                MemoryCache.Default,
+                TimeSpan.FromSeconds(10),
+                mongoViewStore);
+            
             var writeThroughViewStoreCache = ViewStoreCacheFactory.New()
                 .WithCacheDrainPeriod(TimeSpan.FromSeconds(1))
                 .WithCacheDrainBatchSize(500)
-                .For(mongoViewStore)
+                .For(mongoReadThroughViewStore)
                 .UseCallbackWhenDrainFinished(count => Console.WriteLine($"Bulk write count: {count}"))
                 .Build();
 
@@ -31,11 +36,6 @@ namespace ViewStore.PerformanceTests
                 new DateTime(2022, 1, 1),
                 TimeSpan.FromSeconds(20));
 
-            var readThroughCache = new ReadThroughViewStoreCache(
-                MemoryCache.Default,
-                TimeSpan.FromSeconds(10),
-                writeThroughViewStoreCache);
-
             var sw = new Stopwatch();
             sw.Start();
             var totalNumberOfEvents = 0L;
@@ -43,13 +43,13 @@ namespace ViewStore.PerformanceTests
             {
                 foreach (var storyIsLiked in generatedEvents)
                 {
-                    var view = readThroughCache.Read<StoryLikesPerHour>(storyIsLiked.StoryLikesPerHourId)
+                    var view = writeThroughViewStoreCache.Read<StoryLikesPerHour>(storyIsLiked.StoryLikesPerHourId)
                                ?? new StoryLikesPerHour(storyIsLiked.StoryLikesPerHourId, -1L, 0L);
 
                     if (view.GlobalVersion < storyIsLiked.GlobalVersion)
                     {
                         view.Apply(storyIsLiked);
-                        readThroughCache.Save(view);
+                        writeThroughViewStoreCache.Save(view);
                     }
 
                     totalNumberOfEvents++;
