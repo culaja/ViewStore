@@ -5,7 +5,7 @@ using MongoDB.Driver;
 using ViewStore.MongoDb;
 using ViewStore.WriteThroughCache;
 
-namespace ViewStore.PerformanceTestsnceTests
+namespace ViewStore.PerformanceTests
 {
     class Program
     {

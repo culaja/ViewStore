@@ -1,6 +1,6 @@
 ﻿using ViewStore.Abstractions;
 
-namespace ViewStore.PerformanceTestsnceTests
+namespace ViewStore.PerformanceTests
 {
     internal sealed class StoryLikesPerHour : IView
     {
