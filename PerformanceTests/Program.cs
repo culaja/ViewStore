@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Caching;
 using MongoDB.Driver;
 using ViewStore.MongoDb;
+using ViewStore.ReadThroughCache;
 using ViewStore.WriteThroughCache;
 
 namespace ViewStore.PerformanceTests
@@ -15,7 +17,7 @@ namespace ViewStore.PerformanceTests
             var mongoDatabase = mongoClient.GetDatabase("TestDb");
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(StoryLikesPerHour));
             
-            var viewStoreCache = ViewStoreCacheFactory.New()
+            var writeThroughViewStoreCache = ViewStoreCacheFactory.New()
                 .WithCacheDrainPeriod(TimeSpan.FromSeconds(1))
                 .WithCacheDrainBatchSize(500)
                 .For(mongoViewStore)
@@ -23,26 +25,31 @@ namespace ViewStore.PerformanceTests
                 .Build();
 
             var generatedEvents = GenerateEventsFor(
-                viewStoreCache.ReadLastKnownPosition(),
+                writeThroughViewStoreCache.ReadLastKnownPosition(),
                 100,
                 new DateTime(2021, 1, 1),
                 new DateTime(2022, 1, 1),
                 TimeSpan.FromSeconds(20));
 
+            var readThroughCache = new ReadThroughViewStoreCache(
+                MemoryCache.Default,
+                TimeSpan.FromSeconds(10),
+                writeThroughViewStoreCache);
+
             var sw = new Stopwatch();
             sw.Start();
             var totalNumberOfEvents = 0L;
-            using (viewStoreCache)
+            using (writeThroughViewStoreCache)
             {
                 foreach (var storyIsLiked in generatedEvents)
                 {
-                    var view = viewStoreCache.Read<StoryLikesPerHour>(storyIsLiked.StoryLikesPerHourId)
-                        ?? new StoryLikesPerHour(storyIsLiked.StoryLikesPerHourId, -1L, 0L);
+                    var view = readThroughCache.Read<StoryLikesPerHour>(storyIsLiked.StoryLikesPerHourId)
+                               ?? new StoryLikesPerHour(storyIsLiked.StoryLikesPerHourId, -1L, 0L);
 
                     if (view.GlobalVersion < storyIsLiked.GlobalVersion)
                     {
                         view.Apply(storyIsLiked);
-                        viewStoreCache.Save(view);
+                        readThroughCache.Save(view);
                     }
 
                     totalNumberOfEvents++;

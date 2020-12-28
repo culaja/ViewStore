@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MongoDb\MongoDb.csproj" />
+      <ProjectReference Include="..\ReadThroughCache\ReadThroughCache.csproj" />
       <ProjectReference Include="..\WriteThroughCache\WriteThroughCache.csproj" />
     </ItemGroup>
 

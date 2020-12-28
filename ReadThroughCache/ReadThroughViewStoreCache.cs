@@ -5,7 +5,7 @@ using ViewStore.Abstractions;
 
 namespace ViewStore.ReadThroughCache
 {
-    internal sealed class ReadThroughViewStoreCache : IViewStore
+    public sealed class ReadThroughViewStoreCache : IViewStore
     {
         private readonly MemoryCache _memoryCache;
         private readonly TimeSpan _readCacheExpirationPeriod;
