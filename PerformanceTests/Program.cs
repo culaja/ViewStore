@@ -16,7 +16,7 @@ namespace ViewStore.PerformanceTests
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(StoryLikesPerHour));
             
             var viewStoreCache = ViewStoreCacheFactory.New()
-                .WithCacheDrainPeriod(TimeSpan.FromMilliseconds(1000))
+                .WithCacheDrainPeriod(TimeSpan.FromSeconds(1))
                 .WithCacheDrainBatchSize(500)
                 .For(mongoViewStore)
                 .UseCallbackWhenDrainFinished(count => Console.WriteLine($"Bulk write count: {count}"))
