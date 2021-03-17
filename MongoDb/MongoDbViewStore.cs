@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using ViewStore.Abstractions;
+using static MongoDB.Driver.FilterDefinition<ViewStore.MongoDb.View>;
 
 namespace ViewStore.MongoDb
 {
@@ -20,16 +21,19 @@ namespace ViewStore.MongoDb
         }
 
         public long? ReadLastKnownPosition() =>
-            Collection<IView>()
-                .AsQueryable()
-                .OrderByDescending(t => t.GlobalVersion)
-                .FirstOrDefault()?.GlobalVersion;
+            Collection<View>()
+                .Find(Empty)
+                .SortByDescending(view => view.GlobalVersion)
+                .Limit(1)
+                .FirstOrDefault()
+                ?.GlobalVersion;
 
         public async Task<long?> ReadLastKnownPositionAsync()
         {
-            var lastUpdatedView = await Collection<IView>()
-                .AsQueryable()
-                .OrderByDescending(t => t.GlobalVersion)
+            var lastUpdatedView = await Collection<View>()
+                .Find(Empty)
+                .SortByDescending(view => view.GlobalVersion)
+                .Limit(1)
                 .FirstOrDefaultAsync();
             return lastUpdatedView?.GlobalVersion;
         }

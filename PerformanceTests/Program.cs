@@ -13,52 +13,11 @@ namespace ViewStore.PerformanceTests
     {
         static void Main()
         {
-            var mongoClient = new MongoClient("mongodb://localhost:27017/TestDb");
-            var mongoDatabase = mongoClient.GetDatabase("TestDb");
+            var mongoClient = new MongoClient("mongodb://kolotree:dagi987@localhost:27017");
+            var mongoDatabase = mongoClient.GetDatabase("MES");
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(StoryLikesPerHour));
+            Console.WriteLine(mongoViewStore.ReadLastKnownPosition());
             
-            var mongoReadThroughViewStore = new ReadThroughViewStoreCache(
-                MemoryCache.Default,
-                TimeSpan.FromSeconds(10),
-                mongoViewStore);
-            
-            var writeThroughViewStoreCache = ViewStoreCacheFactory.New()
-                .WithCacheDrainPeriod(TimeSpan.FromSeconds(1))
-                .WithCacheDrainBatchSize(500)
-                .For(mongoReadThroughViewStore)
-                .UseCallbackWhenDrainFinished(count => Console.WriteLine($"Bulk write count: {count}"))
-                .Build();
-
-            var generatedEvents = GenerateEventsFor(
-                writeThroughViewStoreCache.ReadLastKnownPosition(),
-                100,
-                new DateTime(2021, 1, 1),
-                new DateTime(2022, 1, 1),
-                TimeSpan.FromSeconds(20));
-
-            var sw = new Stopwatch();
-            sw.Start();
-            var totalNumberOfEvents = 0L;
-            using (writeThroughViewStoreCache)
-            {
-                foreach (var storyIsLiked in generatedEvents)
-                {
-                    var view = writeThroughViewStoreCache.Read<StoryLikesPerHour>(storyIsLiked.StoryLikesPerHourId)
-                               ?? new StoryLikesPerHour(storyIsLiked.StoryLikesPerHourId, -1L, 0L);
-
-                    if (view.GlobalVersion < storyIsLiked.GlobalVersion)
-                    {
-                        view.Apply(storyIsLiked);
-                        writeThroughViewStoreCache.Save(view);
-                    }
-
-                    totalNumberOfEvents++;
-                }
-            }
-            sw.Stop();
-            
-            Console.WriteLine($"Elapsed: {sw.Elapsed.TotalSeconds}");
-            Console.WriteLine($"Total number of events: {totalNumberOfEvents}");
         }
 
         private static IEnumerable<StoryIsLiked> GenerateEventsFor(
