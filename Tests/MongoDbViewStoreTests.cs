@@ -11,7 +11,7 @@ namespace ViewStore.Tests
     {
         private MongoDbViewStore BuildEmptyMongoDbViewStore() =>
             new(
-                new MongoClient("mongodb://kolotree:dagi987@localhost:27017").GetDatabase(Guid.NewGuid().ToString()),
+                new MongoClient("mongodb://localhost:27017").GetDatabase(Guid.NewGuid().ToString()),
                 Guid.NewGuid().ToString());
         
         [Fact]

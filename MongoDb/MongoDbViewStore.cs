@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using ViewStore.Abstractions;
 using static MongoDB.Driver.FilterDefinition<ViewStore.MongoDb.View>;
 
