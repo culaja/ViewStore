@@ -6,6 +6,20 @@ namespace ViewStore.Tests
 {
     public sealed class GlobalVersionTests
     {
+        [Fact]
+        public void constructing_value_with_just_one_part_sets_second_part_two_zero()
+        {
+            (GlobalVersion.Of(12UL) == GlobalVersion.Of(12UL, 0UL))
+                .Should().BeTrue();
+        }
+        
+        [Fact]
+        public void Start_value_sets_both_parts_to_zero()
+        {
+            (GlobalVersion.Start == GlobalVersion.Of(0UL, 0UL))
+                .Should().BeTrue();
+        }
+        
         [Theory]
         [InlineData(0UL, 0UL, 0UL, 0UL, true)]
         [InlineData(10UL, 10UL, 10UL, 10UL, true)]

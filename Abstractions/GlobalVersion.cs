@@ -11,6 +11,7 @@
             Part2 = part2;
         }
 
+        public static readonly GlobalVersion Start = new(0UL, 0UL);
         public static GlobalVersion Of(ulong part1) => new(part1, 0UL);
         public static GlobalVersion Of(ulong part1, ulong part2) => new(part1, part2);
         
