@@ -9,11 +9,11 @@ namespace ViewStore.Tests
     {
         private readonly Dictionary<string, IView> _dictionary = new();
 
-        public long? ReadLastKnownPosition() => _dictionary.Count > 0
+        public GlobalVersion? ReadLastKnownPosition() => _dictionary.Count > 0
             ? _dictionary.Values.Max(v => v.GlobalVersion)
             : default;
 
-        public Task<long?> ReadLastKnownPositionAsync() => Task.FromResult(ReadLastKnownPosition());
+        public Task<GlobalVersion?> ReadLastKnownPositionAsync() => Task.FromResult(ReadLastKnownPosition());
 
         public T? Read<T>(string viewId) where T : IView
         {

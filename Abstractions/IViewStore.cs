@@ -4,8 +4,8 @@ namespace ViewStore.Abstractions
 {
     public interface IViewStore
     {
-        long? ReadLastKnownPosition();
-        Task<long?> ReadLastKnownPositionAsync();
+        GlobalVersion? ReadLastKnownPosition();
+        Task<GlobalVersion?> ReadLastKnownPositionAsync();
         
         T? Read<T>(string viewId) where T : IView;
         Task<T?> ReadAsync<T>(string viewId) where T : IView;

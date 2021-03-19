@@ -62,20 +62,20 @@ namespace ViewStore.WriteThroughCache
             }
         }
 
-        private void StoreGlobalPosition(long? largestGlobalPosition)
+        private void StoreGlobalPosition(GlobalVersion? largestGlobalVersion)
         {
             try
             {
-                if (largestGlobalPosition != null)
+                if (largestGlobalVersion != null)
                 {
-                    _destinationViewStore.Save(ViewMetaData.Of(largestGlobalPosition.Value));
+                    _destinationViewStore.Save(ViewMetaData.Of(largestGlobalVersion.Value));
                 }
             }
             catch (Exception e)
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 Thread.Sleep(1000);
-                StoreGlobalPosition(largestGlobalPosition);
+                StoreGlobalPosition(largestGlobalVersion);
             }
         }
     }

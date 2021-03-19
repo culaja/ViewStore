@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
-using static MongoDB.Driver.FilterDefinition<ViewStore.MongoDb.View>;
+using static MongoDB.Driver.FilterDefinition<ViewStore.MongoDb.ViewDto>;
 
 namespace ViewStore.MongoDb
 {
@@ -19,17 +19,17 @@ namespace ViewStore.MongoDb
             _collectionName = collectionName;
         }
 
-        public long? ReadLastKnownPosition() =>
-            Collection<View>()
+        public GlobalVersion? ReadLastKnownPosition() =>
+            Collection<ViewDto>()
                 .Find(Empty)
                 .SortByDescending(view => view.GlobalVersion)
                 .Limit(1)
                 .FirstOrDefault()
                 ?.GlobalVersion;
 
-        public async Task<long?> ReadLastKnownPositionAsync()
+        public async Task<GlobalVersion?> ReadLastKnownPositionAsync()
         {
-            var lastUpdatedView = await Collection<View>()
+            var lastUpdatedView = await Collection<ViewDto>()
                 .Find(Empty)
                 .SortByDescending(view => view.GlobalVersion)
                 .Limit(1)
@@ -43,7 +43,7 @@ namespace ViewStore.MongoDb
                 .FirstOrDefault();
 
         public async Task<T?> ReadAsync<T>(string viewId) where T : IView =>
-            (T?)await Collection<T>()
+            (T?) await Collection<T>()
                 .Find(Builders<T>.Filter.Eq("_id", viewId))
                 .FirstOrDefaultAsync();
 

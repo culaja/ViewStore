@@ -15,9 +15,9 @@ namespace ViewStore.WriteThroughCache
             _automaticCacheDrainer = automaticCacheDrainer;
         }
 
-        public long? ReadLastKnownPosition() => _viewStoreCacheInternal.ReadLastKnownPosition();
+        public GlobalVersion? ReadLastKnownPosition() => _viewStoreCacheInternal.ReadLastKnownPosition();
 
-        public Task<long?> ReadLastKnownPositionAsync() => _viewStoreCacheInternal.ReadLastKnownPositionAsync();
+        public Task<GlobalVersion?> ReadLastKnownPositionAsync() => _viewStoreCacheInternal.ReadLastKnownPositionAsync();
 
         public T? Read<T>(string viewId) where T : IView => _viewStoreCacheInternal.Read<T>(viewId);
 

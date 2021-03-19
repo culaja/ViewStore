@@ -7,15 +7,15 @@ namespace ViewStore.WriteThroughCache
         public const string MetaDataId = nameof(MetaDataId);
         
         public string Id { get; }
-        public long GlobalVersion { get; }
+        public GlobalVersion GlobalVersion { get; }
 
-        public ViewMetaData(string id, long globalVersion)
+        public ViewMetaData(string id, GlobalVersion globalVersion)
         {
             Id = id;
             GlobalVersion = globalVersion;
         }
 
-        public static ViewMetaData Of(long globalVersion) =>
+        public static ViewMetaData Of(GlobalVersion globalVersion) =>
             new(MetaDataId, globalVersion);
     }
 }

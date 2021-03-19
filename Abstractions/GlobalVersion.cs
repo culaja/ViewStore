@@ -2,18 +2,18 @@
 {
     public readonly struct GlobalVersion
     {
-        public ulong Part1 { get; }
-        public ulong Part2 { get; }
+        public long Part1 { get; }
+        public long Part2 { get; }
 
-        public GlobalVersion(ulong part1, ulong part2)
+        public GlobalVersion(long part1, long part2)
         {
             Part1 = part1;
             Part2 = part2;
         }
 
-        public static readonly GlobalVersion Start = new(0UL, 0UL);
-        public static GlobalVersion Of(ulong part1) => new(part1, 0UL);
-        public static GlobalVersion Of(ulong part1, ulong part2) => new(part1, part2);
+        public static readonly GlobalVersion Start = new(0L, 0L);
+        public static GlobalVersion Of(long part1) => new(part1, 0L);
+        public static GlobalVersion Of(long part1, long part2) => new(part1, part2);
         
         public static bool operator <(GlobalVersion p1, GlobalVersion p2)
         {

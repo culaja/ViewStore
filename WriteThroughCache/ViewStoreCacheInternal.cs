@@ -16,9 +16,9 @@ namespace ViewStore.WriteThroughCache
             _outgoingCache = outgoingCache;
         }
 
-        public long? ReadLastKnownPosition() => _next.Read<ViewMetaData>(ViewMetaData.MetaDataId)?.GlobalVersion;
+        public GlobalVersion? ReadLastKnownPosition() => _next.Read<ViewMetaData>(ViewMetaData.MetaDataId)?.GlobalVersion;
 
-        public async Task<long?> ReadLastKnownPositionAsync()
+        public async Task<GlobalVersion?> ReadLastKnownPositionAsync()
         {
             var metadata = await  _next.ReadAsync<ViewMetaData>(ViewMetaData.MetaDataId);
             return metadata?.GlobalVersion;

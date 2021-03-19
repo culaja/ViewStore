@@ -24,7 +24,7 @@ namespace ViewStore.WriteThroughCache
         IEnumerator IEnumerable.GetEnumerator() => _batches.GetEnumerator();
 
         public int Count => _batches.Count;
-        public long? LargestGlobalVersion { get; }
+        public GlobalVersion? LargestGlobalVersion { get; }
         public int CountOfAllViews { get; }
 
         public IReadOnlyList<IView> this[int index] => _batches[index];
@@ -33,11 +33,11 @@ namespace ViewStore.WriteThroughCache
         private static IReadOnlyList<IReadOnlyList<IView>> Batch(
             IEnumerable<IView> source, 
             int batchSize,
-            out long? largestGlobalVersion,
+            out GlobalVersion? largestGlobalVersion,
             out int countOfAllViews)
         {
             List<IView>? bucket = null;
-            var largestGlobalVersionTracker = -1L;
+            largestGlobalVersion = null;
             countOfAllViews = 0;
 
             var resultList = new List<List<IView>>();
@@ -47,7 +47,7 @@ namespace ViewStore.WriteThroughCache
                     bucket = new List<IView>(batchSize);
 
                 bucket.Add(item);
-                largestGlobalVersionTracker = largestGlobalVersionTracker < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersionTracker;
+                largestGlobalVersion = largestGlobalVersion < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersion;
 
                 if (bucket.Count != batchSize)
                     continue;
@@ -64,7 +64,6 @@ namespace ViewStore.WriteThroughCache
                 countOfAllViews += bucket.Count;
             }
 
-            largestGlobalVersion = largestGlobalVersionTracker != -1 ? largestGlobalVersionTracker : null;
             return resultList;
         }
     }

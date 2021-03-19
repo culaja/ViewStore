@@ -4,15 +4,17 @@ using ViewStore.Abstractions;
 namespace ViewStore.MongoDb
 {
     [BsonIgnoreExtraElements]
-    internal sealed class View : IView
+    internal sealed class ViewDto : IView
     {
-        public View(string id, long globalVersion)
+        public ViewDto(string id, GlobalVersion globalVersion)
         {
             Id = id;
             GlobalVersion = globalVersion;
         }
 
         public string Id { get; }
-        public long GlobalVersion { get; }
+        
+        [BsonSerializer(typeof(GlobalVersionSerializer))]
+        public GlobalVersion GlobalVersion { get; }
     }
 }
