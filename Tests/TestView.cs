@@ -8,8 +8,8 @@ namespace ViewStore.Tests
     [BsonIgnoreExtraElements]
     public sealed class TestView : IView
     {
-        public static readonly TestView TestView1 = new("1", 1, GlobalVersion.Of(1));
-        public static readonly TestView TestView2 = new("2", 2, GlobalVersion.Of(2));
+        public static readonly TestView TestView1 = new("1", 1, GlobalVersion.Of(0 ,1));
+        public static readonly TestView TestView2 = new("2", 2, GlobalVersion.Of(0, 2));
 
         public string Id { get; }
         public int Number { get; }

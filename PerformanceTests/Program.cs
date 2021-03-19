@@ -13,7 +13,7 @@ namespace ViewStore.PerformanceTests
     {
         static void Main()
         {
-            var mongoClient = new MongoClient("mongodb://kolotree:dagi987@localhost:27017");
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
             var mongoDatabase = mongoClient.GetDatabase("MES");
             var mongoViewStore = new MongoDbViewStore(mongoDatabase, nameof(StoryLikesPerHour));
             Console.WriteLine(mongoViewStore.ReadLastKnownPosition());
