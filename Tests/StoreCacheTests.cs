@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using ViewStore.WriteThroughCache;
+using ViewStore.WriteBehindCache;
 using Xunit;
 using static ViewStore.Tests.TestView;
 

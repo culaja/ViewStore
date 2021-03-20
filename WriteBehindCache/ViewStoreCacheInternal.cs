@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteThroughCache
+namespace ViewStore.WriteBehindCache
 {
     internal sealed class ViewStoreCacheInternal : IViewStore
     {

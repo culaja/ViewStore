@@ -1,7 +1,7 @@
 ﻿using System;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteThroughCache
+namespace ViewStore.WriteBehindCache
 {
     public sealed class ViewStoreCacheFactory
     {

@@ -1,6 +1,6 @@
 ﻿using ViewStore.Abstractions;
 
-namespace ViewStore.WriteThroughCache
+namespace ViewStore.WriteBehindCache
 {
     public static class ViewMetaData
     {

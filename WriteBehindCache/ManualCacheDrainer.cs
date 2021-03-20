@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteThroughCache
+namespace ViewStore.WriteBehindCache
 {
     internal sealed class ManualCacheDrainer
     {

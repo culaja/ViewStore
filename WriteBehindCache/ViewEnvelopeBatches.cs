@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteThroughCache
+namespace ViewStore.WriteBehindCache
 {
     internal sealed class ViewEnvelopeBatches : IReadOnlyList<IReadOnlyList<ViewEnvelope>>
     {
