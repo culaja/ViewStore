@@ -36,7 +36,7 @@ namespace ViewStore.WriteBehindCache
             {
                 Thread.Sleep(_drainPeriod);
                 
-                var drainedItems = _manualCacheDrainer.TryDrainCache();
+                var drainedItems = _manualCacheDrainer.DrainCacheUntilEmpty();
                 if (_isStopRequested && drainedItems == 0)
                 {
                     break;

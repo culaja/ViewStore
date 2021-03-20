@@ -23,7 +23,7 @@ namespace ViewStore.Tests
         public async Task saved_view_is_in_real_store_after_drain()
         {
             await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope1);
-            _manualCacheDrainer.TryDrainCache();
+            _manualCacheDrainer.DrainCacheUntilEmpty();
             var actualView = await _realStore.ReadAsync(TestViewEnvelope1.Id);
             actualView.Should().Be(TestViewEnvelope1);
         }

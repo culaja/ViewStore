@@ -26,7 +26,7 @@ namespace ViewStore.WriteBehindCache
             _batchSize = batchSize;
         }
 
-        public int TryDrainCache()
+        public int DrainCacheUntilEmpty()
         {
             var cachedItems = _outgoingCache.Renew();
             var viewBatches = new ViewEnvelopeBatches(cachedItems, _batchSize);
