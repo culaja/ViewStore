@@ -30,7 +30,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Abstractions\Abstractions.csproj" />
       <ProjectReference Include="..\MongoDb\MongoDb.csproj" />
-      <ProjectReference Include="..\WriteThroughCache\WriteThroughCache.csproj" />
+      <ProjectReference Include="..\WriteBehindCache\WriteBehindCache.csproj" />
     </ItemGroup>
 
 </Project>

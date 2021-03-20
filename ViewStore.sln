@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abstractions", "Abstractions\Abstractions.csproj", "{720418CD-7D6E-454A-B34A-B1884C035D5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteThroughCache", "WriteThroughCache\WriteThroughCache.csproj", "{877395B0-6222-4B31-BC72-A2535DB9161D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteBehindCache", "WriteBehindCache\WriteBehindCache.csproj", "{877395B0-6222-4B31-BC72-A2535DB9161D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{D9DE6D80-5DB8-4EAC-BDC9-6EDE9BA6F81C}"
 EndProject

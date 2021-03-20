@@ -4,9 +4,9 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
-        <AssemblyName>ViewStore.WriteThroughCache</AssemblyName>
-        <RootNamespace>ViewStore.WriteThroughCache</RootNamespace>
-        <PackageId>ViewStore.WriteThroughCache</PackageId>
+        <AssemblyName>ViewStore.WriteBehindCache</AssemblyName>
+        <RootNamespace>ViewStore.WriteBehindCache</RootNamespace>
+        <PackageId>ViewStore.WriteBehindCache</PackageId>
         <PackageDescription>Write bihind cache for View Store. It can be used as a decorator for any View Store implementation (e.g. MongoDb View Store).</PackageDescription>
         <Version>1.1.0-alpha3</Version>
         <Authors>Stanko Culaja</Authors>
