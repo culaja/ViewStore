@@ -4,9 +4,11 @@ using FluentAssertions;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
 using ViewStore.MongoDb;
+using ViewStore.Tests;
 using Xunit;
+using static ViewStore.Tests.TestView;
 
-namespace ViewStore.Tests
+namespace MongoDbTests
 {
     public sealed class MongoDbViewStoreAsyncTests
     {
@@ -28,9 +30,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
+            await viewStore.SaveAsync(TestViewEnvelope1);
 
-            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestView.TestViewEnvelope1.GlobalVersion);
+            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestViewEnvelope1.GlobalVersion);
         }
         
         [Fact]
@@ -38,10 +40,10 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
-            await viewStore.SaveAsync(TestView.TestViewEnvelope2);
+            await viewStore.SaveAsync(TestViewEnvelope1);
+            await viewStore.SaveAsync(TestViewEnvelope2);
 
-            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestView.TestViewEnvelope2.GlobalVersion);
+            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestViewEnvelope2.GlobalVersion);
         }
 
         [Fact]
@@ -49,9 +51,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
+            await viewStore.SaveAsync(TestViewEnvelope1);
 
-            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().Be(TestView.TestViewEnvelope1);
+            (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().Be(TestViewEnvelope1);
         }
         
         [Fact]
@@ -59,9 +61,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestViewEnvelope2);
+            await viewStore.SaveAsync(TestViewEnvelope2);
 
-            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().BeNull();
+            (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().BeNull();
         }
         
         [Fact]
@@ -69,11 +71,11 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
-            await viewStore.SaveAsync(TestView.TestViewEnvelope2);
+            await viewStore.SaveAsync(TestViewEnvelope1);
+            await viewStore.SaveAsync(TestViewEnvelope2);
 
-            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().Be(TestView.TestViewEnvelope1);
-            (await viewStore.ReadAsync(TestView.TestViewEnvelope2.Id)).Should().Be(TestView.TestViewEnvelope2);
+            (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().Be(TestViewEnvelope1);
+            (await viewStore.ReadAsync(TestViewEnvelope2.Id)).Should().Be(TestViewEnvelope2);
         }
         
         [Fact]
@@ -81,14 +83,14 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
 
-            var transformedViewEnvelope = TestView.TestViewEnvelope1.ImmutableTransform<TestView>(
+            var transformedViewEnvelope = TestViewEnvelope1.ImmutableTransform<TestView>(
                 GlobalVersion.Of(1, 0),
                 testView => testView.Increment());
             
-            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
+            await viewStore.SaveAsync(TestViewEnvelope1);
             await viewStore.SaveAsync(transformedViewEnvelope);
 
-            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().Be(transformedViewEnvelope);
+            (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().Be(transformedViewEnvelope);
         }
     }
 }

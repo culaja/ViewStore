@@ -3,10 +3,11 @@ using FluentAssertions;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
 using ViewStore.MongoDb;
+using ViewStore.Tests;
 using Xunit;
 using static ViewStore.Tests.TestView;
 
-namespace ViewStore.Tests
+namespace MongoDbTests
 {
     public sealed class MongoDbViewStoreTests
     {

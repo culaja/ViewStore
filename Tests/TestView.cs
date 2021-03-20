@@ -1,9 +1,7 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using ViewStore.Abstractions;
+﻿using ViewStore.Abstractions;
 
 namespace ViewStore.Tests
 {
-    [BsonIgnoreExtraElements]
     public sealed class TestView : IView
     {
         public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(0 ,1));
