@@ -7,7 +7,7 @@ namespace ViewStore.Tests
 {
     internal sealed class InMemoryStore : IViewStore
     {
-        private readonly Dictionary<string, IView> _dictionary = new();
+        private readonly Dictionary<string, ViewEnvelope> _dictionary = new();
 
         public GlobalVersion? ReadLastKnownPosition() => _dictionary.Count > 0
             ? _dictionary.Values.Max(v => v.GlobalVersion)
@@ -15,26 +15,26 @@ namespace ViewStore.Tests
 
         public Task<GlobalVersion?> ReadLastKnownPositionAsync() => Task.FromResult(ReadLastKnownPosition());
 
-        public T? Read<T>(string viewId) where T : IView
+        public ViewEnvelope? Read(string viewId)
         {
             if (_dictionary.TryGetValue(viewId, out var view))
             {
-                return (T) view;
+                return view;
             }
 
             return default;
         }
 
-        public Task<T?> ReadAsync<T>(string viewId) where T : IView => Task.FromResult(Read<T>(viewId));
+        public Task<ViewEnvelope?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
 
-        public void Save(IView view)
+        public void Save(ViewEnvelope viewEnvelope)
         {
-            _dictionary[view.Id] = view;
+            _dictionary[viewEnvelope.Id] = viewEnvelope;
         }
 
-        public Task SaveAsync(IView view)
+        public Task SaveAsync(ViewEnvelope viewEnvelope)
         {
-            Save(view);
+            Save(viewEnvelope);
             return Task.CompletedTask;
         }
     }

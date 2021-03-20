@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Driver;
+using ViewStore.Abstractions;
 using ViewStore.MongoDb;
 using Xunit;
 
@@ -27,9 +28,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestView1);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
 
-            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestView.TestView1.GlobalVersion);
+            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestView.TestViewEnvelope1.GlobalVersion);
         }
         
         [Fact]
@@ -37,10 +38,10 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestView1);
-            await viewStore.SaveAsync(TestView.TestView2);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope2);
 
-            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestView.TestView2.GlobalVersion);
+            (await viewStore.ReadLastKnownPositionAsync()).Should().Be(TestView.TestViewEnvelope2.GlobalVersion);
         }
 
         [Fact]
@@ -48,9 +49,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestView1);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
 
-            (await viewStore.ReadAsync<TestView>(TestView.TestView1.Id)).Should().Be(TestView.TestView1);
+            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().Be(TestView.TestViewEnvelope1);
         }
         
         [Fact]
@@ -58,9 +59,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestView2);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope2);
 
-            (await viewStore.ReadAsync<TestView>(TestView.TestView1.Id)).Should().BeNull();
+            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().BeNull();
         }
         
         [Fact]
@@ -68,21 +69,26 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            await viewStore.SaveAsync(TestView.TestView1);
-            await viewStore.SaveAsync(TestView.TestView2);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
+            await viewStore.SaveAsync(TestView.TestViewEnvelope2);
 
-            (await viewStore.ReadAsync<TestView>(TestView.TestView1.Id)).Should().Be(TestView.TestView1);
-            (await viewStore.ReadAsync<TestView>(TestView.TestView2.Id)).Should().Be(TestView.TestView2);
+            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().Be(TestView.TestViewEnvelope1);
+            (await viewStore.ReadAsync(TestView.TestViewEnvelope2.Id)).Should().Be(TestView.TestViewEnvelope2);
         }
         
         [Fact]
         public async Task saving_view_transformation_will_keep_only_last_version()
         {
             var viewStore = BuildEmptyMongoDbViewStore();
-            
-            await viewStore.SaveAsync(TestView.TestView1.IncrementNumber());
 
-            (await viewStore.ReadAsync<TestView>(TestView.TestView1.Id)).Should().Be(TestView.TestView1.IncrementNumber());
+            var transformedViewEnvelope = TestView.TestViewEnvelope1.ImmutableTransform<TestView>(
+                GlobalVersion.Of(1, 0),
+                testView => testView.Increment());
+            
+            await viewStore.SaveAsync(TestView.TestViewEnvelope1);
+            await viewStore.SaveAsync(transformedViewEnvelope);
+
+            (await viewStore.ReadAsync(TestView.TestViewEnvelope1.Id)).Should().Be(transformedViewEnvelope);
         }
     }
 }

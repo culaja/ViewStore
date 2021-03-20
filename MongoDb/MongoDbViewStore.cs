@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
-using static MongoDB.Driver.FilterDefinition<ViewStore.MongoDb.ViewDto>;
+using static MongoDB.Driver.Builders<ViewStore.Abstractions.ViewEnvelope>;
+using static MongoDB.Driver.FilterDefinition<ViewStore.Abstractions.ViewEnvelope>;
 
 namespace ViewStore.MongoDb
 {
@@ -10,8 +12,19 @@ namespace ViewStore.MongoDb
         private readonly IMongoDatabase _mongoDatabase;
         private readonly string _collectionName;
 
-        private IMongoCollection<T> Collection<T>() where T : IView =>
-            _mongoDatabase.GetCollection<T>(_collectionName);
+        private IMongoCollection<ViewEnvelope> Collection() =>
+            _mongoDatabase.GetCollection<ViewEnvelope>(_collectionName);
+
+        static MongoDbViewStore()
+        {
+            BsonClassMap.RegisterClassMap<ViewEnvelope>(cm =>
+            {
+                cm.MapProperty(m => m.Id);
+                cm.MapProperty(m => m.View);
+                cm.MapProperty(m => m.GlobalVersion).SetSerializer(new GlobalVersionSerializer());
+                cm.MapCreator(m => new ViewEnvelope(m.Id, m.View, m.GlobalVersion));
+            });
+        }
 
         public MongoDbViewStore(IMongoDatabase mongoDatabase, string collectionName)
         {
@@ -20,7 +33,7 @@ namespace ViewStore.MongoDb
         }
 
         public GlobalVersion? ReadLastKnownPosition() =>
-            Collection<ViewDto>()
+            Collection()
                 .Find(Empty)
                 .SortByDescending(view => view.GlobalVersion)
                 .Limit(1)
@@ -29,7 +42,7 @@ namespace ViewStore.MongoDb
 
         public async Task<GlobalVersion?> ReadLastKnownPositionAsync()
         {
-            var lastUpdatedView = await Collection<ViewDto>()
+            var lastUpdatedView = await Collection()
                 .Find(Empty)
                 .SortByDescending(view => view.GlobalVersion)
                 .Limit(1)
@@ -37,39 +50,39 @@ namespace ViewStore.MongoDb
             return lastUpdatedView?.GlobalVersion;
         }
 
-        public T? Read<T>(string viewId) where T : IView =>
-            (T?) Collection<T>()
-                .Find(Builders<T>.Filter.Eq("_id", viewId))
+        public ViewEnvelope? Read(string viewId) =>
+            Collection()
+                .Find(Filter.Eq("_id", viewId))
                 .FirstOrDefault();
 
-        public async Task<T?> ReadAsync<T>(string viewId) where T : IView =>
-            (T?) await Collection<T>()
-                .Find(Builders<T>.Filter.Eq("_id", viewId))
+        public async Task<ViewEnvelope?> ReadAsync(string viewId) =>
+            await Collection()
+                .Find(Filter.Eq("_id", viewId))
                 .FirstOrDefaultAsync();
 
-        public void Save(IView view)
+        public void Save(ViewEnvelope viewEnvelope)
         {
-            var result = Collection<IView>().ReplaceOne(
-                Builders<IView>.Filter.Eq("_id", view.Id),
-                view,
+            var result = Collection().ReplaceOne(
+                Filter.Eq("_id", viewEnvelope.Id),
+                viewEnvelope,
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
             {
-                throw new MongoDbWrongMatchedCountException(view.Id, result.MatchedCount);
+                throw new MongoDbWrongMatchedCountException(viewEnvelope.Id, result.MatchedCount);
             }
         }
 
-        public async Task SaveAsync(IView view)
+        public async Task SaveAsync(ViewEnvelope viewEnvelope)
         {
-            var result = await Collection<IView>().ReplaceOneAsync(
-                Builders<IView>.Filter.Eq("_id", view.Id),
-                view,
+            var result = await Collection().ReplaceOneAsync(
+                Filter.Eq("_id", viewEnvelope.Id),
+                viewEnvelope,
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
             {
-                throw new MongoDbWrongMatchedCountException(view.Id, result.MatchedCount);
+                throw new MongoDbWrongMatchedCountException(viewEnvelope.Id, result.MatchedCount);
             }
         }
     }

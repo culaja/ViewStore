@@ -1,39 +1,24 @@
-﻿using System;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 using ViewStore.Abstractions;
-using ViewStore.MongoDb;
 
 namespace ViewStore.Tests
 {
     [BsonIgnoreExtraElements]
     public sealed class TestView : IView
     {
-        public static readonly TestView TestView1 = new("1", 1, GlobalVersion.Of(0 ,1));
-        public static readonly TestView TestView2 = new("2", 2, GlobalVersion.Of(0, 2));
+        public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(0 ,1));
+        public static readonly ViewEnvelope TestViewEnvelope2 = new("2", new TestView(2), GlobalVersion.Of(0, 2));
 
-        public string Id { get; }
         public int Number { get; }
-        [BsonSerializer(typeof(GlobalVersionSerializer))]
-        public GlobalVersion GlobalVersion { get; }
 
-        public TestView(
-            string id,
-            int number,
-            GlobalVersion globalVersion)
+        public TestView(int number)
         {
-            Id = id;
             Number = number;
-            GlobalVersion = globalVersion;
-        }
-
-        public TestView IncrementNumber()
-        {
-            return new(Id, Number + 1, GlobalVersion);
         }
 
         private bool Equals(TestView other)
         {
-            return Id == other.Id && Number == other.Number && GlobalVersion == other.GlobalVersion;
+            return Number == other.Number;
         }
 
         public override bool Equals(object? obj)
@@ -43,7 +28,9 @@ namespace ViewStore.Tests
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Number, GlobalVersion);
+            return Number;
         }
+
+        public TestView Increment() => new(Number + 1);
     }
 }

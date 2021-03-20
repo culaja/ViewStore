@@ -61,7 +61,7 @@ namespace ViewStore.WriteThroughCache
                 new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
                 _cacheDrainPeriod);
 
-            automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views.CountOfAllViews);
+            automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views.CountOfAllViewEnvelopes);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
             var viewStoreCacheInternal = new ViewStoreCacheInternal(

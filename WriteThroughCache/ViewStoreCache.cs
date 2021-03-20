@@ -19,13 +19,13 @@ namespace ViewStore.WriteThroughCache
 
         public Task<GlobalVersion?> ReadLastKnownPositionAsync() => _viewStoreCacheInternal.ReadLastKnownPositionAsync();
 
-        public T? Read<T>(string viewId) where T : IView => _viewStoreCacheInternal.Read<T>(viewId);
+        public ViewEnvelope? Read(string viewId) => _viewStoreCacheInternal.Read(viewId);
 
-        public Task<T?> ReadAsync<T>(string viewId) where T : IView => _viewStoreCacheInternal.ReadAsync<T>(viewId);
+        public Task<ViewEnvelope?> ReadAsync(string viewId) => _viewStoreCacheInternal.ReadAsync(viewId);
 
-        public void Save(IView view) => _viewStoreCacheInternal.Save(view);
+        public void Save(ViewEnvelope viewEnvelope) => _viewStoreCacheInternal.Save(viewEnvelope);
 
-        public Task SaveAsync(IView view) => _viewStoreCacheInternal.SaveAsync(view);
+        public Task SaveAsync(ViewEnvelope viewEnvelope) => _viewStoreCacheInternal.SaveAsync(viewEnvelope);
 
         public void Dispose()
         {

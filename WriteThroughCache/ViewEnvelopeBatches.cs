@@ -4,47 +4,47 @@ using ViewStore.Abstractions;
 
 namespace ViewStore.WriteThroughCache
 {
-    internal sealed class ViewBatches : IReadOnlyList<IReadOnlyList<IView>>
+    internal sealed class ViewEnvelopeBatches : IReadOnlyList<IReadOnlyList<ViewEnvelope>>
     {
-        private readonly IReadOnlyList<IReadOnlyList<IView>> _batches;
+        private readonly IReadOnlyList<IReadOnlyList<ViewEnvelope>> _batches;
 
-        public ViewBatches(IEnumerable<IView> views, int batchSize)
+        public ViewEnvelopeBatches(IEnumerable<ViewEnvelope> viewEnvelopes, int batchSize)
         {
             _batches = Batch(
-                views,
+                viewEnvelopes,
                 batchSize,
                 out var largestGlobalVersion,
                 out var countOfAllViews);
             LargestGlobalVersion = largestGlobalVersion;
-            CountOfAllViews = countOfAllViews;
+            CountOfAllViewEnvelopes = countOfAllViews;
         }
 
-        public IEnumerator<IReadOnlyList<IView>> GetEnumerator() => _batches.GetEnumerator();
+        public IEnumerator<IReadOnlyList<ViewEnvelope>> GetEnumerator() => _batches.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => _batches.GetEnumerator();
 
         public int Count => _batches.Count;
         public GlobalVersion? LargestGlobalVersion { get; }
-        public int CountOfAllViews { get; }
+        public int CountOfAllViewEnvelopes { get; }
 
-        public IReadOnlyList<IView> this[int index] => _batches[index];
+        public IReadOnlyList<ViewEnvelope> this[int index] => _batches[index];
         
         // Copied from https://github.com/morelinq/MoreLINQ
-        private static IReadOnlyList<IReadOnlyList<IView>> Batch(
-            IEnumerable<IView> source, 
+        private static IReadOnlyList<IReadOnlyList<ViewEnvelope>> Batch(
+            IEnumerable<ViewEnvelope> source, 
             int batchSize,
             out GlobalVersion? largestGlobalVersion,
             out int countOfAllViews)
         {
-            List<IView>? bucket = null;
+            List<ViewEnvelope>? bucket = null;
             largestGlobalVersion = null;
             countOfAllViews = 0;
 
-            var resultList = new List<List<IView>>();
+            var resultList = new List<List<ViewEnvelope>>();
             foreach (var item in source)
             {
                 if (bucket == null)
-                    bucket = new List<IView>(batchSize);
+                    bucket = new List<ViewEnvelope>(batchSize);
 
                 bucket.Add(item);
                 largestGlobalVersion = largestGlobalVersion < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersion;

@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentAssertions;
 using MongoDB.Driver;
+using ViewStore.Abstractions;
 using ViewStore.MongoDb;
 using Xunit;
 using static ViewStore.Tests.TestView;
@@ -27,20 +28,20 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            viewStore.Save(TestView1);
+            viewStore.Save(TestViewEnvelope1);
 
-            viewStore.ReadLastKnownPosition().Should().Be(TestView1.GlobalVersion);
+            viewStore.ReadLastKnownPosition().Should().Be(TestViewEnvelope1.GlobalVersion);
         }
         
         [Fact]
-        public void after_saving_multiple_views_last_known_position_point_to__greatest_view_position()
+        public void after_saving_multiple_views_last_known_position_points_to_greatest_view_position()
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            viewStore.Save(TestView1);
-            viewStore.Save(TestView2);
+            viewStore.Save(TestViewEnvelope1);
+            viewStore.Save(TestViewEnvelope2);
 
-            viewStore.ReadLastKnownPosition().Should().Be(TestView2.GlobalVersion);
+            viewStore.ReadLastKnownPosition().Should().Be(TestViewEnvelope2.GlobalVersion);
         }
 
         [Fact]
@@ -48,9 +49,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            viewStore.Save(TestView1);
+            viewStore.Save(TestViewEnvelope1);
 
-            viewStore.Read<TestView>(TestView1.Id).Should().Be(TestView1);
+            viewStore.Read(TestViewEnvelope1.Id).Should().Be(TestViewEnvelope1);
         }
         
         [Fact]
@@ -58,9 +59,9 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            viewStore.Save(TestView2);
+            viewStore.Save(TestViewEnvelope2);
 
-            viewStore.Read<TestView>(TestView1.Id).Should().BeNull();
+            viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
         }
         
         [Fact]
@@ -68,21 +69,26 @@ namespace ViewStore.Tests
         {
             var viewStore = BuildEmptyMongoDbViewStore();
             
-            viewStore.Save(TestView1);
-            viewStore.Save(TestView2);
+            viewStore.Save(TestViewEnvelope1);
+            viewStore.Save(TestViewEnvelope2);
 
-            viewStore.Read<TestView>(TestView1.Id).Should().Be(TestView1);
-            viewStore.Read<TestView>(TestView2.Id).Should().Be(TestView2);
+            viewStore.Read(TestViewEnvelope1.Id).Should().Be(TestViewEnvelope1);
+            viewStore.Read(TestViewEnvelope2.Id).Should().Be(TestViewEnvelope2);
         }
         
         [Fact]
         public void saving_view_transformation_will_keep_only_last_version()
         {
             var viewStore = BuildEmptyMongoDbViewStore();
-            
-            viewStore.Save(TestView1.IncrementNumber());
 
-            viewStore.Read<TestView>(TestView1.Id).Should().Be(TestView1.IncrementNumber());
+            var transformedViewEnvelope = TestViewEnvelope1.ImmutableTransform<TestView>(
+                GlobalVersion.Of(1, 0),
+                testView => testView.Increment());
+            
+            viewStore.Save(TestViewEnvelope1);
+            viewStore.Save(transformedViewEnvelope);
+
+            viewStore.Read(TestViewEnvelope1.Id).Should().Be(transformedViewEnvelope);
         }
     }
 }

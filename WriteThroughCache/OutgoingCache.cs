@@ -6,31 +6,31 @@ namespace ViewStore.WriteThroughCache
     internal sealed class OutgoingCache
     {
         private readonly object _sync = new();
-        private Dictionary<string, IView> _cache = new();
-        private Dictionary<string, IView> _lastCache = new();
+        private Dictionary<string, ViewEnvelope> _cache = new();
+        private Dictionary<string, ViewEnvelope> _lastCache = new();
 
-        public void AddOrUpdate(IView view)
+        public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
             lock (_sync)
             {
-                _cache[view.Id] = view;
+                _cache[viewEnvelope.Id] = viewEnvelope;
             }
         }
 
-        public bool TryGetValue(string viewId, out IView view)
+        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope)
         {
             lock (_sync)
             {
-                return _cache.TryGetValue(viewId, out view) || _lastCache.TryGetValue(viewId, out view);
+                return _cache.TryGetValue(viewId, out viewEnvelope) || _lastCache.TryGetValue(viewId, out viewEnvelope);
             }
         }
 
-        public IEnumerable<IView> Renew()
+        public IEnumerable<ViewEnvelope> Renew()
         {
             lock (_sync)
             {
                 _lastCache = _cache;
-                _cache = new Dictionary<string, IView>();
+                _cache = new Dictionary<string, ViewEnvelope>();
                 return _lastCache.Values;
             }
         }

@@ -16,34 +16,34 @@ namespace ViewStore.WriteThroughCache
             _outgoingCache = outgoingCache;
         }
 
-        public GlobalVersion? ReadLastKnownPosition() => _next.Read<ViewMetaData>(ViewMetaData.MetaDataId)?.GlobalVersion;
+        public GlobalVersion? ReadLastKnownPosition() => _next.Read(ViewMetaData.MetaDataId)?.GlobalVersion;
 
         public async Task<GlobalVersion?> ReadLastKnownPositionAsync()
         {
-            var metadata = await  _next.ReadAsync<ViewMetaData>(ViewMetaData.MetaDataId);
+            var metadata = await  _next.ReadAsync(ViewMetaData.MetaDataId);
             return metadata?.GlobalVersion;
         }
 
-        public T? Read<T>(string viewId) where T : IView
+        public ViewEnvelope? Read(string viewId)
         {
             if (_outgoingCache.TryGetValue(viewId, out var view))
             {
-                return (T)view;
+                return view;
             }
             
-            return _next.Read<T>(viewId);
+            return _next.Read(viewId);
         }
 
-        public Task<T?> ReadAsync<T>(string viewId) where T : IView  => Task.FromResult(Read<T>(viewId));
+        public Task<ViewEnvelope?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
 
-        public void Save(IView view)
+        public void Save(ViewEnvelope viewEnvelope)
         {
-            _outgoingCache.AddOrUpdate(view);
+            _outgoingCache.AddOrUpdate(viewEnvelope);
         }
 
-        public Task SaveAsync(IView view)
+        public Task SaveAsync(ViewEnvelope viewEnvelope)
         {
-            Save(view);
+            Save(viewEnvelope);
             return Task.CompletedTask;
         }
     }

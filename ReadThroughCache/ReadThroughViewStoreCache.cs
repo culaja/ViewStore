@@ -25,50 +25,50 @@ namespace ViewStore.ReadThroughCache
 
         public Task<GlobalVersion?> ReadLastKnownPositionAsync() => _next.ReadLastKnownPositionAsync();
 
-        public T? Read<T>(string viewId) where T : IView
+        public ViewEnvelope? Read(string viewId)
         {
             CacheItem? optionalCacheItem = _memoryCache.GetCacheItem(viewId);
             if (optionalCacheItem != null)
             {
-                return (T)optionalCacheItem.Value;
+                return (ViewEnvelope)optionalCacheItem.Value;
             }
 
-            var optionalView = _next.Read<T>(viewId);
-            if (optionalView != null)
+            var viewEnvelope = _next.Read(viewId);
+            if (viewEnvelope != null)
             {
-                _memoryCache.Set(new CacheItem(viewId, optionalView), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
+                _memoryCache.Set(new CacheItem(viewId, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
             }
 
-            return optionalView;
+            return viewEnvelope;
         }
 
-        public async Task<T?> ReadAsync<T>(string viewId) where T : IView
+        public async Task<ViewEnvelope?> ReadAsync(string viewId)
         {
             CacheItem? optionalCacheItem = _memoryCache.GetCacheItem(viewId);
             if (optionalCacheItem != null)
             {
-                return (T)optionalCacheItem.Value;
+                return (ViewEnvelope)optionalCacheItem.Value;
             }
 
-            var optionalView = await _next.ReadAsync<T>(viewId);
-            if (optionalView != null)
+            var viewEnvelope = await _next.ReadAsync(viewId);
+            if (viewEnvelope != null)
             {
-                _memoryCache.Set(new CacheItem(viewId, optionalView), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
+                _memoryCache.Set(new CacheItem(viewId, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
             }
 
-            return optionalView;
+            return viewEnvelope;
         }
 
-        public void Save(IView view)
+        public void Save(ViewEnvelope viewEnvelope)
         {
-            _memoryCache.Set(new CacheItem(view.Id, view), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
-            _next.Save(view);
+            _memoryCache.Set(new CacheItem(viewEnvelope.Id, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
+            _next.Save(viewEnvelope);
         }
 
-        public Task SaveAsync(IView view)
+        public Task SaveAsync(ViewEnvelope viewEnvelope)
         {
-            _memoryCache.Set(new CacheItem(view.Id, view), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
-            return _next.SaveAsync(view);
+            _memoryCache.Set(new CacheItem(viewEnvelope.Id, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
+            return _next.SaveAsync(viewEnvelope);
         }
     }
 }

@@ -7,10 +7,10 @@ namespace ViewStore.Abstractions
         GlobalVersion? ReadLastKnownPosition();
         Task<GlobalVersion?> ReadLastKnownPositionAsync();
         
-        T? Read<T>(string viewId) where T : IView;
-        Task<T?> ReadAsync<T>(string viewId) where T : IView;
+        ViewEnvelope? Read(string viewId);
+        Task<ViewEnvelope?> ReadAsync(string viewId);
 
-        void Save(IView view);
-        Task SaveAsync(IView view);
+        void Save(ViewEnvelope viewEnvelope);
+        Task SaveAsync(ViewEnvelope viewEnvelope);
     }
 }

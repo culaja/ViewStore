@@ -29,26 +29,26 @@ namespace ViewStore.WriteThroughCache
         public int TryDrainCache()
         {
             var cachedItems = _outgoingCache.Renew();
-            var viewBatches = new ViewBatches(cachedItems, _batchSize);
+            var viewBatches = new ViewEnvelopeBatches(cachedItems, _batchSize);
             DrainCache(viewBatches);
             StoreGlobalPosition(viewBatches.LargestGlobalVersion);
-            return viewBatches.CountOfAllViews;
+            return viewBatches.CountOfAllViewEnvelopes;
         }
 
-        private void DrainCache(ViewBatches viewBatches)
+        private void DrainCache(ViewEnvelopeBatches viewEnvelopeBatches)
         {
-            foreach (var batch in viewBatches)
+            foreach (var batch in viewEnvelopeBatches)
             {
                 SendBatch(batch);
             }
 
-            if (viewBatches.CountOfAllViews > 0)
+            if (viewEnvelopeBatches.CountOfAllViewEnvelopes > 0)
             {
-                OnDrainFinishedEvent?.Invoke(viewBatches);
+                OnDrainFinishedEvent?.Invoke(viewEnvelopeBatches);
             }
         }
 
-        private void SendBatch(IReadOnlyList<IView> batch)
+        private void SendBatch(IReadOnlyList<ViewEnvelope> batch)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace ViewStore.WriteThroughCache
             {
                 if (largestGlobalVersion != null)
                 {
-                    _destinationViewStore.Save(ViewMetaData.Of(largestGlobalVersion.Value));
+                    _destinationViewStore.Save(ViewMetaData.MetaDataEnvelopeFor(largestGlobalVersion.Value));
                 }
             }
             catch (Exception e)

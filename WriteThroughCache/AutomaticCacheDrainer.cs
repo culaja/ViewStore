@@ -5,7 +5,7 @@ namespace ViewStore.WriteThroughCache
 {
     internal delegate void OnSendingExceptionDelegate(Exception exception);
 
-    internal delegate void OnDrainFinishedDelegate(ViewBatches viewBatches);
+    internal delegate void OnDrainFinishedDelegate(ViewEnvelopeBatches viewEnvelopeBatches);
     
     internal sealed class AutomaticCacheDrainer : IDisposable
     {

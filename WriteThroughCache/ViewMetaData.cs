@@ -2,20 +2,11 @@
 
 namespace ViewStore.WriteThroughCache
 {
-    internal sealed class ViewMetaData : IView
+    public static class ViewMetaData
     {
-        public const string MetaDataId = nameof(MetaDataId);
-        
-        public string Id { get; }
-        public GlobalVersion GlobalVersion { get; }
+        public const string MetaDataId = "28963e0b-b51a-459b-be9d-c5ea1aa6f843";
 
-        public ViewMetaData(string id, GlobalVersion globalVersion)
-        {
-            Id = id;
-            GlobalVersion = globalVersion;
-        }
-
-        public static ViewMetaData Of(GlobalVersion globalVersion) =>
-            new(MetaDataId, globalVersion);
+        public static ViewEnvelope MetaDataEnvelopeFor(GlobalVersion globalVersion) =>
+            new ViewEnvelope("28963e0b-b51a-459b-be9d-c5ea1aa6f843", null!, globalVersion);
     }
 }
