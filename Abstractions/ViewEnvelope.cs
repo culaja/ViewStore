@@ -67,5 +67,7 @@ namespace ViewStore.Abstractions
         {
             return $"{nameof(Id)}: {Id}, {nameof(View)}: {View}, {nameof(GlobalVersion)}: {GlobalVersion}";
         }
+
+        public ViewEnvelope WithGlobalVersion(GlobalVersion newGlobalVersion) => new(Id, View, newGlobalVersion);
     }
 }
