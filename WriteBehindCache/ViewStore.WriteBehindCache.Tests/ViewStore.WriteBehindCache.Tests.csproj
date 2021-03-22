@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Abstraction.Tests\Abstraction.Tests.csproj" />
       <ProjectReference Include="..\..\InMemory\ViewStore.InMemory\ViewStore.InMemory.csproj" />
       <ProjectReference Include="..\ViewStore.WriteBehindCache\ViewStore.WriteBehindCache.csproj" />
     </ItemGroup>

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using ViewStore.InMemory;
 using Xunit;
-using static ViewStore.WriteBehindCache.TestView;
+using static ViewStore.Abstractions.TestView;
 
 namespace ViewStore.WriteBehindCache
 {

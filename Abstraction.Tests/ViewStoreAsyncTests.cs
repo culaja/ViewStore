@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using ViewStore.Abstractions;
 using Xunit;
-using static ViewStore.TestView;
+using static ViewStore.Abstractions.TestView;
 
-namespace ViewStore
+namespace ViewStore.Abstractions
 {
     public abstract class ViewStoreAsyncTests
     {

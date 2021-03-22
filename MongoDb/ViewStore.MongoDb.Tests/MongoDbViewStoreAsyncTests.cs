@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using ViewStore.Abstractions;
+using Xunit;
 
 namespace ViewStore.MongoDb
 {

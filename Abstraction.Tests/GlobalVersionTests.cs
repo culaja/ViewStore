@@ -1,8 +1,7 @@
 ﻿using FluentAssertions;
-using ViewStore.Abstractions;
 using Xunit;
 
-namespace ViewStore
+namespace ViewStore.Abstractions
 {
     public sealed class GlobalVersionTests
     {
