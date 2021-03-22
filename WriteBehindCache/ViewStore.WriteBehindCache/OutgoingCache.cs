@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ViewStore.Abstractions;
 
 namespace ViewStore.WriteBehindCache
@@ -22,6 +23,16 @@ namespace ViewStore.WriteBehindCache
             lock (_sync)
             {
                 return _cache.TryGetValue(viewId, out viewEnvelope) || _lastCache.TryGetValue(viewId, out viewEnvelope);
+            }
+        }
+
+        public GlobalVersion? LastKnownCachedPosition()
+        {
+            lock (_sync)
+            {
+                return _cache.Count > 0 || _lastCache.Count > 0 
+                    ? _cache.Values.Concat(_lastCache.Values).Max(ve => ve.GlobalVersion)
+                    : null;
             }
         }
 

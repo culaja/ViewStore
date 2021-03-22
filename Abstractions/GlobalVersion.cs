@@ -16,6 +16,21 @@ namespace ViewStore.Abstractions
         public static readonly GlobalVersion Start = new(0L, 0L);
         public static GlobalVersion Of(long part1) => new(part1, 0L);
         public static GlobalVersion Of(long part1, long part2) => new(part1, part2);
+
+        public static GlobalVersion? Max(GlobalVersion? a, GlobalVersion? b)
+        {
+            if (a == null)
+            {
+                return b;
+            }
+
+            if (b == null)
+            {
+                return a;
+            }
+
+            return a.Value > b.Value ? a : b;
+        }
         
         public static bool operator <(GlobalVersion p1, GlobalVersion p2)
         {

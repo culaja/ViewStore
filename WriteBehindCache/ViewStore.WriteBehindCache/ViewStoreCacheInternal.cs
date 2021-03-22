@@ -16,13 +16,15 @@ namespace ViewStore.WriteBehindCache
             _outgoingCache = outgoingCache;
         }
 
-        public GlobalVersion? ReadLastKnownPosition() => _next.Read(ViewMetaData.MetaDataId)?.GlobalVersion;
+        public GlobalVersion? ReadLastKnownPosition() =>
+            GlobalVersion.Max(
+                _outgoingCache.LastKnownCachedPosition(),
+                _next.Read(ViewMetaData.MetaDataId)?.GlobalVersion);
 
-        public async Task<GlobalVersion?> ReadLastKnownPositionAsync()
-        {
-            var metadata = await  _next.ReadAsync(ViewMetaData.MetaDataId);
-            return metadata?.GlobalVersion;
-        }
+        public async Task<GlobalVersion?> ReadLastKnownPositionAsync() =>
+            GlobalVersion.Max(
+                _outgoingCache.LastKnownCachedPosition(),
+                (await _next.ReadAsync(ViewMetaData.MetaDataId))?.GlobalVersion);
 
         public ViewEnvelope? Read(string viewId)
         {
