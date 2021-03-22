@@ -1,5 +1,4 @@
-﻿using ViewStore.Tests;
-using Xunit;
+﻿using Xunit;
 
 namespace ViewStore.MongoDb
 {

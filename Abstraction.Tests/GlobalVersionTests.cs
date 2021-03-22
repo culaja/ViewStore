@@ -2,7 +2,7 @@
 using ViewStore.Abstractions;
 using Xunit;
 
-namespace ViewStore.Tests
+namespace ViewStore
 {
     public sealed class GlobalVersionTests
     {

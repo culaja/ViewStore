@@ -5,10 +5,15 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>ViewStore.InMemory</RootNamespace>
+        <Nullable>enable</Nullable>
+
+        <AssemblyName>ViewStore.Abstractions.Tests</AssemblyName>
+
+        <RootNamespace>ViewStore.Abstractions</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
         <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -22,8 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Abstraction.Tests\Abstraction.Tests.csproj" />
-      <ProjectReference Include="..\ViewStore.InMemory\ViewStore.InMemory.csproj" />
+      <ProjectReference Include="..\Abstractions\Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

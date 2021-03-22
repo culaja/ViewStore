@@ -2,9 +2,9 @@
 using FluentAssertions;
 using ViewStore.Abstractions;
 using Xunit;
-using static ViewStore.Tests.TestView;
+using static ViewStore.TestView;
 
-namespace ViewStore.Tests
+namespace ViewStore
 {
     public abstract class ViewStoreAsyncTests
     {

@@ -1,5 +1,4 @@
 ﻿using ViewStore.Abstractions;
-using ViewStore.Tests;
 
 namespace ViewStore.InMemory
 {

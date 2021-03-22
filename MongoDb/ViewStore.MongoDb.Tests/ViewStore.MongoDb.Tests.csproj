@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Tests\Tests.csproj" />
+      <ProjectReference Include="..\..\Abstraction.Tests\Abstraction.Tests.csproj" />
       <ProjectReference Include="..\ViewStore.MongoDb\ViewStore.MongoDb.csproj" />
     </ItemGroup>
 

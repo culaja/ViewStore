@@ -1,8 +1,8 @@
 ﻿using ViewStore.Abstractions;
 
-namespace ViewStore.Tests
+namespace ViewStore.WriteBehindCache
 {
-    public sealed class TestView : IView
+    internal sealed class TestView : IView
     {
         public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(0 ,1));
         public static readonly ViewEnvelope TestViewEnvelope2 = new("2", new TestView(2), GlobalVersion.Of(0, 2));

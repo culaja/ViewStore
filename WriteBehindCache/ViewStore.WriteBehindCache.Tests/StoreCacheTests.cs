@@ -1,11 +1,10 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using ViewStore.InMemory;
-using ViewStore.WriteBehindCache;
 using Xunit;
-using static ViewStore.Tests.TestView;
+using static ViewStore.WriteBehindCache.TestView;
 
-namespace ViewStore.Tests
+namespace ViewStore.WriteBehindCache
 {
     public sealed class StoreCacheTests
     {

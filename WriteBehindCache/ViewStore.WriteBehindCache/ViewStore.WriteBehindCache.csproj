@@ -15,12 +15,12 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>ViewStore.Tests</_Parameter1>
+            <_Parameter1>ViewStore.WriteBehindCache.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Abstractions\Abstractions.csproj" />
+      <ProjectReference Include="..\..\Abstractions\Abstractions.csproj" />
     </ItemGroup>
 
 </Project>
