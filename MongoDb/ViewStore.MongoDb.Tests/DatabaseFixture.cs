@@ -1,10 +1,9 @@
 ﻿using System;
 using Mongo2Go;
 using MongoDB.Driver;
-using ViewStore.MongoDb;
 using Xunit;
 
-namespace MongoDbTests
+namespace ViewStore.MongoDb
 {
     [CollectionDefinition("Database collection")]
     public class DatabaseCollection : ICollectionFixture<DatabaseFixture>

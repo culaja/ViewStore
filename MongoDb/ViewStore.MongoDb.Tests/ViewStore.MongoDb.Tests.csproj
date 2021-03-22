@@ -7,7 +7,7 @@
 
         <Nullable>enable</Nullable>
 
-        <RootNamespace>MongoDbTests</RootNamespace>
+        <RootNamespace>ViewStore.MongoDb</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

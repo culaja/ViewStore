@@ -1,6 +1,8 @@
-﻿namespace ViewStore.Abstractions
+﻿using System;
+
+namespace ViewStore.Abstractions
 {
-    public readonly struct GlobalVersion
+    public readonly struct GlobalVersion : IComparable<GlobalVersion>
     {
         public long Part1 { get; }
         public long Part2 { get; }
@@ -49,5 +51,11 @@
         
         public override string ToString() => $"P1:{Part1}/P2:{Part2}";
 
+        public int CompareTo(GlobalVersion other)
+        {
+            var part1Comparison = Part1.CompareTo(other.Part1);
+            if (part1Comparison != 0) return part1Comparison;
+            return Part2.CompareTo(other.Part2);
+        }
     }
 }

@@ -3,15 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.Tests
+namespace ViewStore.InMemory
 {
-    internal sealed class InMemoryStore : IViewStore
+    public sealed class InMemoryViewStore : IViewStore
     {
         private readonly Dictionary<string, ViewEnvelope> _dictionary = new();
 
         public GlobalVersion? ReadLastKnownPosition() => _dictionary.Count > 0
             ? _dictionary.Values.Max(v => v.GlobalVersion)
-            : default;
+            : null;
 
         public Task<GlobalVersion?> ReadLastKnownPositionAsync() => Task.FromResult(ReadLastKnownPosition());
 

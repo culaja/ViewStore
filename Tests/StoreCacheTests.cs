@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
+using ViewStore.InMemory;
 using ViewStore.WriteBehindCache;
 using Xunit;
 using static ViewStore.Tests.TestView;
@@ -8,7 +9,7 @@ namespace ViewStore.Tests
 {
     public sealed class StoreCacheTests
     {
-        private readonly InMemoryStore _realStore = new();
+        private readonly InMemoryViewStore _realStore = new();
         private readonly OutgoingCache _outgoingCache = new();
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly ViewStoreCacheInternal _viewStoreCacheInternal;

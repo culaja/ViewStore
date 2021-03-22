@@ -1,8 +1,7 @@
-﻿using ViewStore.MongoDb;
-using ViewStore.Tests;
+﻿using ViewStore.Tests;
 using Xunit;
 
-namespace MongoDbTests
+namespace ViewStore.MongoDb
 {
     [Collection("Database collection")]
     public sealed class MongoDbViewStoreAsyncTests : ViewStoreAsyncTests
