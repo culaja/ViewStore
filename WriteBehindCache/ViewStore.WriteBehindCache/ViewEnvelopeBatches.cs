@@ -47,7 +47,9 @@ namespace ViewStore.WriteBehindCache
                     bucket = new List<ViewEnvelope>(batchSize);
 
                 bucket.Add(item);
-                largestGlobalVersion = largestGlobalVersion < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersion;
+                largestGlobalVersion = 
+                    largestGlobalVersion < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersion
+                    ?? item.GlobalVersion;
 
                 if (bucket.Count != batchSize)
                     continue;
