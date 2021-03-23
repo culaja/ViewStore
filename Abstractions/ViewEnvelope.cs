@@ -48,25 +48,16 @@ namespace ViewStore.Abstractions
             return this;
         }
 
-        public bool Equals(ViewEnvelope other)
-        {
-            return Id == other.Id && View.Equals(other.View) && GlobalVersion.Equals(other.GlobalVersion);
-        }
+        public bool Equals(ViewEnvelope other) => 
+            Id == other.Id && View.Equals(other.View) && GlobalVersion.Equals(other.GlobalVersion);
 
-        public override bool Equals(object? obj)
-        {
-            return ReferenceEquals(this, obj) || obj is ViewEnvelope other && Equals(other);
-        }
+        public override bool Equals(object? obj) => 
+            ReferenceEquals(this, obj) || obj is ViewEnvelope other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Id, View, GlobalVersion);
-        }
+        public override int GetHashCode() => Id.GetHashCode();
 
-        public override string ToString()
-        {
-            return $"{nameof(Id)}: {Id}, {nameof(View)}: {View}, {nameof(GlobalVersion)}: {GlobalVersion}";
-        }
+        public override string ToString() => 
+            $"{nameof(Id)}: {Id}, {nameof(View)}: {View}, {nameof(GlobalVersion)}: {GlobalVersion}";
 
         public ViewEnvelope WithGlobalVersion(GlobalVersion newGlobalVersion) => new(Id, View, newGlobalVersion);
     }
