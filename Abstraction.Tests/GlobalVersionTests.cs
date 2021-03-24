@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Runtime.InteropServices;
+using FluentAssertions;
 using Xunit;
 
 namespace ViewStore.Abstractions
@@ -156,6 +157,38 @@ namespace ViewStore.Abstractions
         {
             (GlobalVersion.Of(aPart1, aPart2) >= GlobalVersion.Of(bPart1, bPart2))
                 .Should().Be(aGreaterOrEqualThanB);
+        }
+
+        [Theory]
+        [InlineData(0UL, 0UL, 0L, 0L)]
+        [InlineData(1UL, 0UL, 0L, 0L)]
+        [InlineData(0UL, 1UL, 0L, 0L)]
+        [InlineData(18446744073709551615UL, 0UL, 9223372036854775807L, 0L)]
+        [InlineData(0UL, 18446744073709551615UL, 0L, 9223372036854775807L)]
+        [InlineData(3658975214525UL, 269857885214584UL, 1829487607262L, 134928942607292L)]
+        public void conversion_from_ulong_parts_is_downscaled_for_1_bit(
+            ulong part1, ulong part2,
+            long expectedPart1, long expectedPart2)
+        {
+            GlobalVersion.FromUlong(part1, part2)
+                .Should()
+                .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
+        }
+
+        [Theory]
+        [InlineData(0L, 0L, 0UL, 0UL)]
+        [InlineData(1L, 0L, 2UL, 0UL)]
+        [InlineData(0L, 1L, 0UL, 2UL)]
+        [InlineData(9223372036854775807L, 0L, 18446744073709551614UL, 0UL)]
+        [InlineData(0L, 9223372036854775807L, 0UL, 18446744073709551614UL)]
+        [InlineData(1829487607262L, 134928942607292L, 3658975214524UL, 269857885214584UL)]
+        public void conversion_to_ulong_parts_is_up_scaled_for_1_bit(
+            long part1, long part2,
+            ulong expectedPart1, ulong expectedPart2)
+        {
+            GlobalVersion.Of(part1, part2).ToUlong()
+                .Should()
+                .Be(new (expectedPart1, expectedPart2));
         }
     }
 }

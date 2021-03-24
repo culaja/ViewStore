@@ -14,8 +14,12 @@ namespace ViewStore.Abstractions
         }
 
         public static readonly GlobalVersion Start = new(0L, 0L);
-        public static GlobalVersion Of(long part1) => new(part1, 0L);
-        public static GlobalVersion Of(long part1, long part2) => new(part1, part2);
+        public static GlobalVersion Of(long part1, long part2 = 0L) => new(part1, part2);
+
+        public static GlobalVersion FromUlong(ulong part1, ulong part2 = 0UL) =>
+            new((long) (part1 >> 1), (long) (part2 >> 1));
+
+        public (ulong, ulong) ToUlong() => new((ulong)Part1 << 1, (ulong)Part2 << 1);
 
         public static GlobalVersion? Max(GlobalVersion? a, GlobalVersion? b)
         {
