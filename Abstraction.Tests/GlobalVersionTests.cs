@@ -163,10 +163,11 @@ namespace ViewStore.Abstractions
         [InlineData(0UL, 0UL, 0L, 0L)]
         [InlineData(1UL, 0UL, 0L, 0L)]
         [InlineData(0UL, 1UL, 0L, 0L)]
+        [InlineData(2UL, 2UL, 1L, 1L)]
         [InlineData(18446744073709551615UL, 0UL, 9223372036854775807L, 0L)]
         [InlineData(0UL, 18446744073709551615UL, 0L, 9223372036854775807L)]
         [InlineData(3658975214525UL, 269857885214584UL, 1829487607262L, 134928942607292L)]
-        public void conversion_from_ulong_parts_is_downscaled_for_1_bit(
+        public void conversion_from_ulong_parts_is_downscaled_for_1_bit_so_first_bit_is_lost(
             ulong part1, ulong part2,
             long expectedPart1, long expectedPart2)
         {
