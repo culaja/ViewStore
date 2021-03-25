@@ -7,14 +7,14 @@ namespace ViewStore.WriteBehindCache
     internal sealed class OutgoingCache
     {
         private readonly object _sync = new();
-        private Dictionary<string, ViewEnvelope> _cache = new();
-        private Dictionary<string, ViewEnvelope> _lastCache = new();
+        private Dictionary<string, ViewEnvelope> _currentCache = new();
+        private Dictionary<string, ViewEnvelope> _drainedCache = new();
 
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
             lock (_sync)
             {
-                _cache[viewEnvelope.Id] = viewEnvelope;
+                _currentCache[viewEnvelope.Id] = viewEnvelope;
             }
         }
 
@@ -22,7 +22,7 @@ namespace ViewStore.WriteBehindCache
         {
             lock (_sync)
             {
-                return _cache.TryGetValue(viewId, out viewEnvelope) || _lastCache.TryGetValue(viewId, out viewEnvelope);
+                return _currentCache.TryGetValue(viewId, out viewEnvelope) || _drainedCache.TryGetValue(viewId, out viewEnvelope);
             }
         }
 
@@ -30,8 +30,8 @@ namespace ViewStore.WriteBehindCache
         {
             lock (_sync)
             {
-                return _cache.Count > 0 || _lastCache.Count > 0 
-                    ? _cache.Values.Concat(_lastCache.Values).Max(ve => ve.GlobalVersion)
+                return _currentCache.Count > 0 || _drainedCache.Count > 0 
+                    ? _currentCache.Values.Concat(_drainedCache.Values).Max(ve => ve.GlobalVersion)
                     : null;
             }
         }
@@ -40,9 +40,9 @@ namespace ViewStore.WriteBehindCache
         {
             lock (_sync)
             {
-                _lastCache = _cache;
-                _cache = new Dictionary<string, ViewEnvelope>();
-                return _lastCache.Values;
+                _drainedCache = _currentCache;
+                _currentCache = new Dictionary<string, ViewEnvelope>();
+                return _drainedCache.Values;
             }
         }
     }

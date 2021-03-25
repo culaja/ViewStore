@@ -20,6 +20,11 @@ namespace ViewStore.WriteBehindCache
             _viewStoreCacheInternal = new ViewStoreCacheInternal(_finalStore, _outgoingCache);
         }
         
+        /// <remarks>
+        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        ///           V1, V2
+        /// -------------------------*-------------------------*---------------------- 
+        /// </remarks>
         [Theory]
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
@@ -38,6 +43,11 @@ namespace ViewStore.WriteBehindCache
         }
         
         
+        /// <remarks>
+        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        ///                                    V1 V2                    V1 V2
+        /// -------------------------*-------------------------*---------------------- 
+        /// </remarks>
         [Theory]
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
@@ -57,6 +67,11 @@ namespace ViewStore.WriteBehindCache
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
         
+        /// <remarks>
+        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        ///              V2                       V1                      V1
+        /// -------------------------*-------------------------*---------------------- 
+        /// </remarks>
         [Theory]
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
@@ -75,6 +90,11 @@ namespace ViewStore.WriteBehindCache
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
         
+        /// <remarks>
+        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        ///                                                             V1, V2
+        /// -------------------------*-------------------------*---------------------- 
+        /// </remarks>
         [Theory]
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
