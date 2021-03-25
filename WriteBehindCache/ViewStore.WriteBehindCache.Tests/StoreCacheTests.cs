@@ -57,6 +57,6 @@ namespace ViewStore.WriteBehindCache
         {
             var actualView = await _viewStoreCacheInternal.ReadAsync(TestViewEnvelope1.Id);
             actualView.Should().BeNull();
-        }
+        } 
     }
 }
