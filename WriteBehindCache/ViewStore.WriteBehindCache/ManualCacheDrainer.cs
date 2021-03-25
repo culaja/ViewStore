@@ -31,7 +31,7 @@ namespace ViewStore.WriteBehindCache
             var cachedItems = _outgoingCache.Renew();
             var viewBatches = new ViewEnvelopeBatches(cachedItems, _batchSize);
             DrainCache(viewBatches);
-            StoreGlobalPosition(viewBatches.LargestGlobalVersion);
+            StoreCacheMetadata(viewBatches.LargestGlobalVersion);
             return viewBatches.CountOfAllViewEnvelopes;
         }
 
@@ -62,7 +62,7 @@ namespace ViewStore.WriteBehindCache
             }
         }
 
-        private void StoreGlobalPosition(GlobalVersion? largestGlobalVersion)
+        private void StoreCacheMetadata(GlobalVersion? largestGlobalVersion)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace ViewStore.WriteBehindCache
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 Thread.Sleep(1000);
-                StoreGlobalPosition(largestGlobalVersion);
+                StoreCacheMetadata(largestGlobalVersion);
             }
         }
     }

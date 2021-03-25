@@ -15,9 +15,9 @@ namespace ViewStore.WriteBehindCache
             _automaticCacheDrainer = automaticCacheDrainer;
         }
 
-        public GlobalVersion? ReadLastKnownPosition() => _viewStoreCacheInternal.ReadLastKnownPosition();
+        public GlobalVersion? ReadLastGlobalVersion() => _viewStoreCacheInternal.ReadLastGlobalVersion();
 
-        public Task<GlobalVersion?> ReadLastKnownPositionAsync() => _viewStoreCacheInternal.ReadLastKnownPositionAsync();
+        public Task<GlobalVersion?> ReadLastGlobalVersionAsync() => _viewStoreCacheInternal.ReadLastGlobalVersionAsync();
 
         public ViewEnvelope? Read(string viewId) => _viewStoreCacheInternal.Read(viewId);
 

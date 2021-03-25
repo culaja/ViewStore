@@ -32,7 +32,7 @@ namespace ViewStore.MongoDb
             _collectionName = collectionName;
         }
 
-        public GlobalVersion? ReadLastKnownPosition() =>
+        public GlobalVersion? ReadLastGlobalVersion() =>
             Collection()
                 .Find(Empty)
                 .SortByDescending(view => view.GlobalVersion)
@@ -40,7 +40,7 @@ namespace ViewStore.MongoDb
                 .FirstOrDefault()
                 ?.GlobalVersion;
 
-        public async Task<GlobalVersion?> ReadLastKnownPositionAsync()
+        public async Task<GlobalVersion?> ReadLastGlobalVersionAsync()
         {
             var lastUpdatedView = await Collection()
                 .Find(Empty)

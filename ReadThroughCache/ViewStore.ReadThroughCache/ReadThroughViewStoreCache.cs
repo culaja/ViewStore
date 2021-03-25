@@ -21,9 +21,9 @@ namespace ViewStore.ReadThroughCache
             _next = next;
         }
 
-        public GlobalVersion? ReadLastKnownPosition() => _next.ReadLastKnownPosition();
+        public GlobalVersion? ReadLastGlobalVersion() => _next.ReadLastGlobalVersion();
 
-        public Task<GlobalVersion?> ReadLastKnownPositionAsync() => _next.ReadLastKnownPositionAsync();
+        public Task<GlobalVersion?> ReadLastGlobalVersionAsync() => _next.ReadLastGlobalVersionAsync();
 
         public ViewEnvelope? Read(string viewId)
         {

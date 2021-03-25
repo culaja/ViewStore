@@ -26,7 +26,7 @@ namespace ViewStore.WriteBehindCache
             }
         }
 
-        public GlobalVersion? LastKnownCachedPosition()
+        public GlobalVersion? LastGlobalVersion()
         {
             lock (_sync)
             {

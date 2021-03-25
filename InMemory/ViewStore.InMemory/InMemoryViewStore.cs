@@ -9,11 +9,11 @@ namespace ViewStore.InMemory
     {
         private readonly Dictionary<string, ViewEnvelope> _dictionary = new();
 
-        public GlobalVersion? ReadLastKnownPosition() => _dictionary.Count > 0
+        public GlobalVersion? ReadLastGlobalVersion() => _dictionary.Count > 0
             ? _dictionary.Values.Max(v => v.GlobalVersion)
             : null;
 
-        public Task<GlobalVersion?> ReadLastKnownPositionAsync() => Task.FromResult(ReadLastKnownPosition());
+        public Task<GlobalVersion?> ReadLastGlobalVersionAsync() => Task.FromResult(ReadLastGlobalVersion());
 
         public ViewEnvelope? Read(string viewId)
         {

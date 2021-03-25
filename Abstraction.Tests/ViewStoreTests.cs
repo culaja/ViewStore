@@ -9,21 +9,21 @@ namespace ViewStore.Abstractions
         protected abstract IViewStore BuildViewStore();
         
         [Fact]
-        public void when_view_store_is_empty_last_known_position_is_null()
+        public void when_view_store_is_empty_last_global_version_is_null()
         {
             var viewStore = BuildViewStore();
 
-            viewStore.ReadLastKnownPosition().Should().BeNull();
+            viewStore.ReadLastGlobalVersion().Should().BeNull();
         }
 
         [Fact]
-        public void after_saving_single_view_last_known_position_point_to_views_position()
+        public void after_saving_single_view_last_global_version_in_store_point_to_views_global_version()
         {
             var viewStore = BuildViewStore();
             
             viewStore.Save(TestViewEnvelope1);
 
-            viewStore.ReadLastKnownPosition().Should().Be(TestViewEnvelope1.GlobalVersion);
+            viewStore.ReadLastGlobalVersion().Should().Be(TestViewEnvelope1.GlobalVersion);
         }
         
         [Theory]
@@ -39,21 +39,21 @@ namespace ViewStore.Abstractions
         [InlineData(6, 3,   6, 3,   6, 3)]
         [InlineData(6, 3,   7, 2,   7, 2)]
         [InlineData(6, 3,   7, 7,   7, 7)]
-        public void after_saving_multiple_views_last_known_position_points_to_greatest_view_position(
-            long view1GlobalPositionPart1,
-            long view1GlobalPositionPart2,
-            long view2GlobalPositionPart1,
-            long view2GlobalPositionPart2,
-            long expectedLastKnownPositionPart1,
-            long expectedLastKnownPositionPart2)
+        public void after_saving_multiple_views_last_global_version_in_store_points_to_greatest_view_global_version(
+            long view1GlobalVersionPart1,
+            long view1GlobalVersionPart2,
+            long view2GlobalVersionPart1,
+            long view2GlobalVersionPart2,
+            long expectedLastGlobalVersionPart1,
+            long expectedLastGlobalVersionPart2)
         {
             var viewStore = BuildViewStore();
             
-            viewStore.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1GlobalPositionPart1, view1GlobalPositionPart2)));
-            viewStore.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2GlobalPositionPart1, view2GlobalPositionPart2)));
+            viewStore.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1GlobalVersionPart1, view1GlobalVersionPart2)));
+            viewStore.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2GlobalVersionPart1, view2GlobalVersionPart2)));
 
-            viewStore.ReadLastKnownPosition()
-                .Should().Be(GlobalVersion.Of(expectedLastKnownPositionPart1, expectedLastKnownPositionPart2));
+            viewStore.ReadLastGlobalVersion()
+                .Should().Be(GlobalVersion.Of(expectedLastGlobalVersionPart1, expectedLastGlobalVersionPart2));
         }
 
         [Fact]
