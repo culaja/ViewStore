@@ -1,4 +1,4 @@
-name: .NET
+name: PublishNugets
 
 on:
   push:
@@ -30,24 +30,24 @@ jobs:
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.WriteThroughCache
+    - name: Publish ViewStore.WriteBehindCache
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: WriteThroughCache/WriteThroughCache.csproj
+        PROJECT_FILE_PATH: WriteBehindCache/ViewStore.WriteBehindCache/ViewStore.WriteBehindCache.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
     - name: Publish ViewStore.ReadThroughCache
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: ReadThroughCache/ReadThroughCache.csproj
+        PROJECT_FILE_PATH: ReadThroughCache/ViewStore.ReadThroughCache/ViewStore.ReadThroughCache.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
     - name: Publish ViewStore.MongoDb
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: MongoDb/MongoDb.csproj
+        PROJECT_FILE_PATH: MongoDb/ViewStore.MongoDb/ViewStore.MongoDb.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
