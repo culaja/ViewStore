@@ -19,12 +19,34 @@ namespace ViewStore.WriteBehindCache
         public GlobalVersion? ReadLastGlobalVersion() =>
             GlobalVersion.Max(
                 _outgoingCache.LastGlobalVersion(),
-                _next.Read(ViewMetaData.MetaDataId)?.GlobalVersion);
+                ReadLastGlobalVersionFromNextStore());
+        
+        private GlobalVersion? ReadLastGlobalVersionFromNextStore()
+        {
+            var lastGlobalVersion = _next.Read(ViewMetaData.MetaDataId)?.GlobalVersion;
+            if (lastGlobalVersion != null)
+            {
+                return lastGlobalVersion;
+            }
+
+            return _next.ReadLastGlobalVersion();
+        }
 
         public async Task<GlobalVersion?> ReadLastGlobalVersionAsync() =>
             GlobalVersion.Max(
                 _outgoingCache.LastGlobalVersion(),
-                (await _next.ReadAsync(ViewMetaData.MetaDataId))?.GlobalVersion);
+                await ReadLastGlobalVersionFromNextStoreAsync());
+
+        private async Task<GlobalVersion?> ReadLastGlobalVersionFromNextStoreAsync()
+        {
+            var lastGlobalVersion = (await _next.ReadAsync(ViewMetaData.MetaDataId))?.GlobalVersion;
+            if (lastGlobalVersion != null)
+            {
+                return lastGlobalVersion;
+            }
+
+            return await _next.ReadLastGlobalVersionAsync();
+        }
 
         public ViewEnvelope? Read(string viewId)
         {
