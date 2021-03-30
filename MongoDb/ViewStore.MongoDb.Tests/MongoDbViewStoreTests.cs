@@ -13,6 +13,6 @@ namespace ViewStore.MongoDb
             _databaseFixture = databaseFixture;
         }
 
-        protected override MongoDbViewStore BuildViewStore() => _databaseFixture.BuildMongoDbViewStore();
+        protected override IViewStore BuildViewStore() => _databaseFixture.BuildMongoDbViewStore();
     }
 }

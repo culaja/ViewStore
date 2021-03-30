@@ -7,7 +7,7 @@ using static MongoDB.Driver.FilterDefinition<ViewStore.Abstractions.ViewEnvelope
 
 namespace ViewStore.MongoDb
 {
-    public sealed class MongoDbViewStore : IViewStore
+    internal sealed class MongoDbViewStore : IViewStore
     {
         private readonly IMongoDatabase _mongoDatabase;
         private readonly string _collectionName;
@@ -17,13 +17,16 @@ namespace ViewStore.MongoDb
 
         static MongoDbViewStore()
         {
-            BsonClassMap.RegisterClassMap<ViewEnvelope>(cm =>
+            if (!BsonClassMap.IsClassMapRegistered(typeof(ViewEnvelope)))
             {
-                cm.MapProperty(m => m.Id);
-                cm.MapProperty(m => m.View);
-                cm.MapProperty(m => m.GlobalVersion).SetSerializer(new GlobalVersionSerializer());
-                cm.MapCreator(m => new ViewEnvelope(m.Id, m.View, m.GlobalVersion));
-            });
+                BsonClassMap.RegisterClassMap<ViewEnvelope>(cm =>
+                {
+                    cm.MapProperty(m => m.Id);
+                    cm.MapProperty(m => m.View);
+                    cm.MapProperty(m => m.GlobalVersion).SetSerializer(new GlobalVersionSerializer());
+                    cm.MapCreator(m => new ViewEnvelope(m.Id, m.View, m.GlobalVersion));
+                });    
+            }
         }
 
         public MongoDbViewStore(IMongoDatabase mongoDatabase, string collectionName)

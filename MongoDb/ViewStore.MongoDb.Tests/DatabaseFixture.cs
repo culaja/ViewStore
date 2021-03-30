@@ -1,6 +1,7 @@
 ﻿using System;
 using Mongo2Go;
 using MongoDB.Driver;
+using ViewStore.Abstractions;
 using Xunit;
 
 namespace ViewStore.MongoDb
@@ -18,11 +19,12 @@ namespace ViewStore.MongoDb
         {
             _mongoDbRunner = MongoDbRunner.Start();
         }
-        
-        public MongoDbViewStore BuildMongoDbViewStore() =>
-            new(
-                new MongoClient(_mongoDbRunner.ConnectionString).GetDatabase(Guid.NewGuid().ToString()),
-                Guid.NewGuid().ToString());
+
+        public IViewStore BuildMongoDbViewStore() =>
+            MongoDbViewStoreBuilder.New()
+                .WithConnectionDetails(_mongoDbRunner.ConnectionString, Guid.NewGuid().ToString())
+                .WithCollectionName(Guid.NewGuid().ToString())
+                .Build();
         
         public void Dispose()
         {
