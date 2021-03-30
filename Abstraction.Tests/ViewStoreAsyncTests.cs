@@ -95,7 +95,7 @@ namespace ViewStore.Abstractions
             var viewStore = BuildViewStore();
 
             var transformedViewEnvelope = TestViewEnvelope1.ImmutableTransform<TestView>(
-                GlobalVersion.Of(1, 0),
+                GlobalVersion.Of(1),
                 testView => testView.Increment());
             
             await viewStore.SaveAsync(TestViewEnvelope1);

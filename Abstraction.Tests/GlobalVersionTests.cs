@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Xunit;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace ViewStore.Abstractions
 {

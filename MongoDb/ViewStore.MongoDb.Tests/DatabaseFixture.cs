@@ -1,6 +1,5 @@
 ﻿using System;
 using Mongo2Go;
-using MongoDB.Driver;
 using ViewStore.Abstractions;
 using Xunit;
 

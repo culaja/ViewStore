@@ -6,8 +6,8 @@ namespace ViewStore.MongoDb
 {
     public sealed class MongoDbViewStoreBuilder
     {
-        private IMongoDatabase? _mongoDatabase = null;
-        private string? _collectionName = null;
+        private IMongoDatabase? _mongoDatabase;
+        private string? _collectionName;
         private Action _viewRegistrator = () => { };
 
         public static MongoDbViewStoreBuilder New() => new();
