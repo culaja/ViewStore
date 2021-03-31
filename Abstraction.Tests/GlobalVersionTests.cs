@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Xunit;
 // ReSharper disable RedundantArgumentDefaultValue
 
@@ -161,13 +162,11 @@ namespace ViewStore.Abstractions
 
         [Theory]
         [InlineData(0UL, 0UL, 0L, 0L)]
-        [InlineData(1UL, 0UL, 0L, 0L)]
-        [InlineData(0UL, 1UL, 0L, 0L)]
-        [InlineData(2UL, 2UL, 1L, 1L)]
-        [InlineData(18446744073709551615UL, 0UL, 9223372036854775807L, 0L)]
-        [InlineData(0UL, 18446744073709551615UL, 0L, 9223372036854775807L)]
-        [InlineData(3658975214525UL, 269857885214584UL, 1829487607262L, 134928942607292L)]
-        public void conversion_from_ulong_parts_is_downscaled_for_1_bit_so_first_bit_is_lost(
+        [InlineData(1UL, 0UL, 1L, 0L)]
+        [InlineData(0UL, 1UL, 0L, 1L)]
+        [InlineData(2UL, 2UL, 2L, 2L)]
+        [InlineData(3658975214525UL, 269857885214584UL, 3658975214525L, 269857885214584L)]
+        public void conversion_from_ulong_parts_is_mapped_to_the_same_long_values(
             ulong part1, ulong part2,
             long expectedPart1, long expectedPart2)
         {
@@ -175,15 +174,26 @@ namespace ViewStore.Abstractions
                 .Should()
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
+        
+        [Theory]
+        [InlineData(18446744073709551615UL, 0UL)]
+        [InlineData(0UL, 18446744073709551615UL)]
+        [InlineData(9223372036854775808UL, 100UL)]
+        [InlineData(100UL, 9223372036854775808UL)]
+        public void conversion_from_ulong_parts_throws_exception_if_parts_are_out_of_range(
+            ulong part1, ulong part2)
+        {
+            Assert.Throws<OverflowException>(() => GlobalVersion.FromUlong(part1, part2));
+        }
 
         [Theory]
         [InlineData(0L, 0L, 0UL, 0UL)]
-        [InlineData(1L, 0L, 2UL, 0UL)]
-        [InlineData(0L, 1L, 0UL, 2UL)]
-        [InlineData(9223372036854775807L, 0L, 18446744073709551614UL, 0UL)]
-        [InlineData(0L, 9223372036854775807L, 0UL, 18446744073709551614UL)]
-        [InlineData(1829487607262L, 134928942607292L, 3658975214524UL, 269857885214584UL)]
-        public void conversion_to_ulong_parts_is_up_scaled_for_1_bit(
+        [InlineData(1L, 0L, 1UL, 0UL)]
+        [InlineData(0L, 1L, 0UL, 1UL)]
+        [InlineData(9223372036854775807L, 0L, 9223372036854775807UL, 0UL)]
+        [InlineData(0L, 9223372036854775807L, 0UL, 9223372036854775807UL)]
+        [InlineData(1829487607262L, 134928942607292L, 1829487607262UL, 134928942607292UL)]
+        public void conversion_from_long_to_ulong_parts_keeps_the_same_values(
             long part1, long part2,
             ulong expectedPart1, ulong expectedPart2)
         {

@@ -8,7 +8,7 @@
         <AssemblyName>ViewStore.MongoDb</AssemblyName>
         <PackageId>ViewStore.MongoDb</PackageId>
         <PackageDescription>MongoDb implementation of View Store.</PackageDescription>
-        <Version>1.2.0-alpha3</Version>
+        <Version>1.2.0-alpha4</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>MongoDb;MongoDb View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>

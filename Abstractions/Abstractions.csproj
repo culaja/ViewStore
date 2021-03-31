@@ -8,7 +8,7 @@
         <RootNamespace>ViewStore.Abstractions</RootNamespace>
         <PackageId>ViewStore.Abstractions</PackageId>
         <PackageDescription>Contains core View Store model.</PackageDescription>
-        <Version>1.2.0-alpha3</Version>
+        <Version>1.2.0-alpha4</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
