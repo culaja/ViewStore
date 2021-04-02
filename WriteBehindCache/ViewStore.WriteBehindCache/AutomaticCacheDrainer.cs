@@ -5,7 +5,7 @@ namespace ViewStore.WriteBehindCache
 {
     internal delegate void OnSendingExceptionDelegate(Exception exception);
 
-    internal delegate void OnDrainFinishedDelegate(ViewEnvelopeBatches viewEnvelopeBatches);
+    internal delegate void OnDrainFinishedDelegate(DrainStatistics drainStatistics);
     
     internal sealed class AutomaticCacheDrainer : IDisposable
     {
@@ -19,8 +19,7 @@ namespace ViewStore.WriteBehindCache
 
         public AutomaticCacheDrainer(
             ManualCacheDrainer manualCacheDrainer,
-            TimeSpan drainPeriod
-            )
+            TimeSpan drainPeriod)
         {
             _manualCacheDrainer = manualCacheDrainer;
             manualCacheDrainer.OnSendingExceptionEvent += exception => OnSendingExceptionEvent?.Invoke(exception);

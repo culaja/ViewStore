@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace ViewStore.WriteBehindCache
 {
     internal sealed class ManualCacheDrainer
     {
+        private readonly Stopwatch _stopwatch = new();
         private readonly IViewStore _destinationViewStore;
         private readonly OutgoingCache _outgoingCache;
         private readonly int _batchSize;
@@ -28,27 +30,39 @@ namespace ViewStore.WriteBehindCache
 
         public int DrainCacheUntilEmpty()
         {
+            _stopwatch.Restart();
+            var (drainedViewCount, numberOfRetries) = DrainCacheUntilEmptyInternal();
+            _stopwatch.Stop();
+            
+            if (drainedViewCount > 0)
+            {
+                OnDrainFinishedEvent?.Invoke(new DrainStatistics(_stopwatch.Elapsed,drainedViewCount,numberOfRetries));
+            }
+
+            return drainedViewCount;
+        }
+
+        private (int, int) DrainCacheUntilEmptyInternal()
+        {
             var cachedItems = _outgoingCache.Renew();
             var viewBatches = new ViewEnvelopeBatches(cachedItems, _batchSize);
-            DrainCache(viewBatches);
-            StoreCacheMetadata(viewBatches.LargestGlobalVersion);
-            return viewBatches.CountOfAllViewEnvelopes;
+            var drainCacheRetryCount = DrainCache(viewBatches);
+            var storeCacheMetadataRetryCount = StoreCacheMetadata(viewBatches.LargestGlobalVersion);
+            return (viewBatches.CountOfAllViewEnvelopes, drainCacheRetryCount + storeCacheMetadataRetryCount);
         }
 
-        private void DrainCache(ViewEnvelopeBatches viewEnvelopeBatches)
+        private int DrainCache(ViewEnvelopeBatches viewEnvelopeBatches)
         {
+            var numberOfRetries = 0;
             foreach (var batch in viewEnvelopeBatches)
             {
-                SendBatch(batch);
+                numberOfRetries += SendBatch(batch);
             }
 
-            if (viewEnvelopeBatches.CountOfAllViewEnvelopes > 0)
-            {
-                OnDrainFinishedEvent?.Invoke(viewEnvelopeBatches);
-            }
+            return numberOfRetries;
         }
 
-        private void SendBatch(IReadOnlyList<ViewEnvelope> batch)
+        private int SendBatch(IReadOnlyList<ViewEnvelope> batch, int numberOfRetries = 0)
         {
             try
             {
@@ -58,11 +72,13 @@ namespace ViewStore.WriteBehindCache
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 Thread.Sleep(1000);
-                SendBatch(batch);
+                return SendBatch(batch, numberOfRetries + 1);
             }
+
+            return numberOfRetries;
         }
 
-        private void StoreCacheMetadata(GlobalVersion? largestGlobalVersion)
+        private int StoreCacheMetadata(GlobalVersion? largestGlobalVersion, int numberOfRetries = 0)
         {
             try
             {
@@ -75,8 +91,10 @@ namespace ViewStore.WriteBehindCache
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 Thread.Sleep(1000);
-                StoreCacheMetadata(largestGlobalVersion);
+                StoreCacheMetadata(largestGlobalVersion, numberOfRetries + 1);
             }
+
+            return numberOfRetries;
         }
     }
 }

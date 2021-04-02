@@ -8,7 +8,7 @@ namespace ViewStore.WriteBehindCache
         private IViewStore? _realViewStore;
         private TimeSpan _cacheDrainPeriod = TimeSpan.Zero;
         private int _cacheDrainBatchSize;
-        private Action<int>? _cacheDrainedCallback;
+        private Action<DrainStatistics>? _cacheDrainedCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
 
         public static ViewStoreCacheFactory New() => new();
@@ -36,7 +36,7 @@ namespace ViewStore.WriteBehindCache
             return this;
         }
 
-        public ViewStoreCacheFactory UseCallbackWhenDrainFinished(Action<int> callback)
+        public ViewStoreCacheFactory UseCallbackWhenDrainFinished(Action<DrainStatistics> callback)
         {
             _cacheDrainedCallback = callback;
             return this;
@@ -61,7 +61,7 @@ namespace ViewStore.WriteBehindCache
                 new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
                 _cacheDrainPeriod);
 
-            automaticCacheDrainer.OnDrainFinishedEvent += views => _cacheDrainedCallback?.Invoke(views.CountOfAllViewEnvelopes);
+            automaticCacheDrainer.OnDrainFinishedEvent += ds => _cacheDrainedCallback?.Invoke(ds);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
             var viewStoreCacheInternal = new ViewStoreCacheInternal(
