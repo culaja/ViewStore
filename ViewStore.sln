@@ -28,6 +28,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewStore.WriteBehindCache.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewStore.ReadThroughCache.Tests", "ReadThroughCache\ViewStore.ReadThroughCache.Tests\ViewStore.ReadThroughCache.Tests.csproj", "{9A54B317-2F2F-40A6-A565-9F16FDF03A3E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{9C716C3D-C029-479B-8291-18434F58B2BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteBehindCacheTestApp", "Samples\WriteBehindCacheTestApp\WriteBehindCacheTestApp.csproj", "{9DE143E6-2301-4403-98EE-6D9983699AB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +78,10 @@ Global
 		{9A54B317-2F2F-40A6-A565-9F16FDF03A3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A54B317-2F2F-40A6-A565-9F16FDF03A3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A54B317-2F2F-40A6-A565-9F16FDF03A3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DE143E6-2301-4403-98EE-6D9983699AB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DE143E6-2301-4403-98EE-6D9983699AB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DE143E6-2301-4403-98EE-6D9983699AB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DE143E6-2301-4403-98EE-6D9983699AB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{816A7A48-3F1A-4DB6-B05F-585E35A84B44} = {6B8B487E-8FEF-4EC0-A81F-43F5AF707827}
@@ -84,5 +92,6 @@ Global
 		{877395B0-6222-4B31-BC72-A2535DB9161D} = {CBDC38B5-99D5-4B12-98FE-E62BA97A0058}
 		{E191226F-DC32-4E96-85F1-749B2CE990BD} = {CBDC38B5-99D5-4B12-98FE-E62BA97A0058}
 		{9A54B317-2F2F-40A6-A565-9F16FDF03A3E} = {88FED5D3-3ABA-4671-974C-F205B1634EE3}
+		{9DE143E6-2301-4403-98EE-6D9983699AB6} = {9C716C3D-C029-479B-8291-18434F58B2BB}
 	EndGlobalSection
 EndGlobal
