@@ -2,7 +2,7 @@
 {
     public sealed class TestView : IView
     {
-        public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(0 ,1));
+        public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(0, 1));
         public static readonly ViewEnvelope TestViewEnvelope2 = new("2", new TestView(2), GlobalVersion.Of(0, 2));
 
         public int Number { get; }
