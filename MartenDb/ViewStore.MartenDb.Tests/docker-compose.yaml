@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  postgres_mes:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      - 'POSTGRES_USER=root'
+      - 'POSTGRES_PASSWORD=dagi123'
+      - 'POSTGRES_DB=EventStore'
+    ports:
+      - 8276:5432
