@@ -1,7 +1,6 @@
 ﻿using System;
 using Marten;
 using ViewStore.Abstractions;
-using Xunit;
 
 namespace ViewStore.MartenDb
 {
@@ -15,7 +14,7 @@ namespace ViewStore.MartenDb
             {
                 _.AutoCreateSchemaObjects = AutoCreate.All;
                 _.Connection("host=localhost;port=8276;database=EventStore;password=dagi123;username=root");
-                _.Schema.For<ViewEnvelope>().DatabaseSchemaName($"S{Guid.NewGuid().ToString("N")}");
+                _.Schema.For<ViewEnvelope>().DatabaseSchemaName($"S{Guid.NewGuid():N}");
             });
         }
 

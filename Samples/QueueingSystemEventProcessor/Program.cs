@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Runtime.Caching;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MongoDB.Bson.Serialization;
-using Newtonsoft.Json;
 using Spectre.Console;
 using ViewStore.Abstractions;
 using ViewStore.MongoDb;
