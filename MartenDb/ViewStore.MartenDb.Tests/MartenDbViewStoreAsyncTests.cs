@@ -15,6 +15,8 @@ namespace ViewStore.MartenDb
                 _.AutoCreateSchemaObjects = AutoCreate.All;
                 _.Connection("host=localhost;port=8276;database=EventStore;password=dagi123;username=root");
                 _.Schema.For<ViewEnvelope>().DatabaseSchemaName($"S{Guid.NewGuid():N}");
+                _.Schema.For<ViewEnvelope>().Index(ve => ve.Id);
+                _.Schema.For<ViewEnvelope>().Index(ve => ve.GlobalVersion);
             });
         }
 
