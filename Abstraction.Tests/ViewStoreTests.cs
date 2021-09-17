@@ -102,5 +102,16 @@ namespace ViewStore.Abstractions
 
             viewStore.Read(TestViewEnvelope1.Id).Should().Be(transformedViewEnvelope);
         }
+
+        [Fact]
+        public void saving_batch_of_views_works()
+        {
+            var viewStore = BuildViewStore();
+
+            viewStore.Save(new [] { TestViewEnvelope1, TestViewEnvelope2} );
+
+            viewStore.Read(TestViewEnvelope1.Id).Should().Be(TestViewEnvelope1);
+            viewStore.Read(TestViewEnvelope2.Id).Should().Be(TestViewEnvelope2);
+        }
     }
 }

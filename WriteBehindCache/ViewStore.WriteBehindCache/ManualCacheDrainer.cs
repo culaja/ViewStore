@@ -66,7 +66,7 @@ namespace ViewStore.WriteBehindCache
         {
             try
             {
-                Task.WhenAll(batch.Select(view => _destinationViewStore.SaveAsync(view))).Wait();
+                _destinationViewStore.SaveAsync(batch).Wait();
             }
             catch (Exception e)
             {

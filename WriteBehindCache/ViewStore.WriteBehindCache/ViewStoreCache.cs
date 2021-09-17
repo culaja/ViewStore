@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
@@ -26,6 +27,10 @@ namespace ViewStore.WriteBehindCache
         public void Save(ViewEnvelope viewEnvelope) => _viewStoreCacheInternal.Save(viewEnvelope);
 
         public Task SaveAsync(ViewEnvelope viewEnvelope) => _viewStoreCacheInternal.SaveAsync(viewEnvelope);
+        
+        public void Save(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.Save(viewEnvelopes);
+
+        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.SaveAsync(viewEnvelopes);
 
         public void Dispose()
         {

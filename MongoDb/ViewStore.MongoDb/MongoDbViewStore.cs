@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
@@ -87,6 +89,19 @@ namespace ViewStore.MongoDb
             {
                 throw new MongoDbWrongMatchedCountException(viewEnvelope.Id, result.MatchedCount);
             }
+        }
+
+        public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                Save(viewEnvelope);
+            }
+        }
+
+        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
         }
     }
 }

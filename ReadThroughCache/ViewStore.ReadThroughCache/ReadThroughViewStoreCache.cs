@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
@@ -69,6 +71,19 @@ namespace ViewStore.ReadThroughCache
         {
             _memoryCache.Set(new CacheItem(viewEnvelope.Id, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
             return _next.SaveAsync(viewEnvelope);
+        }
+
+        public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                Save(viewEnvelope);
+            }
+        }
+
+        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
         }
     }
 }

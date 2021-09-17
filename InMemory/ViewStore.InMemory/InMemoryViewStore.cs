@@ -66,5 +66,21 @@ namespace ViewStore.InMemory
             Save(viewEnvelope);
             return Task.CompletedTask;
         }
+
+        public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                Save(viewEnvelope);
+            }
+        }
+
+        public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                await SaveAsync(viewEnvelope);
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ViewStore.Abstractions
 {
@@ -12,5 +13,8 @@ namespace ViewStore.Abstractions
 
         void Save(ViewEnvelope viewEnvelope);
         Task SaveAsync(ViewEnvelope viewEnvelope);
+
+        void Save(IEnumerable<ViewEnvelope> viewEnvelopes);
+        Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes);
     }
 }

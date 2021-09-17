@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Marten;
 using ViewStore.Abstractions;
@@ -62,6 +63,20 @@ namespace ViewStore.MartenDb
         {
             using var session = _documentStore.OpenSession();
             session.Store(viewEnvelope);
+            await session.SaveChangesAsync();
+        }
+
+        public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var session = _documentStore.OpenSession();
+            session.StoreObjects(viewEnvelopes);
+            session.SaveChanges();
+        }
+
+        public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var session = _documentStore.OpenSession();
+            session.StoreObjects(viewEnvelopes);
             await session.SaveChangesAsync();
         }
     }
