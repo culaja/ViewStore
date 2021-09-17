@@ -75,15 +75,26 @@ namespace ViewStore.ReadThroughCache
 
         public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
+            var list = new List<ViewEnvelope>();
             foreach (var viewEnvelope in viewEnvelopes)
             {
-                Save(viewEnvelope);
+                _memoryCache.Set(new CacheItem(viewEnvelope.Id, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
+                list.Add(viewEnvelope);
             }
+            
+            _next.Save(list);
         }
 
         public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
-            return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
+            var list = new List<ViewEnvelope>();
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                _memoryCache.Set(new CacheItem(viewEnvelope.Id, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
+                list.Add(viewEnvelope);
+            }
+            
+            return _next.SaveAsync(list);
         }
     }
 }
