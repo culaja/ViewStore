@@ -114,5 +114,21 @@ namespace ViewStore.Abstractions
             (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().Be(TestViewEnvelope1);
             (await viewStore.ReadAsync(TestViewEnvelope2.Id)).Should().Be(TestViewEnvelope2);
         }
+        
+        [Fact]
+        public async Task metadata_is_correctly_persisted()
+        {
+            var expectedViewEnvelope = NewTestViewEnvelopeWith(10);
+            expectedViewEnvelope.MetaData.Set("CorrelationId", "SomeCorrelationId");
+            expectedViewEnvelope.MetaData.Set("CausationId", "SomeCausationId");
+            
+            var viewStore = BuildViewStore();
+            await viewStore.SaveAsync(expectedViewEnvelope);
+
+            var actualViewEnvelope = await viewStore.ReadAsync(expectedViewEnvelope.Id);
+            actualViewEnvelope!.MetaData.Get("CorrelationId").Should().Be("SomeCorrelationId");
+            actualViewEnvelope.MetaData.Get("CausationId").Should().Be("SomeCausationId");
+            actualViewEnvelope.MetaData.Get("InvalidKey").Should().BeNull();
+        }
     }
 }

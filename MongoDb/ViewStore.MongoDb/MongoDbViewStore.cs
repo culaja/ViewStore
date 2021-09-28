@@ -26,7 +26,8 @@ namespace ViewStore.MongoDb
                     cm.MapProperty(m => m.Id);
                     cm.MapProperty(m => m.View);
                     cm.MapProperty(m => m.GlobalVersion).SetSerializer(new GlobalVersionSerializer());
-                    cm.MapCreator(m => new ViewEnvelope(m.Id, m.View, m.GlobalVersion));
+                    cm.MapProperty(m => m.MetaData);
+                    cm.MapCreator(m => new ViewEnvelope(m.Id, m.View, m.GlobalVersion, m.MetaData));
                 });    
             }
         }

@@ -113,5 +113,21 @@ namespace ViewStore.Abstractions
             viewStore.Read(TestViewEnvelope1.Id).Should().Be(TestViewEnvelope1);
             viewStore.Read(TestViewEnvelope2.Id).Should().Be(TestViewEnvelope2);
         }
+
+        [Fact]
+        public void metadata_is_correctly_persisted()
+        {
+            var expectedViewEnvelope = NewTestViewEnvelopeWith(10);
+            expectedViewEnvelope.MetaData.Set("CorrelationId", "SomeCorrelationId");
+            expectedViewEnvelope.MetaData.Set("CausationId", "SomeCausationId");
+            
+            var viewStore = BuildViewStore();
+            viewStore.Save(expectedViewEnvelope);
+
+            var actualViewEnvelope = viewStore.Read(expectedViewEnvelope.Id);
+            actualViewEnvelope!.MetaData.Get("CorrelationId").Should().Be("SomeCorrelationId");
+            actualViewEnvelope.MetaData.Get("CausationId").Should().Be("SomeCausationId");
+            actualViewEnvelope.MetaData.Get("InvalidKey").Should().BeNull();
+        }
     }
 }
