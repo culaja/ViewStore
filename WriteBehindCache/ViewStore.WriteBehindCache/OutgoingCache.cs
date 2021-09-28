@@ -18,6 +18,14 @@ namespace ViewStore.WriteBehindCache
             }
         }
 
+        public bool Remove(string id)
+        {
+            lock (_sync)
+            {
+                return _currentCache.Remove(id);
+            }
+        }
+
         public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope)
         {
             lock (_sync)
