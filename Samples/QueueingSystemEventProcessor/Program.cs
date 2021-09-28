@@ -86,7 +86,7 @@ namespace QueueingSystemEventProcessor
         {
             var e = resolvedEvent.ToEvent();
             ViewStore.SaveAsync(
-                (ViewStore.Read(e.ViewId) ?? new ViewEnvelope(e.ViewId, TotalStatisticsView.New(), GlobalVersion.Start))
+                (ViewStore.Read(e.ViewId) ?? ViewEnvelope.NewOf(e.ViewId, TotalStatisticsView.New()))
                     .ImmutableTransform<TotalStatisticsView>(resolvedEvent.ToGlobalVersion(), v => v.Apply(e)));
         }
     }

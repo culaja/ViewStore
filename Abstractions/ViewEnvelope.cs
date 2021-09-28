@@ -22,24 +22,11 @@ namespace ViewStore.Abstractions
             MetaData = metaData;
         }
 
-        public ViewEnvelope(
-            string id,
-            IView view,
-            GlobalVersion globalVersion)
-        {
-            Id = id;
-            View = view;
-            GlobalVersion = globalVersion;
-            MetaData = new MetaData(new Dictionary<string, string>());
-        }
-
-        public ViewEnvelope(string id, IView view) : this(
-            id, 
-            view, 
+        public static ViewEnvelope NewOf(string id, IView view) => new(
+            id,
+            view,
             GlobalVersion.Start,
-            new MetaData(new Dictionary<string, string>()))
-        {
-        }
+            new MetaData(new Dictionary<string, string>()));
         
         public bool Transform<T>(
             GlobalVersion transformationGlobalVersion,
