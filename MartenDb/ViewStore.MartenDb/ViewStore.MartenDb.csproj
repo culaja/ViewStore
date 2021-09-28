@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <PackageId>ViewStore.MartenDb</PackageId>
         <PackageDescription>MartenDb implementation of View Store.</PackageDescription>
-        <Version>1.2.0-alpha8</Version>
+        <Version>1.2.0-alpha9</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>MartenDb;MartenDb View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
