@@ -129,5 +129,16 @@ namespace ViewStore.Abstractions
             actualViewEnvelope.MetaData.Get("CausationId").Should().Be("SomeCausationId");
             actualViewEnvelope.MetaData.Get("InvalidKey").Should().BeNull();
         }
+
+        [Fact]
+        public void after_deleting_an_object_it_cant_be_found_in_store()
+        {
+            var viewStore = BuildViewStore();
+            viewStore.Save(TestViewEnvelope1);
+
+            viewStore.Delete(TestViewEnvelope1.Id);
+
+            viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
+        }
     }
 }

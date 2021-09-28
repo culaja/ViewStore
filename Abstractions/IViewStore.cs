@@ -16,5 +16,8 @@ namespace ViewStore.Abstractions
 
         void Save(IEnumerable<ViewEnvelope> viewEnvelopes);
         Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes);
+
+        bool Delete(string viewId);
+        Task<bool> DeleteAsync(string viewId);
     }
 }

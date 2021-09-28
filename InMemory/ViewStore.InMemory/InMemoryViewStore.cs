@@ -82,5 +82,23 @@ namespace ViewStore.InMemory
                 await SaveAsync(viewEnvelope);
             }
         }
+
+        public bool Delete(string viewId)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                return _dictionary.Remove(viewId);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
+
+        public Task<bool> DeleteAsync(string viewId)
+        {
+            return Task.FromResult(Delete(viewId));
+        }
     }
 }

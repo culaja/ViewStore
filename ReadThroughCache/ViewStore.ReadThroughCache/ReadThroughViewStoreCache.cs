@@ -96,5 +96,17 @@ namespace ViewStore.ReadThroughCache
             
             return _next.SaveAsync(list);
         }
+
+        public bool Delete(string viewId)
+        {
+            _memoryCache.Remove(viewId);
+            return _next.Delete(viewId);
+        }
+
+        public Task<bool> DeleteAsync(string viewId)
+        {
+            _memoryCache.Remove(viewId);
+            return _next.DeleteAsync(viewId);
+        }
     }
 }

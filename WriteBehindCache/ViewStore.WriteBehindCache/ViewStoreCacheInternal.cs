@@ -85,5 +85,9 @@ namespace ViewStore.WriteBehindCache
         {
             return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
         }
+
+        public bool Delete(string viewId) => _next.Delete(viewId);
+
+        public Task<bool> DeleteAsync(string viewId) => _next.DeleteAsync(viewId);
     }
 }

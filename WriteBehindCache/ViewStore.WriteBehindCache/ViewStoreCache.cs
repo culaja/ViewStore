@@ -31,6 +31,9 @@ namespace ViewStore.WriteBehindCache
         public void Save(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.Save(viewEnvelopes);
 
         public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.SaveAsync(viewEnvelopes);
+        public bool Delete(string viewId) => _viewStoreCacheInternal.Delete(viewId);
+
+        public Task<bool> DeleteAsync(string viewId) => _viewStoreCacheInternal.DeleteAsync(viewId);
 
         public void Dispose()
         {

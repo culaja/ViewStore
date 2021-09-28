@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marten;
+using Marten.Linq.SoftDeletes;
 using ViewStore.Abstractions;
 
 namespace ViewStore.MartenDb
@@ -78,6 +79,22 @@ namespace ViewStore.MartenDb
             using var session = _documentStore.OpenSession();
             session.StoreObjects(viewEnvelopes);
             await session.SaveChangesAsync();
+        }
+
+        public bool Delete(string viewId)
+        {
+            using var session = _documentStore.OpenSession();
+            session.Delete<ViewEnvelope>(viewId);
+            session.SaveChanges();
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(string viewId)
+        {
+            using var session = _documentStore.OpenSession();
+            session.Delete<ViewEnvelope>(viewId);
+            await session.SaveChangesAsync();
+            return true;
         }
     }
 }
