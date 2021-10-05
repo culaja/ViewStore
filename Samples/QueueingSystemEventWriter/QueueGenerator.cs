@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+
 // ReSharper disable PossibleLossOfFraction
 
-namespace WriteBehindCacheTestApp
+namespace QueueingSystemEventWriter
 {
     internal sealed class QueueGenerator
     {

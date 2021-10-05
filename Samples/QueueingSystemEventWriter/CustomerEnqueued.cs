@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WriteBehindCacheTestApp
+namespace QueueingSystemEventWriter
 {
     public sealed class CustomerEnqueued
     {

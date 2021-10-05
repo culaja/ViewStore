@@ -8,7 +8,7 @@
         <PackageDescription>Write bihind cache for View Store. It can be used as a decorator for any View Store implementation (e.g. MongoDb View Store).</PackageDescription>
         <Version>1.2.0-alpha9</Version>
         <Authors>Stanko Culaja</Authors>
-        <PackageTags>Write behind cache;Cache View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
+        <PackageTags>Write behind cache;Read through cache;Cache View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

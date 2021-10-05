@@ -7,7 +7,7 @@ using EventStore.Client;
 using Newtonsoft.Json;
 using Spectre.Console;
 
-namespace WriteBehindCacheTestApp
+namespace QueueingSystemEventWriter
 {
     class Program
     {

@@ -4,7 +4,7 @@ using ViewStore.InMemory;
 
 namespace ViewStore.Cache
 {
-    public sealed class WriteBehindCacheViewStoreAsyncTests : ViewStoreAsyncTests
+    public sealed class CacheViewStoreAsyncTests : ViewStoreAsyncTests
     {
         protected override IViewStore BuildViewStore() =>
             ViewStoreCacheFactory.New()
