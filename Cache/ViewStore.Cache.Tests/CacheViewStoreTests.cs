@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Caching;
 using ViewStore.Abstractions;
 using ViewStore.InMemory;
 
@@ -10,6 +11,7 @@ namespace ViewStore.Cache
             ViewStoreCacheFactory.New()
                 .For(new InMemoryViewStore())
                 .WithCacheDrainPeriod(TimeSpan.Zero)
+                .WithReadMemoryCache(new MemoryCache(Guid.NewGuid().ToString()))
                 .Build();
     }
 }
