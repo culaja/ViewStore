@@ -136,7 +136,7 @@ namespace ViewStore.Abstractions
             var viewStore = BuildViewStore();
             viewStore.Save(TestViewEnvelope1);
 
-            viewStore.Delete(TestViewEnvelope1.Id);
+            viewStore.Delete(TestViewEnvelope1);
 
             viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
         }

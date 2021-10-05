@@ -81,20 +81,18 @@ namespace ViewStore.MartenDb
             await session.SaveChangesAsync();
         }
 
-        public bool Delete(string viewId)
+        public void Delete(ViewEnvelope viewEnvelope)
         {
             using var session = _documentStore.OpenSession();
-            session.Delete<ViewEnvelope>(viewId);
+            session.Delete(viewEnvelope);
             session.SaveChanges();
-            return true;
         }
 
-        public async Task<bool> DeleteAsync(string viewId)
+        public async Task DeleteAsync(ViewEnvelope viewEnvelope)
         {
             using var session = _documentStore.OpenSession();
-            session.Delete<ViewEnvelope>(viewId);
+            session.Delete(viewEnvelope);
             await session.SaveChangesAsync();
-            return true;
         }
     }
 }

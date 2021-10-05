@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
@@ -97,16 +96,16 @@ namespace ViewStore.ReadThroughCache
             return _next.SaveAsync(list);
         }
 
-        public bool Delete(string viewId)
+        public void Delete(ViewEnvelope viewEnvelope)
         {
-            _memoryCache.Remove(viewId);
-            return _next.Delete(viewId);
+            _memoryCache.Remove(viewEnvelope.Id);
+            _next.Delete(viewEnvelope);
         }
 
-        public Task<bool> DeleteAsync(string viewId)
+        public Task DeleteAsync(ViewEnvelope viewEnvelope)
         {
-            _memoryCache.Remove(viewId);
-            return _next.DeleteAsync(viewId);
+            _memoryCache.Remove(viewEnvelope.Id);
+            return _next.DeleteAsync(viewEnvelope);
         }
     }
 }

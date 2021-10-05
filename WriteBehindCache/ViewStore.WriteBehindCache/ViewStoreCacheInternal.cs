@@ -86,16 +86,16 @@ namespace ViewStore.WriteBehindCache
             return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
         }
 
-        public bool Delete(string viewId)
+        public void Delete(ViewEnvelope viewEnvelope)
         {
-            _outgoingCache.Remove(viewId);
-            return _next.Delete(viewId);
+            _outgoingCache.Remove(viewEnvelope);
+            _next.Delete(viewEnvelope);
         }
 
-        public Task<bool> DeleteAsync(string viewId)
+        public Task DeleteAsync(ViewEnvelope viewEnvelope)
         {
-            _outgoingCache.Remove(viewId);
-            return _next.DeleteAsync(viewId);
+            _outgoingCache.Remove(viewEnvelope);
+            return _next.DeleteAsync(viewEnvelope);
         }
     }
 }

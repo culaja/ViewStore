@@ -83,12 +83,12 @@ namespace ViewStore.InMemory
             }
         }
 
-        public bool Delete(string viewId)
+        public void Delete(ViewEnvelope viewEnvelope)
         {
             _lock.EnterWriteLock();
             try
             {
-                return _dictionary.Remove(viewId);
+                _dictionary.Remove(viewEnvelope.Id);
             }
             finally
             {
@@ -96,9 +96,10 @@ namespace ViewStore.InMemory
             }
         }
 
-        public Task<bool> DeleteAsync(string viewId)
+        public Task DeleteAsync(ViewEnvelope viewEnvelope)
         {
-            return Task.FromResult(Delete(viewId));
+            Delete(viewEnvelope);
+            return Task.CompletedTask;
         }
     }
 }

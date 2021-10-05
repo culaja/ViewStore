@@ -105,16 +105,14 @@ namespace ViewStore.MongoDb
             return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
         }
 
-        public bool Delete(string viewId)
+        public void Delete(ViewEnvelope viewEnvelope)
         {
-            var deleteResult = Collection().DeleteOne(Filter.Eq("_id", viewId));
-            return deleteResult.DeletedCount == 1;
+            Collection().DeleteOne(Filter.Eq("_id", viewEnvelope.Id));
         }
 
-        public async Task<bool> DeleteAsync(string viewId)
+        public async Task DeleteAsync(ViewEnvelope viewEnvelope)
         {
-            var deleteResult = await Collection().DeleteOneAsync(Filter.Eq("_id", viewId));
-            return deleteResult.DeletedCount == 1;
+            await Collection().DeleteOneAsync(Filter.Eq("_id", viewEnvelope.Id));
         }
     }
 }

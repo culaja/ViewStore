@@ -1,28 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ViewStore.Abstractions;
+﻿using ViewStore.Abstractions;
 
 namespace ViewStore.WriteBehindCache
 {
     internal sealed class OutgoingCache
     {
         private readonly object _sync = new();
-        private Dictionary<string, ViewEnvelope> _currentCache = new();
-        private Dictionary<string, ViewEnvelope> _drainedCache = new();
+        private CachedItems _currentCache = new();
+        private CachedItems _drainedCache = new();
 
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
             lock (_sync)
             {
-                _currentCache[viewEnvelope.Id] = viewEnvelope;
+                _currentCache.AddOrUpdate(viewEnvelope);
             }
         }
 
-        public bool Remove(string id)
+        public void Remove(ViewEnvelope viewEnvelope)
         {
             lock (_sync)
             {
-                return _currentCache.Remove(id);
+                _currentCache.Remove(viewEnvelope);
             }
         }
 
@@ -38,19 +36,19 @@ namespace ViewStore.WriteBehindCache
         {
             lock (_sync)
             {
-                return _currentCache.Count > 0 || _drainedCache.Count > 0 
-                    ? _currentCache.Values.Concat(_drainedCache.Values).Max(ve => ve.GlobalVersion)
-                    : null;
+                return GlobalVersion.Max(
+                    _currentCache.LastGlobalVersion(),
+                    _drainedCache.LastGlobalVersion());
             }
         }
 
-        public IEnumerable<ViewEnvelope> Renew()
+        public CachedItems Renew()
         {
             lock (_sync)
             {
                 _drainedCache = _currentCache;
-                _currentCache = new Dictionary<string, ViewEnvelope>();
-                return _drainedCache.Values;
+                _currentCache = new();
+                return _drainedCache;
             }
         }
     }

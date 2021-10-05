@@ -137,7 +137,7 @@ namespace ViewStore.Abstractions
             var viewStore = BuildViewStore();
             await viewStore.SaveAsync(TestViewEnvelope1);
 
-            await viewStore.DeleteAsync(TestViewEnvelope1.Id);
+            await viewStore.DeleteAsync(TestViewEnvelope1);
 
             (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().BeNull();
         }

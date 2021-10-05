@@ -45,7 +45,7 @@ namespace ViewStore.WriteBehindCache
         private (int, int) DrainCacheUntilEmptyInternal()
         {
             var cachedItems = _outgoingCache.Renew();
-            var viewBatches = new ViewEnvelopeBatches(cachedItems, _batchSize);
+            var viewBatches = new ViewEnvelopeBatches(cachedItems.AddedOrUpdated, _batchSize);
             var drainCacheRetryCount = DrainCache(viewBatches);
             var storeCacheMetadataRetryCount = StoreCacheMetadata(viewBatches.LargestGlobalVersion);
             return (viewBatches.CountOfAllViewEnvelopes, drainCacheRetryCount + storeCacheMetadataRetryCount);
