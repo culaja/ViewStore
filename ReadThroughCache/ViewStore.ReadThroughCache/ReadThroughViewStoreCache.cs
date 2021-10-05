@@ -107,5 +107,29 @@ namespace ViewStore.ReadThroughCache
             _memoryCache.Remove(viewEnvelope.Id);
             return _next.DeleteAsync(viewEnvelope);
         }
+
+        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            var list = new List<ViewEnvelope>();
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                _memoryCache.Remove(viewEnvelope.Id);
+                list.Add(viewEnvelope);
+            }
+            
+            _next.Delete(list);
+        }
+
+        public Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            var list = new List<ViewEnvelope>();
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                _memoryCache.Remove(viewEnvelope.Id);
+                list.Add(viewEnvelope);
+            }
+            
+            return _next.DeleteAsync(list);
+        }
     }
 }

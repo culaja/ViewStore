@@ -52,12 +52,12 @@ namespace ViewStore.WriteBehindCache
 
         public ViewEnvelope? Read(string viewId)
         {
-            if (_outgoingCache.TryGetValue(viewId, out var view))
+            if (_outgoingCache.TryGetValue(viewId, out var view, out var isDeleted))
             {
                 return view;
             }
             
-            return _next.Read(viewId);
+            return isDeleted ? null : _next.Read(viewId);
         }
 
         public Task<ViewEnvelope?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
@@ -81,21 +81,39 @@ namespace ViewStore.WriteBehindCache
             }
         }
 
-        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
-            return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                await SaveAsync(viewEnvelope);
+            }
         }
 
         public void Delete(ViewEnvelope viewEnvelope)
         {
             _outgoingCache.Remove(viewEnvelope);
-            _next.Delete(viewEnvelope);
         }
 
         public Task DeleteAsync(ViewEnvelope viewEnvelope)
         {
             _outgoingCache.Remove(viewEnvelope);
-            return _next.DeleteAsync(viewEnvelope);
+            return Task.CompletedTask;
+        }
+
+        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                Delete(viewEnvelope);
+            }
+        }
+
+        public async Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                await DeleteAsync(viewEnvelope);
+            }
         }
     }
 }

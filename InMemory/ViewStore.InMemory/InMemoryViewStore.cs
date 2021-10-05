@@ -101,5 +101,21 @@ namespace ViewStore.InMemory
             Delete(viewEnvelope);
             return Task.CompletedTask;
         }
+
+        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                Delete(viewEnvelope);
+            }
+        }
+
+        public async Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                await DeleteAsync(viewEnvelope);
+            }
+        }
     }
 }

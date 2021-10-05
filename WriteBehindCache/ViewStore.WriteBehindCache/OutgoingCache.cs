@@ -24,11 +24,12 @@ namespace ViewStore.WriteBehindCache
             }
         }
 
-        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope)
+        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)
         {
             lock (_sync)
             {
-                return _currentCache.TryGetValue(viewId, out viewEnvelope) || _drainedCache.TryGetValue(viewId, out viewEnvelope);
+                return _currentCache.TryGetValue(viewId, out viewEnvelope, out isDeleted) || 
+                       (isDeleted == false && _drainedCache.TryGetValue(viewId, out viewEnvelope, out isDeleted));
             }
         }
 

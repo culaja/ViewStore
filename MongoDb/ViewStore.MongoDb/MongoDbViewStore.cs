@@ -100,19 +100,22 @@ namespace ViewStore.MongoDb
             }
         }
 
-        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
-        {
-            return Task.WhenAll(viewEnvelopes.Select(SaveAsync));
-        }
+        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => Task.WhenAll(viewEnvelopes.Select(SaveAsync));
 
         public void Delete(ViewEnvelope viewEnvelope)
         {
             Collection().DeleteOne(Filter.Eq("_id", viewEnvelope.Id));
         }
 
-        public async Task DeleteAsync(ViewEnvelope viewEnvelope)
+        public Task DeleteAsync(ViewEnvelope viewEnvelope) => 
+            Collection().DeleteOneAsync(Filter.Eq("_id", viewEnvelope.Id));
+
+        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
-            await Collection().DeleteOneAsync(Filter.Eq("_id", viewEnvelope.Id));
+            Collection().DeleteMany(Filter.In("_id", viewEnvelopes.Select(ve => ve.Id)));
         }
+
+        public Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => 
+            Collection().DeleteManyAsync(Filter.In("_id", viewEnvelopes.Select(ve => ve.Id)));
     }
 }

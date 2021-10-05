@@ -94,5 +94,19 @@ namespace ViewStore.MartenDb
             session.Delete(viewEnvelope);
             await session.SaveChangesAsync();
         }
+
+        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var session = _documentStore.OpenSession();
+            session.Delete(viewEnvelopes);
+            session.SaveChanges();
+        }
+
+        public async Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var session = _documentStore.OpenSession();
+            session.Delete(viewEnvelopes);
+            await session.SaveChangesAsync();
+        }
     }
 }

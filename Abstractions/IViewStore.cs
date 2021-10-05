@@ -19,5 +19,8 @@ namespace ViewStore.Abstractions
 
         void Delete(ViewEnvelope viewEnvelope);
         Task DeleteAsync(ViewEnvelope viewEnvelope);
+        
+        void Delete(IEnumerable<ViewEnvelope> viewEnvelopes);
+        Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes);
     }
 }

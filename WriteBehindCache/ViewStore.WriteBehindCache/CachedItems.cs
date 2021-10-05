@@ -14,17 +14,22 @@ namespace ViewStore.WriteBehindCache
         
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
+            _deleted.Remove(viewEnvelope.Id);
             _addedOrUpdated[viewEnvelope.Id] = viewEnvelope;
         }
 
         public void Remove(ViewEnvelope viewEnvelope)
         {
+            _addedOrUpdated.Remove(viewEnvelope.Id);
             _deleted[viewEnvelope.Id] = viewEnvelope;
         }
         
-        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope) => 
-            _addedOrUpdated.TryGetValue(viewId, out viewEnvelope);
-        
+        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)
+        {
+            isDeleted = _deleted.ContainsKey(viewId);
+            return _addedOrUpdated.TryGetValue(viewId, out viewEnvelope);
+        }
+
         public GlobalVersion? LastGlobalVersion() =>
             _addedOrUpdated.Count > 0 || _deleted.Count > 0 
                 ? _addedOrUpdated.Values.Concat(_deleted.Values).Max(ve => ve.GlobalVersion)
