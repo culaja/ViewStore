@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     public sealed class DrainStatistics
     {

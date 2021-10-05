@@ -6,9 +6,8 @@ using EventStore.Client;
 using MongoDB.Bson.Serialization;
 using Spectre.Console;
 using ViewStore.Abstractions;
+using ViewStore.Cache;
 using ViewStore.MongoDb;
-using ViewStore.ReadThroughCache;
-using ViewStore.WriteBehindCache;
 
 namespace QueueingSystemEventProcessor
 {
@@ -28,9 +27,6 @@ namespace QueueingSystemEventProcessor
                 .WithCollectionName($"{nameof(TotalStatisticsView)}_1")
                 .WithConnectionDetails("mongodb://kolotree:kolotree4532@localhost:27018", "MyDb")
                 .Build();
-
-            var readThroughCache =
-                new ReadThroughViewStoreCache(MemoryCache.Default, TimeSpan.FromHours(1), mongoDbStore);
 
             ViewStore = ViewStoreCacheFactory.New()
                 .For(mongoDbStore)

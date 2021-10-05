@@ -4,9 +4,9 @@ using System.Runtime.Caching;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.ReadThroughCache
+namespace ViewStore.Cache
 {
-    public sealed class ReadThroughViewStoreCache : IViewStore
+    internal sealed class ReadThroughViewStoreCache : IViewStore
     {
         private readonly MemoryCache _memoryCache;
         private readonly TimeSpan _readCacheExpirationPeriod;

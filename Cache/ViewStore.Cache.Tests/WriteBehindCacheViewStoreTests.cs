@@ -1,13 +1,15 @@
-﻿using ViewStore.Abstractions;
+﻿using System;
+using ViewStore.Abstractions;
 using ViewStore.InMemory;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
-    public sealed class WriteBehindCacheViewStoreAsyncTests : ViewStoreAsyncTests
+    public sealed class WriteBehindCacheViewStoreTests : ViewStoreTests
     {
         protected override IViewStore BuildViewStore() =>
             ViewStoreCacheFactory.New()
                 .For(new InMemoryViewStore())
+                .WithCacheDrainPeriod(TimeSpan.Zero)
                 .Build();
     }
 }

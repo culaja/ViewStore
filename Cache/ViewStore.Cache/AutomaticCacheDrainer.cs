@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     internal delegate void OnSendingExceptionDelegate(Exception exception);
 

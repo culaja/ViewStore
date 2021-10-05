@@ -98,14 +98,14 @@ namespace ViewStore.MartenDb
         public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
             using var session = _documentStore.OpenSession();
-            session.Delete(viewEnvelopes);
+            foreach (var viewEnvelope in viewEnvelopes) session.Delete(viewEnvelope);
             session.SaveChanges();
         }
 
         public async Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
             using var session = _documentStore.OpenSession();
-            session.Delete(viewEnvelopes);
+            foreach (var viewEnvelope in viewEnvelopes) session.Delete(viewEnvelope);
             await session.SaveChangesAsync();
         }
     }

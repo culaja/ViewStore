@@ -13,8 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\MongoDb\ViewStore.MongoDb\ViewStore.MongoDb.csproj" />
-      <ProjectReference Include="..\..\ReadThroughCache\ViewStore.ReadThroughCache\ViewStore.ReadThroughCache.csproj" />
-      <ProjectReference Include="..\..\WriteBehindCache\ViewStore.WriteBehindCache\ViewStore.WriteBehindCache.csproj" />
+      <ProjectReference Include="..\..\Cache\ViewStore.Cache\ViewStore.Cache.csproj" />
     </ItemGroup>
 
 </Project>

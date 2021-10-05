@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     internal sealed class CachedItems
     {

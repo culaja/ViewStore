@@ -1,21 +1,37 @@
 ﻿using System;
+using System.Runtime.Caching;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     public sealed class ViewStoreCacheFactory
     {
         private IViewStore? _realViewStore;
-        private TimeSpan _cacheDrainPeriod = TimeSpan.Zero;
+        private TimeSpan _cacheDrainPeriod = TimeSpan.FromSeconds(5);
         private int _cacheDrainBatchSize;
         private Action<DrainStatistics>? _cacheDrainedCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
+        
+        private MemoryCache _memoryCache = MemoryCache.Default;
+        private TimeSpan _readCacheExpirationPeriod = TimeSpan.FromSeconds(10);
 
         public static ViewStoreCacheFactory New() => new();
 
         public ViewStoreCacheFactory For(IViewStore viewStore)
         {
             _realViewStore = viewStore;
+            return this;
+        }
+
+        public ViewStoreCacheFactory WithReadMemoryCache(MemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+            return this;
+        }
+        
+        public ViewStoreCacheFactory WithReadCacheExpirationPeriod(TimeSpan readCacheExpirationPeriod)
+        {
+            _readCacheExpirationPeriod = readCacheExpirationPeriod;
             return this;
         }
 
@@ -64,8 +80,13 @@ namespace ViewStore.WriteBehindCache
             automaticCacheDrainer.OnDrainFinishedEvent += ds => _cacheDrainedCallback?.Invoke(ds);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
+            var readThroughViewStoreCache = new ReadThroughViewStoreCache(
+                _memoryCache,
+                _readCacheExpirationPeriod,
+                _realViewStore);
+
             var viewStoreCacheInternal = new ViewStoreCacheInternal(
-                _realViewStore,
+                readThroughViewStoreCache,
                 outgoingCache);
 
             return new ViewStoreCache(

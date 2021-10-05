@@ -4,9 +4,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
-        <AssemblyName>ViewStore.WriteBehindCache</AssemblyName>
-        <RootNamespace>ViewStore.WriteBehindCache</RootNamespace>
-        <PackageId>ViewStore.WriteBehindCache</PackageId>
+        <PackageId>ViewStore.Cache</PackageId>
         <PackageDescription>Write bihind cache for View Store. It can be used as a decorator for any View Store implementation (e.g. MongoDb View Store).</PackageDescription>
         <Version>1.2.0-alpha9</Version>
         <Authors>Stanko Culaja</Authors>
@@ -15,12 +13,16 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>ViewStore.WriteBehindCache.Tests</_Parameter1>
+            <_Parameter1>ViewStore.Cache.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\Abstractions\Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Runtime.Caching" Version="5.0.0" />
     </ItemGroup>
 
 </Project>

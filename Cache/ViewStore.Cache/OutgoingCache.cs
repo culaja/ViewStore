@@ -1,6 +1,6 @@
 ﻿using ViewStore.Abstractions;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     internal sealed class OutgoingCache
     {

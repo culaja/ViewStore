@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     public sealed class ViewStoreCache : IViewStore, IDisposable
     {

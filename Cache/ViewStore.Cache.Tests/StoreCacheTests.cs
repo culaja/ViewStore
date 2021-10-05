@@ -4,7 +4,7 @@ using ViewStore.InMemory;
 using Xunit;
 using static ViewStore.Abstractions.TestView;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
     public sealed class StoreCacheTests
     {

@@ -1,20 +1,19 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using ViewStore.Abstractions;
 using ViewStore.InMemory;
 using Xunit;
 using static ViewStore.Abstractions.TestView;
 
-namespace ViewStore.WriteBehindCache
+namespace ViewStore.Cache
 {
-    public sealed class FetchingLastGlobalVersionFromCacheAsyncTests
+    public sealed class FetchingLastGlobalVersionFromCacheTests
     {
         private readonly InMemoryViewStore _finalStore = new();
         private readonly OutgoingCache _outgoingCache = new();
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly ViewStoreCacheInternal _viewStoreCacheInternal;
 
-        public FetchingLastGlobalVersionFromCacheAsyncTests()
+        public FetchingLastGlobalVersionFromCacheTests()
         {
             _manualCacheDrainer = new ManualCacheDrainer(_finalStore, _outgoingCache, 10);
             _viewStoreCacheInternal = new ViewStoreCacheInternal(_finalStore, _outgoingCache);
@@ -29,15 +28,15 @@ namespace ViewStore.WriteBehindCache
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
         [InlineData(0, 1,    0, 5,    0, 5)]
-        public async Task check_last_global_version_after_adding_two_views_and_when_drain_is_not_triggered(
+        public void check_last_global_version_after_adding_two_views_and_when_drain_is_not_triggered(
             long partA1, long partA2,
             long partB1, long partB2,
             long expectedPart1, long expectedPart2)
         {
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
 
-            (await _viewStoreCacheInternal.ReadLastGlobalVersionAsync())
+            _viewStoreCacheInternal.ReadLastGlobalVersion()
                 .Should()
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
@@ -52,17 +51,17 @@ namespace ViewStore.WriteBehindCache
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
         [InlineData(0, 1,    0, 5,    0, 5)]
-        public async Task check_last_global_version_after_adding_two_views_and_when_drain_is_triggered(
+        public void check_last_global_version_after_adding_two_views_and_when_drain_is_triggered(
             long partA1, long partA2,
             long partB1, long partB2,
             long expectedPart1, long expectedPart2)
         {
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
 
             _manualCacheDrainer.DrainCacheUntilEmpty();
 
-            (await _viewStoreCacheInternal.ReadLastGlobalVersionAsync())
+            _viewStoreCacheInternal.ReadLastGlobalVersion()
                 .Should()
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
@@ -76,16 +75,16 @@ namespace ViewStore.WriteBehindCache
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
         [InlineData(0, 1,    0, 5,    0, 5)]
-        public async Task check_last_global_version_after_adding_two_views_and_when_drain_is_triggered_between_two_saves(
+        public void check_last_global_version_after_adding_two_views_and_when_drain_is_triggered_between_two_saves(
             long partA1, long partA2,
             long partB1, long partB2,
             long expectedPart1, long expectedPart2)
         {
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
             _manualCacheDrainer.DrainCacheUntilEmpty();
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
 
-            (await _viewStoreCacheInternal.ReadLastGlobalVersionAsync())
+            _viewStoreCacheInternal.ReadLastGlobalVersion()
                 .Should()
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
@@ -99,28 +98,28 @@ namespace ViewStore.WriteBehindCache
         [InlineData(2, 1,    1, 2,    2, 1)]
         [InlineData(2, 1,    2, 2,    2, 2)]
         [InlineData(0, 1,    0, 5,    0, 5)]
-        public async Task check_last_global_version_after_adding_two_views_and_after_two_consecutive_drains(
+        public void check_last_global_version_after_adding_two_views_and_after_two_consecutive_drains(
             long partA1, long partA2,
             long partB1, long partB2,
             long expectedPart1, long expectedPart2)
         {
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
-            await _viewStoreCacheInternal.SaveAsync(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(partA1, partA2)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(partB1, partB2)));
 
             _manualCacheDrainer.DrainCacheUntilEmpty();
             _manualCacheDrainer.DrainCacheUntilEmpty();
 
-            (await _viewStoreCacheInternal.ReadLastGlobalVersionAsync())
+            _viewStoreCacheInternal.ReadLastGlobalVersion()
                 .Should()
                 .Be(GlobalVersion.Of(expectedPart1, expectedPart2));
         }
         
         [Fact]
-        public async Task check_last_global_version_after_adding_a_view_to_final_store_without_caching()
+        public void check_last_global_version_after_adding_a_view_to_final_store_without_caching()
         {
-            await _finalStore.SaveAsync(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(5, 2)));
+            _finalStore.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(5, 2)));
 
-            (await _viewStoreCacheInternal.ReadLastGlobalVersionAsync())
+            _viewStoreCacheInternal.ReadLastGlobalVersion()
                 .Should()
                 .Be(GlobalVersion.Of(5, 2));
         }
