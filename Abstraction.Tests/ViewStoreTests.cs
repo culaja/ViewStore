@@ -140,5 +140,18 @@ namespace ViewStore.Abstractions
 
             viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
         }
+        
+        [Fact]
+        public void after_deleting_batch_of_objects_those_objects_cant_be_found_in_store()
+        {
+            var viewStore = BuildViewStore();
+            viewStore.Save(TestViewEnvelope1);
+            viewStore.Save(TestViewEnvelope2);
+
+            viewStore.Delete(new [] { TestViewEnvelope1, TestViewEnvelope2 });
+
+            viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
+            viewStore.Read(TestViewEnvelope2.Id).Should().BeNull();
+        }
     }
 }
