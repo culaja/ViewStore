@@ -10,7 +10,7 @@ namespace ViewStore.WriteBehindCache
         private readonly Dictionary<string, ViewEnvelope> _deleted = new();
 
         public IReadOnlyCollection<ViewEnvelope> AddedOrUpdated => _addedOrUpdated.Values;
-        public IReadOnlyCollection<ViewEnvelope> Deleted => _addedOrUpdated.Values;
+        public IReadOnlyCollection<ViewEnvelope> Deleted => _deleted.Values;
         
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
