@@ -55,7 +55,7 @@ namespace QueueingSystemEventProcessor
 
                     var lastGlobalVersion = ViewStore.ReadLastGlobalVersion();
                     var startPosition = lastGlobalVersion.HasValue
-                        ? new Position(lastGlobalVersion.Value.ToUlong().Item1, lastGlobalVersion.Value.ToUlong().Item1)
+                        ? new Position((ulong)lastGlobalVersion.Value.Value, (ulong)lastGlobalVersion.Value.Value)
                         : Position.Start;
 
                     EventStoreClient.SubscribeToAllAsync(

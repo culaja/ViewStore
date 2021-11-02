@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using ViewStore.Abstractions;
-using static MongoDB.Driver.Builders<ViewStore.Abstractions.ViewEnvelope>;
-using static MongoDB.Driver.FilterDefinition<ViewStore.Abstractions.ViewEnvelope>;
+using static MongoDB.Driver.Builders<ViewStore.MongoDb.ViewEnvelopeInternal>;
+using static MongoDB.Driver.FilterDefinition<ViewStore.MongoDb.ViewEnvelopeInternal>;
 
 namespace ViewStore.MongoDb
 {
@@ -14,20 +14,20 @@ namespace ViewStore.MongoDb
         private readonly IMongoDatabase _mongoDatabase;
         private readonly string _collectionName;
 
-        private IMongoCollection<ViewEnvelope> Collection() =>
-            _mongoDatabase.GetCollection<ViewEnvelope>(_collectionName);
+        private IMongoCollection<ViewEnvelopeInternal> Collection() =>
+            _mongoDatabase.GetCollection<ViewEnvelopeInternal>(_collectionName);
 
         static MongoDbViewStore()
         {
-            if (!BsonClassMap.IsClassMapRegistered(typeof(ViewEnvelope)))
+            if (!BsonClassMap.IsClassMapRegistered(typeof(ViewEnvelopeInternal)))
             {
-                BsonClassMap.RegisterClassMap<ViewEnvelope>(cm =>
+                BsonClassMap.RegisterClassMap<ViewEnvelopeInternal>(cm =>
                 {
                     cm.MapProperty(m => m.Id);
                     cm.MapProperty(m => m.View);
-                    cm.MapProperty(m => m.GlobalVersion).SetSerializer(new GlobalVersionSerializer());
+                    cm.MapProperty(m => m.GlobalVersion);
                     cm.MapProperty(m => m.MetaData);
-                    cm.MapCreator(m => new ViewEnvelope(m.Id, m.View, m.GlobalVersion, m.MetaData));
+                    cm.MapCreator(m => new ViewEnvelopeInternal(m.Id, m.View, m.GlobalVersion, m.MetaData));
                 });    
             }
         }
@@ -41,8 +41,10 @@ namespace ViewStore.MongoDb
         public GlobalVersion? ReadLastGlobalVersion() =>
             Collection()
                 .Find(Empty)
-                .SortByDescending(view => view.GlobalVersion)
+                .SortByDescending(vei => vei.GlobalVersion)
                 .Limit(1)
+                .ToList()
+                .Select(vei => vei.ToViewEnvelope())
                 .FirstOrDefault()
                 ?.GlobalVersion;
 
@@ -53,7 +55,7 @@ namespace ViewStore.MongoDb
                 .SortByDescending(view => view.GlobalVersion)
                 .Limit(1)
                 .FirstOrDefaultAsync();
-            return lastUpdatedView?.GlobalVersion;
+            return lastUpdatedView != null ? GlobalVersion.Of(lastUpdatedView.GlobalVersion) : null;
         }
 
         public ViewEnvelope? Read(string viewId) =>
@@ -70,7 +72,7 @@ namespace ViewStore.MongoDb
         {
             var result = Collection().ReplaceOne(
                 Filter.Eq("_id", viewEnvelope.Id),
-                viewEnvelope,
+                viewEnvelope.ToViewEnvelopeInternal(),
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)
@@ -83,7 +85,7 @@ namespace ViewStore.MongoDb
         {
             var result = await Collection().ReplaceOneAsync(
                 Filter.Eq("_id", viewEnvelope.Id),
-                viewEnvelope,
+                viewEnvelope.ToViewEnvelopeInternal(),
                 new ReplaceOptions { IsUpsert = true });
             
             if (result.MatchedCount > 1)

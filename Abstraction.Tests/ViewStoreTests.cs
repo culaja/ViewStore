@@ -27,33 +27,22 @@ namespace ViewStore.Abstractions
         }
         
         [Theory]
-        [InlineData(0, 0,   0, 0,   0, 0)]
-        [InlineData(0, 1,   0, 1,   0, 1)]
-        [InlineData(0, 1,   0, 2,   0, 2)]
-        [InlineData(0, 2,   0, 1,   0, 2)]
-        [InlineData(1, 0,   1, 0,   1, 0)]
-        [InlineData(1, 0,   2, 0,   2, 0)]
-        [InlineData(2, 0,   1, 0,   2, 0)]
-        [InlineData(6, 3,   5, 9,   6, 3)]
-        [InlineData(6, 3,   6, 2,   6, 3)]
-        [InlineData(6, 3,   6, 3,   6, 3)]
-        [InlineData(6, 3,   7, 2,   7, 2)]
-        [InlineData(6, 3,   7, 7,   7, 7)]
+        [InlineData(0, 0, 0)]
+        [InlineData(1, 1, 1)]
+        [InlineData(1, 2, 2)]
+        [InlineData(2, 1, 2)]
         public void after_saving_multiple_views_last_global_version_in_store_points_to_greatest_view_global_version(
-            long view1GlobalVersionPart1,
-            long view1GlobalVersionPart2,
-            long view2GlobalVersionPart1,
-            long view2GlobalVersionPart2,
-            long expectedLastGlobalVersionPart1,
-            long expectedLastGlobalVersionPart2)
+            long view1GlobalVersion,
+            long view2GlobalVersion,
+            long expectedLastGlobalVersion)
         {
             var viewStore = BuildViewStore();
             
-            viewStore.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1GlobalVersionPart1, view1GlobalVersionPart2)));
-            viewStore.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2GlobalVersionPart1, view2GlobalVersionPart2)));
+            viewStore.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1GlobalVersion)));
+            viewStore.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2GlobalVersion)));
 
             viewStore.ReadLastGlobalVersion()
-                .Should().Be(GlobalVersion.Of(expectedLastGlobalVersionPart1, expectedLastGlobalVersionPart2));
+                .Should().Be(GlobalVersion.Of(expectedLastGlobalVersion));
         }
 
         [Fact]

@@ -17,8 +17,6 @@ namespace QueueingSystemEventProcessor
         }
 
         public static GlobalVersion ToGlobalVersion(this ResolvedEvent resolvedEvent) =>
-            GlobalVersion.FromUlong(
-                resolvedEvent.OriginalPosition.Value.CommitPosition,
-                resolvedEvent.OriginalPosition.Value.PreparePosition);
+            GlobalVersion.Of((long)(resolvedEvent.OriginalPosition?.CommitPosition ?? 0));
     }
 }

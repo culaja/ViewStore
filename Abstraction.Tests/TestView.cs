@@ -2,10 +2,10 @@
 {
     public sealed class TestView : IView
     {
-        public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(0, 1), MetaData.New());
-        public static readonly ViewEnvelope TestViewEnvelope2 = new("2", new TestView(2), GlobalVersion.Of(0, 2), MetaData.New());
+        public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(1), MetaData.New());
+        public static readonly ViewEnvelope TestViewEnvelope2 = new("2", new TestView(2), GlobalVersion.Of(2), MetaData.New());
         
-        public static ViewEnvelope NewTestViewEnvelopeWith(int number) => new(number.ToString(), new TestView(number), GlobalVersion.Of(0, 1), MetaData.New());
+        public static ViewEnvelope NewTestViewEnvelopeWith(int number) => new(number.ToString(), new TestView(number), GlobalVersion.Of(1), MetaData.New());
 
         public int Number { get; }
 
