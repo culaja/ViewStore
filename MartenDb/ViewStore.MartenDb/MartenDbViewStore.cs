@@ -18,28 +18,29 @@ namespace ViewStore.MartenDb
         public GlobalVersion? ReadLastGlobalVersion()
         {
             using var session = _documentStore.OpenSession();
-            return session
-                .Query<ViewEnvelope>()
+            var globalVersion = session
+                .Query<ViewEnvelopeInternal>()
                 .OrderByDescending(ve => ve.GlobalVersion)
                 .FirstOrDefault()
                 ?.GlobalVersion;
+            return globalVersion != null ? GlobalVersion.Of(globalVersion.Value) : null;
         }
 
         public async Task<GlobalVersion?> ReadLastGlobalVersionAsync()
         {
             using var session =  _documentStore.OpenSession();
-            var lastUpdatedView = await session
-                .Query<ViewEnvelope>()
+            var viewEnvelopeInternal = await session
+                .Query<ViewEnvelopeInternal>()
                 .OrderByDescending(ve => ve.GlobalVersion)
                 .FirstOrDefaultAsync();
-            return lastUpdatedView?.GlobalVersion;
+            return viewEnvelopeInternal != null ? GlobalVersion.Of(viewEnvelopeInternal.GlobalVersion) : null;
         }
 
         public ViewEnvelope? Read(string viewId)
         {
             using var session = _documentStore.OpenSession();
             return session
-                .Query<ViewEnvelope>()
+                .Query<ViewEnvelopeInternal>()
                 .SingleOrDefault(ve => ve.Id == viewId);
         }
 
@@ -47,7 +48,7 @@ namespace ViewStore.MartenDb
         {
             using var session = _documentStore.OpenSession();
             var viewEnvelope = await session
-                .Query<ViewEnvelope>()
+                .Query<ViewEnvelopeInternal>()
                 .SingleOrDefaultAsync(ve => ve.Id == viewId);
             return viewEnvelope;
         }
@@ -55,56 +56,56 @@ namespace ViewStore.MartenDb
         public void Save(ViewEnvelope viewEnvelope)
         {
             using var session = _documentStore.OpenSession();
-            session.Store(viewEnvelope);
+            session.Store(viewEnvelope.ToViewEnvelopeInternal());
             session.SaveChanges();
         }
 
         public async Task SaveAsync(ViewEnvelope viewEnvelope)
         {
             using var session = _documentStore.OpenSession();
-            session.Store(viewEnvelope);
+            session.Store(viewEnvelope.ToViewEnvelopeInternal());
             await session.SaveChangesAsync();
         }
 
         public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
             using var session = _documentStore.OpenSession();
-            session.StoreObjects(viewEnvelopes);
+            session.StoreObjects(viewEnvelopes.Select(ve => ve.ToViewEnvelopeInternal()));
             session.SaveChanges();
         }
         
         public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
             using var session = _documentStore.OpenSession();
-            session.StoreObjects(viewEnvelopes);
+            session.StoreObjects(viewEnvelopes.Select(ve => ve.ToViewEnvelopeInternal()));
             await session.SaveChangesAsync();
         }
 
         public void Delete(string viewId, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
+            session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
             session.SaveChanges();
         }
 
         public async Task DeleteAsync(string viewId, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
+            session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
             await session.SaveChangesAsync();
         }
 
         public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
+            foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
             session.SaveChanges();
         }
 
         public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
+            foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
             await session.SaveChangesAsync();
         }
     }
