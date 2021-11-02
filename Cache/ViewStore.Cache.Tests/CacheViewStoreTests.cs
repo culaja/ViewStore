@@ -5,13 +5,24 @@ using ViewStore.InMemory;
 
 namespace ViewStore.Cache
 {
-    public sealed class CacheViewStoreTests : ViewStoreTests
+    public sealed class CacheViewStoreTests : ViewStoreTests, IDisposable
     {
-        protected override IViewStore BuildViewStore() =>
-            ViewStoreCacheFactory.New()
+        private readonly ViewStoreCache _cache;
+
+        public CacheViewStoreTests()
+        {
+            _cache = ViewStoreCacheFactory.New()
                 .For(new InMemoryViewStore())
                 .WithCacheDrainPeriod(TimeSpan.Zero)
                 .WithReadMemoryCache(new MemoryCache(Guid.NewGuid().ToString()))
                 .Build();
+        }
+
+        protected override IViewStore BuildViewStore() => _cache;
+
+        public void Dispose()
+        {
+            _cache.Dispose();
+        }
     }
 }
