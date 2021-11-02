@@ -8,6 +8,7 @@ namespace ViewStore.MartenDb
     {
         private string? _connectionString;
         private string? _schemaName;
+        private AutoCreate _autoCreate = AutoCreate.None;
 
         public static MartenDbViewStoreBuilder New() => new();
 
@@ -23,6 +24,12 @@ namespace ViewStore.MartenDb
             return this;
         }
 
+        public MartenDbViewStoreBuilder WithAutoCreate(AutoCreate autoCreate)
+        {
+            _autoCreate = autoCreate;
+            return this;
+        }
+
         public IViewStore Build()
         {
             if (_connectionString == null) throw new ArgumentNullException(nameof(_connectionString), "Connection string is not provided");
@@ -30,12 +37,12 @@ namespace ViewStore.MartenDb
             
             var documentStore = DocumentStore.For(_ =>
             {
-                _.AutoCreateSchemaObjects = AutoCreate.All;
+                _.AutoCreateSchemaObjects = _autoCreate;
                 _.Connection(_connectionString);
-                _.Schema.For<ViewEnvelope>().DatabaseSchemaName(_schemaName);
-                _.Schema.For<ViewEnvelope>().Identity(x => x.Id);
-                _.Schema.For<ViewEnvelope>().Index(ve => ve.Id);
-                _.Schema.For<ViewEnvelope>().Index(ve => ve.GlobalVersion);
+                _.Schema.For<ViewEnvelopeInternal>().DatabaseSchemaName(_schemaName);
+                _.Schema.For<ViewEnvelopeInternal>().Identity(x => x.Id);
+                _.Schema.For<ViewEnvelopeInternal>().Index(ve => ve.Id);
+                _.Schema.For<ViewEnvelopeInternal>().Index(ve => ve.GlobalVersion);
             });
             
             return new MartenDbViewStore(documentStore);

@@ -9,6 +9,7 @@ namespace ViewStore.MartenDb
         protected override IViewStore BuildViewStore() => MartenDbViewStoreBuilder.New()
             .WithConnectionString("host=localhost;port=8276;database=EventStore;password=dagi123;username=root")
             .WithSchemaName($"S{Guid.NewGuid():N}")
+            .WithAutoCreate(AutoCreate.All)
             .Build();
     }
 }
