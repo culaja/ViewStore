@@ -35,7 +35,7 @@ namespace ViewStore.Cache
 
         public GlobalVersion? LastGlobalVersion() =>
             GlobalVersion.Max(
-                _addedOrUpdated.Values.Max(ve => ve.GlobalVersion),
-                _deleted.Values.Max());
+                _addedOrUpdated.Count > 0 ?_addedOrUpdated.Values.Max(ve => ve.GlobalVersion) : null,
+                _deleted.Count > 0 ? _deleted.Values.Max() : null);
     }
 }
