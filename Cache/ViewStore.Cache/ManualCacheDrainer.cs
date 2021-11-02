@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using ViewStore.Abstractions;
 
@@ -93,9 +94,9 @@ namespace ViewStore.Cache
         
         private int DrainDeletedCache(CachedItems cachedItems)
         {
-            var viewEnvelopeBatches = new ViewEnvelopeBatches(cachedItems.Deleted, _batchSize);
+            var deletedViewEnvelopeBatches = new DeletedViewEnvelopeBatches(cachedItems.Deleted, _batchSize);
             var numberOfRetries = 0;
-            foreach (var batch in viewEnvelopeBatches)
+            foreach (var batch in deletedViewEnvelopeBatches)
             {
                 numberOfRetries += DeleteBatch(batch);
             }
@@ -103,20 +104,19 @@ namespace ViewStore.Cache
             return numberOfRetries;
         }
 
-        private int DeleteBatch(IReadOnlyList<ViewEnvelope> batch, int numberOfRetries = 0)
+        private int DeleteBatch(IReadOnlyList<DeletedViewEnvelope> batch, int numberOfRetries = 0)
         {
             try
             {
-                foreach (var item in batch)
-                {
-                    _destinationViewStore.Delete(item);    
-                }
+                _destinationViewStore.Delete(
+                    batch.Select(i => i.ViewId),
+                    batch.Max(i => i.GlobalVersion));
             }
             catch (Exception e)
             {
                 OnSendingExceptionEvent?.Invoke(e);
                 Thread.Sleep(1000);
-                return SaveBatch(batch, numberOfRetries + 1);
+                return DeleteBatch(batch, numberOfRetries + 1);
             }
 
             return numberOfRetries;

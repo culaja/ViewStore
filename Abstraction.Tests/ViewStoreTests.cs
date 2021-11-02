@@ -136,7 +136,7 @@ namespace ViewStore.Abstractions
             var viewStore = BuildViewStore();
             viewStore.Save(TestViewEnvelope1);
 
-            viewStore.Delete(TestViewEnvelope1);
+            viewStore.Delete(TestViewEnvelope1.Id, GlobalVersion.Of(2));
 
             viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
         }
@@ -148,7 +148,7 @@ namespace ViewStore.Abstractions
             viewStore.Save(TestViewEnvelope1);
             viewStore.Save(TestViewEnvelope2);
 
-            viewStore.Delete(new [] { TestViewEnvelope1, TestViewEnvelope2 });
+            viewStore.Delete(new [] { TestViewEnvelope1.Id, TestViewEnvelope2.Id }, GlobalVersion.Of(3));
 
             viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
             viewStore.Read(TestViewEnvelope2.Id).Should().BeNull();

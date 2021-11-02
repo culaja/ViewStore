@@ -83,12 +83,12 @@ namespace ViewStore.InMemory
             }
         }
 
-        public void Delete(ViewEnvelope viewEnvelope)
+        public void Delete(string viewId, GlobalVersion globalVersion)
         {
             _lock.EnterWriteLock();
             try
             {
-                _dictionary.Remove(viewEnvelope.Id);
+                _dictionary.Remove(viewId);
             }
             finally
             {
@@ -96,25 +96,25 @@ namespace ViewStore.InMemory
             }
         }
 
-        public Task DeleteAsync(ViewEnvelope viewEnvelope)
+        public Task DeleteAsync(string viewId, GlobalVersion globalVersion)
         {
-            Delete(viewEnvelope);
+            Delete(viewId, globalVersion);
             return Task.CompletedTask;
         }
 
-        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            foreach (var viewEnvelope in viewEnvelopes)
+            foreach (var viewId in viewIds)
             {
-                Delete(viewEnvelope);
+                Delete(viewId, globalVersion);
             }
         }
 
-        public async Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            foreach (var viewEnvelope in viewEnvelopes)
+            foreach (var viewId in viewIds)
             {
-                await DeleteAsync(viewEnvelope);
+                await DeleteAsync(viewId, globalVersion);
             }
         }
     }

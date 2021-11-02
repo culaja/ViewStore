@@ -96,40 +96,40 @@ namespace ViewStore.Cache
             return _next.SaveAsync(list);
         }
 
-        public void Delete(ViewEnvelope viewEnvelope)
+        public void Delete(string viewId, GlobalVersion globalVersion)
         {
-            _memoryCache.Remove(viewEnvelope.Id);
-            _next.Delete(viewEnvelope);
+            _memoryCache.Remove(viewId);
+            _next.Delete(viewId, globalVersion);
         }
 
-        public Task DeleteAsync(ViewEnvelope viewEnvelope)
+        public Task DeleteAsync(string viewId, GlobalVersion globalVersion)
         {
-            _memoryCache.Remove(viewEnvelope.Id);
-            return _next.DeleteAsync(viewEnvelope);
+            _memoryCache.Remove(viewId);
+            return _next.DeleteAsync(viewId, globalVersion);
         }
 
-        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            var list = new List<ViewEnvelope>();
-            foreach (var viewEnvelope in viewEnvelopes)
+            var list = new List<string>();
+            foreach (var viewId in viewIds)
             {
-                _memoryCache.Remove(viewEnvelope.Id);
-                list.Add(viewEnvelope);
+                _memoryCache.Remove(viewId);
+                list.Add(viewId);
             }
             
-            _next.Delete(list);
+            _next.Delete(list, globalVersion);
         }
 
-        public Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            var list = new List<ViewEnvelope>();
-            foreach (var viewEnvelope in viewEnvelopes)
+            var list = new List<string>();
+            foreach (var viewId in viewIds)
             {
-                _memoryCache.Remove(viewEnvelope.Id);
-                list.Add(viewEnvelope);
+                _memoryCache.Remove(viewId);
+                list.Add(viewId);
             }
             
-            return _next.DeleteAsync(list);
+            return _next.DeleteAsync(list, globalVersion);
         }
     }
 }

@@ -17,10 +17,10 @@ namespace ViewStore.Abstractions
         void Save(IEnumerable<ViewEnvelope> viewEnvelopes);
         Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes);
 
-        void Delete(ViewEnvelope viewEnvelope);
-        Task DeleteAsync(ViewEnvelope viewEnvelope);
+        void Delete(string viewId, GlobalVersion globalVersion);
+        Task DeleteAsync(string viewId, GlobalVersion globalVersion);
         
-        void Delete(IEnumerable<ViewEnvelope> viewEnvelopes);
-        Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes);
+        void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion);
+        Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion);
     }
 }

@@ -137,7 +137,7 @@ namespace ViewStore.Abstractions
             var viewStore = BuildViewStore();
             await viewStore.SaveAsync(TestViewEnvelope1);
 
-            await viewStore.DeleteAsync(TestViewEnvelope1);
+            await viewStore.DeleteAsync(TestViewEnvelope1.Id, GlobalVersion.Of(2));
 
             (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().BeNull();
         }
@@ -149,7 +149,7 @@ namespace ViewStore.Abstractions
             await viewStore.SaveAsync(TestViewEnvelope1);
             await viewStore.SaveAsync(TestViewEnvelope2);
 
-            await viewStore.DeleteAsync(new [] { TestViewEnvelope1, TestViewEnvelope2 });
+            await viewStore.DeleteAsync(new [] { TestViewEnvelope1.Id, TestViewEnvelope2.Id }, GlobalVersion.Of(3));
 
             (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().BeNull();
             (await viewStore.ReadAsync(TestViewEnvelope2.Id)).Should().BeNull();

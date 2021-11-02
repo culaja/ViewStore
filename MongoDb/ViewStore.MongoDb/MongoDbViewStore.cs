@@ -102,20 +102,20 @@ namespace ViewStore.MongoDb
 
         public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => Task.WhenAll(viewEnvelopes.Select(SaveAsync));
 
-        public void Delete(ViewEnvelope viewEnvelope)
+        public void Delete(string viewId, GlobalVersion globalVersion)
         {
-            Collection().DeleteOne(Filter.Eq("_id", viewEnvelope.Id));
+            Collection().DeleteOne(Filter.Eq("_id", viewId));
         }
 
-        public Task DeleteAsync(ViewEnvelope viewEnvelope) => 
-            Collection().DeleteOneAsync(Filter.Eq("_id", viewEnvelope.Id));
+        public Task DeleteAsync(string viewId, GlobalVersion globalVersion) => 
+            Collection().DeleteOneAsync(Filter.Eq("_id", viewId));
 
-        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            Collection().DeleteMany(Filter.In("_id", viewEnvelopes.Select(ve => ve.Id)));
+            Collection().DeleteMany(Filter.In("_id", viewIds.Select(viewId => viewId)));
         }
 
-        public Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => 
-            Collection().DeleteManyAsync(Filter.In("_id", viewEnvelopes.Select(ve => ve.Id)));
+        public Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion) => 
+            Collection().DeleteManyAsync(Filter.In("_id", viewIds.Select(viewId => viewId)));
     }
 }

@@ -7,10 +7,13 @@ namespace ViewStore.Cache
     internal sealed class CachedItems
     {
         private readonly Dictionary<string, ViewEnvelope> _addedOrUpdated = new();
-        private readonly Dictionary<string, ViewEnvelope> _deleted = new();
+        private readonly Dictionary<string, GlobalVersion> _deleted = new();
 
         public IReadOnlyCollection<ViewEnvelope> AddedOrUpdated => _addedOrUpdated.Values;
-        public IReadOnlyCollection<ViewEnvelope> Deleted => _deleted.Values;
+
+        public IReadOnlyCollection<DeletedViewEnvelope> Deleted => _deleted
+            .Select(d => new DeletedViewEnvelope(d.Key, d.Value))
+            .ToList();
         
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
@@ -18,10 +21,10 @@ namespace ViewStore.Cache
             _addedOrUpdated[viewEnvelope.Id] = viewEnvelope;
         }
 
-        public void Remove(ViewEnvelope viewEnvelope)
+        public void Remove(string viewId, GlobalVersion globalVersion)
         {
-            _addedOrUpdated.Remove(viewEnvelope.Id);
-            _deleted[viewEnvelope.Id] = viewEnvelope;
+            _addedOrUpdated.Remove(viewId);
+            _deleted[viewId] = globalVersion;
         }
         
         public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)
@@ -31,8 +34,8 @@ namespace ViewStore.Cache
         }
 
         public GlobalVersion? LastGlobalVersion() =>
-            _addedOrUpdated.Count > 0 || _deleted.Count > 0 
-                ? _addedOrUpdated.Values.Concat(_deleted.Values).Max(ve => ve.GlobalVersion)
-                : null;
+            GlobalVersion.Max(
+                _addedOrUpdated.Values.Max(ve => ve.GlobalVersion),
+                _deleted.Values.Max());
     }
 }

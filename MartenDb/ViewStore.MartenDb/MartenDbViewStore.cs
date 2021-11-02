@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marten;
-using Marten.Linq.SoftDeletes;
 using ViewStore.Abstractions;
 
 namespace ViewStore.MartenDb
@@ -73,7 +72,7 @@ namespace ViewStore.MartenDb
             session.StoreObjects(viewEnvelopes);
             session.SaveChanges();
         }
-
+        
         public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
             using var session = _documentStore.OpenSession();
@@ -81,31 +80,31 @@ namespace ViewStore.MartenDb
             await session.SaveChangesAsync();
         }
 
-        public void Delete(ViewEnvelope viewEnvelope)
+        public void Delete(string viewId, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            session.Delete(viewEnvelope);
+            session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
             session.SaveChanges();
         }
 
-        public async Task DeleteAsync(ViewEnvelope viewEnvelope)
+        public async Task DeleteAsync(string viewId, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            session.Delete(viewEnvelope);
+            session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
             await session.SaveChangesAsync();
         }
 
-        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            foreach (var viewEnvelope in viewEnvelopes) session.Delete(viewEnvelope);
+            foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
             session.SaveChanges();
         }
 
-        public async Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             using var session = _documentStore.OpenSession();
-            foreach (var viewEnvelope in viewEnvelopes) session.Delete(viewEnvelope);
+            foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelope>(ve => ve.Id == viewId);
             await session.SaveChangesAsync();
         }
     }

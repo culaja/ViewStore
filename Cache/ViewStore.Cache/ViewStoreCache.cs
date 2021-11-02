@@ -31,13 +31,13 @@ namespace ViewStore.Cache
         public void Save(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.Save(viewEnvelopes);
 
         public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.SaveAsync(viewEnvelopes);
-        public void Delete(ViewEnvelope viewEnvelope) => _viewStoreCacheInternal.Delete(viewEnvelope);
+        public void Delete(string viewId, GlobalVersion globalVersion) => _viewStoreCacheInternal.Delete(viewId, globalVersion);
 
-        public Task DeleteAsync(ViewEnvelope viewEnvelope) => _viewStoreCacheInternal.DeleteAsync(viewEnvelope);
+        public Task DeleteAsync(string viewId, GlobalVersion globalVersion) => _viewStoreCacheInternal.DeleteAsync(viewId, globalVersion);
         
-        public void Delete(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.Delete(viewEnvelopes);
+        public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion) => _viewStoreCacheInternal.Delete(viewIds, globalVersion);
         
-        public Task DeleteAsync(IEnumerable<ViewEnvelope> viewEnvelopes) => _viewStoreCacheInternal.DeleteAsync(viewEnvelopes);
+        public Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion) => _viewStoreCacheInternal.DeleteAsync(viewIds, globalVersion);
 
         public void Dispose()
         {

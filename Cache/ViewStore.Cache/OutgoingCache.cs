@@ -16,11 +16,11 @@ namespace ViewStore.Cache
             }
         }
 
-        public void Remove(ViewEnvelope viewEnvelope)
+        public void Remove(string viewId, GlobalVersion globalVersion)
         {
             lock (_sync)
             {
-                _currentCache.Remove(viewEnvelope);
+                _currentCache.Remove(viewId, globalVersion);
             }
         }
 
