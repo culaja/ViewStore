@@ -27,7 +27,7 @@ namespace ViewStore.MongoDb
             Abstractions.GlobalVersion.Of(GlobalVersion),
             MetaData);
 
-        public static implicit operator ViewEnvelope(ViewEnvelopeInternal @internal) =>
-            @internal.ToViewEnvelope();
+        public static implicit operator ViewEnvelope?(ViewEnvelopeInternal? @internal) =>
+            @internal?.ToViewEnvelope();
     }
 }
