@@ -28,6 +28,12 @@ namespace ViewStore.Abstractions
             GlobalVersion.Start,
             new MetaData(new Dictionary<string, string>()));
         
+        public static ViewEnvelope EmptyWith(string id, GlobalVersion globalVersion) => new(
+            id,
+            new EmptyView(),
+            globalVersion,
+            new MetaData(new Dictionary<string, string>()));
+        
         public bool Transform<T>(
             GlobalVersion transformationGlobalVersion,
             Action<T> transform) where T : IView

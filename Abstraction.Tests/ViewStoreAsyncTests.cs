@@ -132,6 +132,17 @@ namespace ViewStore.Abstractions
         }
         
         [Fact]
+        public async Task after_deleting_an_object_last_global_version_is_updated_correctly()
+        {
+            var viewStore = BuildViewStore();
+            await viewStore.SaveAsync(TestViewEnvelope1);
+
+            await viewStore.DeleteAsync(TestViewEnvelope1.Id, GlobalVersion.Of(2));
+
+            (await viewStore.ReadLastGlobalVersionAsync()).Should().Be(GlobalVersion.Of(2));
+        }
+        
+        [Fact]
         public async Task after_deleting_batch_of_objects_those_objects_cant_be_found_in_store()
         {
             var viewStore = BuildViewStore();
@@ -142,6 +153,18 @@ namespace ViewStore.Abstractions
 
             (await viewStore.ReadAsync(TestViewEnvelope1.Id)).Should().BeNull();
             (await viewStore.ReadAsync(TestViewEnvelope2.Id)).Should().BeNull();
+        }
+        
+        [Fact]
+        public async Task after_deleting_batch_of_objects_last_global_version_is_updated_correctly()
+        {
+            var viewStore = BuildViewStore();
+            await viewStore.SaveAsync(TestViewEnvelope1);
+            await viewStore.SaveAsync(TestViewEnvelope2);
+
+            await viewStore.DeleteAsync(new [] { TestViewEnvelope1.Id, TestViewEnvelope2.Id }, GlobalVersion.Of(3));
+
+            (await viewStore.ReadLastGlobalVersionAsync()).Should().Be(GlobalVersion.Of(3));
         }
     }
 }

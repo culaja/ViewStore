@@ -8,6 +8,8 @@ namespace ViewStore.MartenDb
 {
     internal sealed class MartenDbViewStore : IViewStore
     {
+        private const string LastDeletedViewId = "LastDeleted-b24ae98262724d27bd8e31c34ff11f1a";
+        
         private readonly IDocumentStore _documentStore;
 
         public MartenDbViewStore(IDocumentStore documentStore)
@@ -85,6 +87,7 @@ namespace ViewStore.MartenDb
         {
             using var session = _documentStore.OpenSession();
             session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
+            session.Store(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
             session.SaveChanges();
         }
 
@@ -92,6 +95,7 @@ namespace ViewStore.MartenDb
         {
             using var session = _documentStore.OpenSession();
             session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
+            session.Store(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
             await session.SaveChangesAsync();
         }
 
@@ -99,6 +103,7 @@ namespace ViewStore.MartenDb
         {
             using var session = _documentStore.OpenSession();
             foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
+            session.Store(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
             session.SaveChanges();
         }
 
@@ -106,6 +111,7 @@ namespace ViewStore.MartenDb
         {
             using var session = _documentStore.OpenSession();
             foreach (var viewId in viewIds) session.DeleteWhere<ViewEnvelopeInternal>(ve => ve.Id == viewId);
+            session.Store(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
             await session.SaveChangesAsync();
         }
     }

@@ -131,6 +131,17 @@ namespace ViewStore.Abstractions
         }
         
         [Fact]
+        public void after_deleting_an_object_last_global_version_is_updated_correctly()
+        {
+            var viewStore = BuildViewStore();
+            viewStore.Save(TestViewEnvelope1);
+
+            viewStore.Delete(TestViewEnvelope1.Id, GlobalVersion.Of(2));
+
+            viewStore.ReadLastGlobalVersion().Should().Be(GlobalVersion.Of(2));
+        }
+        
+        [Fact]
         public void after_deleting_batch_of_objects_those_objects_cant_be_found_in_store()
         {
             var viewStore = BuildViewStore();
@@ -141,6 +152,18 @@ namespace ViewStore.Abstractions
 
             viewStore.Read(TestViewEnvelope1.Id).Should().BeNull();
             viewStore.Read(TestViewEnvelope2.Id).Should().BeNull();
+        }
+        
+        [Fact]
+        public void after_deleting_batch_of_objects_last_global_version_is_updated_correctly()
+        {
+            var viewStore = BuildViewStore();
+            viewStore.Save(TestViewEnvelope1);
+            viewStore.Save(TestViewEnvelope2);
+
+            viewStore.Delete(new [] { TestViewEnvelope1.Id, TestViewEnvelope2.Id }, GlobalVersion.Of(3));
+
+            viewStore.ReadLastGlobalVersion().Should().Be(GlobalVersion.Of(3));
         }
     }
 }

@@ -8,6 +8,8 @@ namespace ViewStore.InMemory
 {
     public sealed class InMemoryViewStore : IViewStore
     {
+        private const string LastDeletedViewId = "LastDeleted-b24ae98262724d27bd8e31c34ff11f1a";
+        
         private readonly ReaderWriterLockSlim _lock = new();
         private readonly Dictionary<string, ViewEnvelope> _dictionary = new();
 
@@ -89,6 +91,7 @@ namespace ViewStore.InMemory
             try
             {
                 _dictionary.Remove(viewId);
+                _dictionary[LastDeletedViewId] = ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion);
             }
             finally
             {

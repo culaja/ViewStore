@@ -11,6 +11,8 @@ namespace ViewStore.MongoDb
 {
     internal sealed class MongoDbViewStore : IViewStore
     {
+        private const string LastDeletedViewId = "LastDeleted-b24ae98262724d27bd8e31c34ff11f1a";
+        
         private readonly IMongoDatabase _mongoDatabase;
         private readonly string _collectionName;
 
@@ -107,17 +109,25 @@ namespace ViewStore.MongoDb
         public void Delete(string viewId, GlobalVersion globalVersion)
         {
             Collection().DeleteOne(Filter.Eq("_id", viewId));
+            Save(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
         }
 
-        public Task DeleteAsync(string viewId, GlobalVersion globalVersion) => 
-            Collection().DeleteOneAsync(Filter.Eq("_id", viewId));
+        public async Task DeleteAsync(string viewId, GlobalVersion globalVersion)
+        {
+            await Collection().DeleteOneAsync(Filter.Eq("_id", viewId));
+            await SaveAsync(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
+        }
 
         public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             Collection().DeleteMany(Filter.In("_id", viewIds.Select(viewId => viewId)));
+            Save(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
         }
 
-        public Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion) => 
-            Collection().DeleteManyAsync(Filter.In("_id", viewIds.Select(viewId => viewId)));
+        public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        {
+            await Collection().DeleteManyAsync(Filter.In("_id", viewIds.Select(viewId => viewId)));
+            await SaveAsync(ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
+        }
     }
 }
