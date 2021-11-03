@@ -8,7 +8,7 @@ namespace ViewStore.Cache
     {
         private IViewStore? _realViewStore;
         private TimeSpan _cacheDrainPeriod = TimeSpan.FromSeconds(5);
-        private int _cacheDrainBatchSize;
+        private int _cacheDrainBatchSize = 1000;
         private Action<DrainStatistics>? _cacheDrainedCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
         
