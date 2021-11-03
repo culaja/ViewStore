@@ -10,7 +10,7 @@ namespace ViewStore.Cache
         public int DeletedViewCount { get; }
         public int DeletedRetryCount { get; }
         
-        public int Count => AddedOrUpdatedRetryCount + DeletedViewCount;
+        public int Count => AddedOrUpdatedViewCount + DeletedViewCount;
         public bool HasAnyItems => Count > 0;
 
         internal DrainStatistics(
