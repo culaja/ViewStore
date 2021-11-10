@@ -1,6 +1,7 @@
 ﻿using System;
 using Marten;
 using ViewStore.Abstractions;
+using Weasel.Postgresql;
 
 namespace ViewStore.MartenDb
 {
