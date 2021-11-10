@@ -2,7 +2,7 @@ using ViewStore.Abstractions;
 
 namespace ViewStore.MartenDb
 {
-    internal sealed class ViewEnvelopeInternal
+    public sealed class ViewEnvelopeInternal
     {
         public string Id { get; }
         public IView View { get; }
