@@ -5,6 +5,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
+        <PackageId>ViewStore.Postgres</PackageId>
+        <PackageDescription>Postgres implementation of View Store.</PackageDescription>
+        <Version>1.2.1-alpha4</Version>
+        <Authors>Stanko Culaja</Authors>
+        <PackageTags>Postgres;Postgres View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

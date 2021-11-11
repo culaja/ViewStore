@@ -44,10 +44,10 @@ jobs:
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.MartenDb
+    - name: Publish ViewStore.Postgres
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: MartenDb/ViewStore.MartenDb/ViewStore.MartenDb.csproj
+        PROJECT_FILE_PATH: Postgres/ViewStore.Postgres/ViewStore.Postgres.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
