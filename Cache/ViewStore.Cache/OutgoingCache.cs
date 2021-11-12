@@ -1,4 +1,6 @@
-﻿using ViewStore.Abstractions;
+﻿using System;
+using System.Threading;
+using ViewStore.Abstractions;
 
 namespace ViewStore.Cache
 {
@@ -7,13 +9,35 @@ namespace ViewStore.Cache
         private readonly object _sync = new();
         private CachedItems _currentCache = new();
         private CachedItems _drainedCache = new();
+        
+        private readonly int _throttleAfterCacheCount;
+        private readonly Action<ThrottleStatistics>? _throttlingCallback;
+
+        public OutgoingCache(int throttleAfterCacheCount, Action<ThrottleStatistics>? throttlingCallback)
+        {
+            _throttleAfterCacheCount = throttleAfterCacheCount;
+            _throttlingCallback = throttlingCallback;
+        }
 
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
             lock (_sync)
             {
+                if (_currentCache.Count > _throttleAfterCacheCount)
+                {
+                    ThrottleForOneSecond();
+                }
+                
                 _currentCache.AddOrUpdate(viewEnvelope);
             }
+        }
+
+        private void ThrottleForOneSecond()
+        {
+            var throttlingPeriod = TimeSpan.FromSeconds(1);
+            var throttleDetails = new ThrottleStatistics(_currentCache.Count, _throttleAfterCacheCount, throttlingPeriod);
+            _throttlingCallback?.Invoke(throttleDetails);
+            Thread.Sleep(1000);
         }
 
         public void Remove(string viewId, GlobalVersion globalVersion)

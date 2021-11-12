@@ -11,7 +11,7 @@ namespace ViewStore.Cache
 
         public CacheViewStoreAsyncTests()
         {
-            _cache = ViewStoreCacheFactory.New()
+            _cache = ViewStoreCacheBuilder.New()
                 .For(new InMemoryViewStore())
                 .WithCacheDrainPeriod(TimeSpan.Zero)
                 .WithReadMemoryCache(new MemoryCache(Guid.NewGuid().ToString()))

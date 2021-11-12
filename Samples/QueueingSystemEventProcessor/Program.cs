@@ -28,7 +28,7 @@ namespace QueueingSystemEventProcessor
                 .WithConnectionDetails("mongodb://kolotree:kolotree4532@localhost:27018", "MyDb")
                 .Build();
 
-            ViewStore = ViewStoreCacheFactory.New()
+            ViewStore = ViewStoreCacheBuilder.New()
                 .For(mongoDbStore)
                 .WithCacheDrainPeriod(TimeSpan.FromSeconds(5))
                 .UseCallbackWhenDrainFinished(_ => { })

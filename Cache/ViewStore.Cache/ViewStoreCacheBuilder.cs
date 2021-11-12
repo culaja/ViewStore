@@ -4,44 +4,46 @@ using ViewStore.Abstractions;
 
 namespace ViewStore.Cache
 {
-    public sealed class ViewStoreCacheFactory
+    public sealed class ViewStoreCacheBuilder
     {
         private IViewStore? _realViewStore;
         private TimeSpan _cacheDrainPeriod = TimeSpan.FromSeconds(5);
         private int _cacheDrainBatchSize = 1000;
+        private int _throttleAfterCacheCount = 50000;
         private Action<DrainStatistics>? _cacheDrainedCallback;
+        private Action<ThrottleStatistics>? _throttlingCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
         
         private MemoryCache _memoryCache = MemoryCache.Default;
         private TimeSpan _readCacheExpirationPeriod = TimeSpan.FromSeconds(10);
 
-        public static ViewStoreCacheFactory New() => new();
+        public static ViewStoreCacheBuilder New() => new();
 
-        public ViewStoreCacheFactory For(IViewStore viewStore)
+        public ViewStoreCacheBuilder For(IViewStore viewStore)
         {
             _realViewStore = viewStore;
             return this;
         }
 
-        public ViewStoreCacheFactory WithReadMemoryCache(MemoryCache memoryCache)
+        public ViewStoreCacheBuilder WithReadMemoryCache(MemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
             return this;
         }
         
-        public ViewStoreCacheFactory WithReadCacheExpirationPeriod(TimeSpan readCacheExpirationPeriod)
+        public ViewStoreCacheBuilder WithReadCacheExpirationPeriod(TimeSpan readCacheExpirationPeriod)
         {
             _readCacheExpirationPeriod = readCacheExpirationPeriod;
             return this;
         }
 
-        public ViewStoreCacheFactory WithCacheDrainPeriod(TimeSpan timeSpan)
+        public ViewStoreCacheBuilder WithCacheDrainPeriod(TimeSpan timeSpan)
         {
             _cacheDrainPeriod = timeSpan;
             return this;
         }
 
-        public ViewStoreCacheFactory WithCacheDrainBatchSize(int batchSize)
+        public ViewStoreCacheBuilder WithCacheDrainBatchSize(int batchSize)
         {
             if (batchSize < 0)
             {
@@ -52,13 +54,30 @@ namespace ViewStore.Cache
             return this;
         }
 
-        public ViewStoreCacheFactory UseCallbackWhenDrainFinished(Action<DrainStatistics> callback)
+        public ViewStoreCacheBuilder WithThrottleAfterCacheCount(int throttleAfterCacheCount)
+        {
+            if (throttleAfterCacheCount <= 0)
+            {
+                throw new ArgumentException(nameof(throttleAfterCacheCount));
+            }
+            
+            _throttleAfterCacheCount = throttleAfterCacheCount;
+            return this;
+        }
+
+        public ViewStoreCacheBuilder UseCallbackWhenDrainFinished(Action<DrainStatistics> callback)
         {
             _cacheDrainedCallback = callback;
             return this;
         }
+        
+        public ViewStoreCacheBuilder UseCallbackOnThrottling(Action<ThrottleStatistics> throttlingCallback)
+        {
+            _throttlingCallback = throttlingCallback;
+            return this;
+        }
 
-        public ViewStoreCacheFactory UseCallbackOnDrainAttemptFailed(Action<Exception> callback)
+        public ViewStoreCacheBuilder UseCallbackOnDrainAttemptFailed(Action<Exception> callback)
         {
             _onDrainAttemptFailedCallback = callback;
             return this;
@@ -71,7 +90,7 @@ namespace ViewStore.Cache
                 throw new ArgumentException(nameof(_realViewStore));
             }
             
-            var outgoingCache = new OutgoingCache();
+            var outgoingCache = new OutgoingCache(_throttleAfterCacheCount, _throttlingCallback);
 
             var automaticCacheDrainer = new AutomaticCacheDrainer(
                 new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),

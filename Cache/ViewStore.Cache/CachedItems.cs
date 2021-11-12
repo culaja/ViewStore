@@ -14,7 +14,9 @@ namespace ViewStore.Cache
         public IReadOnlyCollection<DeletedViewEnvelope> Deleted => _deleted
             .Select(d => new DeletedViewEnvelope(d.Key, d.Value))
             .ToList();
-        
+
+        public long Count => _addedOrUpdated.Count + _deleted.Count;
+
         public void AddOrUpdate(ViewEnvelope viewEnvelope)
         {
             _deleted.Remove(viewEnvelope.Id);

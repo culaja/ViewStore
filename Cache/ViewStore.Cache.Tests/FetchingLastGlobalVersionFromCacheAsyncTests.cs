@@ -10,7 +10,7 @@ namespace ViewStore.Cache
     public sealed class FetchingLastGlobalVersionFromCacheAsyncTests
     {
         private readonly InMemoryViewStore _finalStore = new();
-        private readonly OutgoingCache _outgoingCache = new();
+        private readonly OutgoingCache _outgoingCache = new(1000, null);
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly ViewStoreCacheInternal _viewStoreCacheInternal;
 
