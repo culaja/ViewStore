@@ -188,7 +188,7 @@ namespace ViewStore.Postgres
                     viewType varchar(256) NOT NULL,
                     metadata jsonb NOT NULL,
                     globalVersion bigint NOT NULL,
-                    lastChangeTimeStamp date NOT NULL);";
+                    lastChangeTimeStamp timestamp NOT NULL);";
             
             using var cmd = new NpgsqlCommand(sql, connection);
             
