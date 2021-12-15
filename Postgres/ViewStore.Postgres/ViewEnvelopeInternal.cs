@@ -6,6 +6,10 @@ namespace ViewStore.Postgres
 {
     internal sealed class ViewEnvelopeInternal
     {
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new() { 
+            TypeNameHandling = TypeNameHandling.All
+        };
+    
         public string Id { get; }
         public string View { get; }
         public string ViewType { get; }
@@ -28,9 +32,9 @@ namespace ViewStore.Postgres
 
         public ViewEnvelopeInternal(ViewEnvelope viewEnvelope) : this(
             viewEnvelope.Id,
-            JsonConvert.SerializeObject(viewEnvelope.View),
+            JsonConvert.SerializeObject(viewEnvelope.View, JsonSerializerSettings),
             viewEnvelope.View.GetType().AssemblyQualifiedName,
-            JsonConvert.SerializeObject(viewEnvelope.MetaData),
+            JsonConvert.SerializeObject(viewEnvelope.MetaData, JsonSerializerSettings),
             viewEnvelope.GlobalVersion.Value)
             {
             }

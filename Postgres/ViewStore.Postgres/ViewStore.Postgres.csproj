@@ -8,7 +8,7 @@
         <AssemblyName>ViewStore.Postgres</AssemblyName>
         <PackageId>ViewStore.Postgres</PackageId>
         <PackageDescription>Postgres implementation of View Store.</PackageDescription>
-        <Version>1.2.1-alpha9</Version>
+        <Version>1.2.1-alpha91</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>Postgres;Postgres View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
