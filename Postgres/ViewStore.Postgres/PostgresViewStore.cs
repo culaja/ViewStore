@@ -26,14 +26,7 @@ namespace ViewStore.Postgres
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
             
-            var sql = @$"
-                select 
-                    globalVersion 
-                from {_tablePath}
-                    order by globalVersion desc
-                limit 1";
-            
-            using var cmd = new NpgsqlCommand(sql, connection);
+            using var cmd = connection.ToReadLastGlobalVersionCommandOn(_tablePath);
             using var reader = cmd.ExecuteReader();
 
             GlobalVersion? globalVersion = reader.Read()
@@ -48,14 +41,7 @@ namespace ViewStore.Postgres
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var sql = @$"
-                select 
-                    globalVersion 
-                from {_tablePath}
-                    order by globalVersion desc
-                limit 1";
-
-            await using var cmd = new NpgsqlCommand(sql, connection);
+            await using var cmd = connection.ToReadLastGlobalVersionCommandOn(_tablePath);
             await using var reader = await cmd.ExecuteReaderAsync();
 
             GlobalVersion? globalVersion = await reader.ReadAsync()
@@ -69,18 +55,8 @@ namespace ViewStore.Postgres
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
-            
-            var sql = @$"
-                select
-                    (view)::text,
-                    viewType,
-                    (metadata)::text,
-                    globalVersion
-                from {_tablePath}
-                    where id = @viewId";
-            
-            using var cmd = new NpgsqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("viewId", viewId);
+
+            using var cmd = connection.ToReadViewIdCommandOn(viewId, _tablePath);
             using var reader = cmd.ExecuteReader();
 
             ViewEnvelope? globalVersion = reader.Read()
@@ -100,16 +76,7 @@ namespace ViewStore.Postgres
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var sql = @$"
-                select
-                    (view)::text,
-                    viewType,
-                    (metadata)::text,
-                    globalVersion
-                from {_tablePath}
-                    where id = @viewId";
-
-            await using var cmd = new NpgsqlCommand(sql, connection);
+            await using var cmd = connection.ToReadViewIdCommandOn(viewId, _tablePath);
             cmd.Parameters.AddWithValue("viewId", viewId);
             await using var reader = await cmd.ExecuteReaderAsync();
 
