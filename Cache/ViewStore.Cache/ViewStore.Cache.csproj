@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <PackageId>ViewStore.Cache</PackageId>
         <PackageDescription>Write bihind cache for View Store. It can be used as a decorator for any View Store implementation (e.g. MongoDb View Store).</PackageDescription>
-        <Version>1.3.0</Version>
+        <Version>2.0.0-rc1</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>Write behind cache;Read through cache;Cache View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
