@@ -135,6 +135,13 @@ namespace ViewStore.Postgres
             connection.Open();
             using var transaction = connection.BeginTransaction();
 
+            SaveInternal(connection, transaction, viewEnvelopes);
+            
+            transaction.Commit();
+        }
+
+        private void SaveInternal(NpgsqlConnection connection, NpgsqlTransaction transaction, IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
             using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewEnvelope in viewEnvelopes)
             {
@@ -142,8 +149,6 @@ namespace ViewStore.Postgres
             }
 
             batch.ExecuteNonQuery();
-            
-            transaction.Commit();
         }
 
         public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
@@ -151,57 +156,26 @@ namespace ViewStore.Postgres
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
             await using var transaction = await connection.BeginTransactionAsync();
+
+            await SaveInternalAsync(connection, transaction, viewEnvelopes);
             
-            await using var batch = new NpgsqlBatch(connection, transaction);
+            await transaction.CommitAsync();
+        }
+        
+        private Task SaveInternalAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewEnvelope in viewEnvelopes)
             {
                 batch.BatchCommands.Add(viewEnvelope.ToInternal().ToBatchCommandOn(_tablePath));
             }
 
-            await batch.ExecuteNonQueryAsync();
-            
-            await transaction.CommitAsync();
+            return batch.ExecuteNonQueryAsync();
         }
 
-        public void Delete(string viewId, GlobalVersion globalVersion)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-            
-            var sql = @$"
-                DELETE FROM {_tablePath}
-                WHERE id = @viewId";
-            
-            using var cmd = new NpgsqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("viewId", viewId);
-            
-            cmd.ExecuteNonQuery();
-            
-            SaveInternal(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
-            
-            transaction.Commit();
-        }
+        public void Delete(string viewId, GlobalVersion globalVersion) => Delete(new[] { viewId }, globalVersion);
 
-        public async Task DeleteAsync(string viewId, GlobalVersion globalVersion)
-        {
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-            await using var transaction = await connection.BeginTransactionAsync();
-            
-            var sql = @$"
-                DELETE FROM {_tablePath}
-                WHERE id = @viewId";
-
-            await using var cmd = new NpgsqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("viewId", viewId);
-            
-            await cmd.ExecuteNonQueryAsync();
-            
-            await CreateBatchCommandFrom(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
-            
-            await transaction.CommitAsync();
-        }
+        public Task DeleteAsync(string viewId, GlobalVersion globalVersion) => DeleteAsync(new[] { viewId }, globalVersion);
 
         public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
@@ -209,18 +183,15 @@ namespace ViewStore.Postgres
             connection.Open();
             using var transaction = connection.BeginTransaction();
             
-            var sql = @$"
-                DELETE FROM {_tablePath}
-                WHERE id = @viewId";
-
+            using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewId in viewIds)
             {
-                using var cmd = new NpgsqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue("viewId", viewId);
-                cmd.ExecuteNonQuery();
+                batch.BatchCommands.Add(viewId.ToBatchCommandOn(_tablePath));
             }
+
+            batch.ExecuteNonQuery();
             
-            SaveInternal(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
+            SaveInternal(connection, transaction, new [] { ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion) });
             
             transaction.Commit();
         }
@@ -228,21 +199,18 @@ namespace ViewStore.Postgres
         public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            connection.Open();
             await using var transaction = await connection.BeginTransactionAsync();
-            
-            var sql = @$"
-                DELETE FROM {_tablePath}
-                WHERE id = @viewId";
 
+            await using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewId in viewIds)
             {
-                await using var cmd = new NpgsqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue("viewId", viewId);
-                await cmd.ExecuteNonQueryAsync();
+                batch.BatchCommands.Add(viewId.ToBatchCommandOn(_tablePath));
             }
+
+            await batch.ExecuteNonQueryAsync();
             
-            await CreateBatchCommandFrom(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
+            await SaveInternalAsync(connection, transaction, new [] { ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion) });
             
             await transaction.CommitAsync();
         }
