@@ -13,17 +13,20 @@ namespace ViewStore.Postgres
         private readonly string _connectionString;
         private readonly string _schemaName;
         private readonly string _tableName;
+        private readonly Func<NpgsqlConnection, NpgsqlTransaction, Task> _postAutoCreationCustomization;
         private readonly IViewStore _next;
 
         public AutoCreateDecorator(
             string connectionString,
             string schemaName,
             string tableName,
+            Func<NpgsqlConnection, NpgsqlTransaction, Task> postAutoCreationCustomization,
             IViewStore next)
         {
             _connectionString = connectionString;
             _schemaName = schemaName;
             _tableName = tableName;
+            _postAutoCreationCustomization = postAutoCreationCustomization;
             _next = next;
         }
         
@@ -165,21 +168,22 @@ namespace ViewStore.Postgres
             connection.Open();
             
             using var transaction = connection.BeginTransaction();
-            CreateSchema(connection, schemaName);
-            CreateTable(connection, schemaName, tableName);
+            CreateSchema(connection, transaction, schemaName);
+            CreateTable(connection, transaction, schemaName, tableName);
+            _postAutoCreationCustomization(connection, transaction);
             transaction.Commit();
             
             connection.Close();
         }
 
-        private void CreateSchema(NpgsqlConnection connection, string schemaName)
+        private void CreateSchema(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName)
         {
             var sql = $"CREATE SCHEMA IF NOT EXISTS {schemaName}";
-            using var cmd = new NpgsqlCommand(sql, connection);
+            using var cmd = new NpgsqlCommand(sql, connection, transaction);
             cmd.ExecuteNonQuery();
         }
 
-        private void CreateTable(NpgsqlConnection connection, string schemaName, string tableName)
+        private void CreateTable(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName, string tableName)
         {
             var sql = $@"
                 CREATE TABLE IF NOT EXISTS {schemaName}.{tableName}(
@@ -190,7 +194,7 @@ namespace ViewStore.Postgres
                     globalVersion bigint NOT NULL,
                     lastChangeTimeStamp timestamp NOT NULL);";
             
-            using var cmd = new NpgsqlCommand(sql, connection);
+            using var cmd = new NpgsqlCommand(sql, connection, transaction);
             
             cmd.ExecuteNonQuery();
         }

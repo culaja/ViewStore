@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using Npgsql;
 using ViewStore.Abstractions;
 
 namespace ViewStore.Postgres
@@ -9,6 +11,7 @@ namespace ViewStore.Postgres
         private string _schemaName = "public";
         private string? _tableName;
         private bool _shouldAutoCreate;
+        private  Func<NpgsqlConnection, NpgsqlTransaction, Task> _postAutoCreationCustomization = (_,_) => Task.CompletedTask;
         
         public static PostgresViewStoreBuilder New() => new();
         
@@ -44,6 +47,12 @@ namespace ViewStore.Postgres
             _shouldAutoCreate = shouldAutoCreate;
             return this;
         }
+
+        public PostgresViewStoreBuilder UsePostAutoCreationCustomization(Func<NpgsqlConnection, NpgsqlTransaction, Task> postAutoCreationCustomization)
+        {
+            _postAutoCreationCustomization = postAutoCreationCustomization;
+            return this;
+        }
         
         public IViewStore Build()
         {
@@ -60,6 +69,7 @@ namespace ViewStore.Postgres
                     _connectionString,
                     _schemaName,
                     _tableName,
+                    _postAutoCreationCustomization,
                     viewStore)
                 : viewStore;
         }
