@@ -30,7 +30,7 @@ namespace ViewStore.Postgres
                 from {tablePath}
                     where id = @viewId";
             
-            using var cmd = new NpgsqlCommand(sql, connection);
+            var cmd = new NpgsqlCommand(sql, connection);
             cmd.Parameters.AddWithValue("viewId", viewId);
 
             return cmd;

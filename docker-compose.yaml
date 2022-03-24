@@ -4,8 +4,8 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      - 'POSTGRES_USER=root'
-      - 'POSTGRES_PASSWORD=dagi123'
-      - 'POSTGRES_DB=EventStore'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_DB=ViewStore'
     ports:
       - 8276:5432
