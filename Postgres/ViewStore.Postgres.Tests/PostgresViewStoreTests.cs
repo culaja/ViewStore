@@ -3,7 +3,7 @@ using ViewStore.Abstractions;
 
 namespace ViewStore.Postgres
 {
-    public sealed class PostgresViewStoreTests : ViewStoreTests
+    internal sealed class PostgresViewStoreTests : ViewStoreTests
     {
         protected override IViewStore BuildViewStore() => PostgresViewStoreBuilder.New()
             .WithConnectionString("Host=localhost;Port=8276;Database=ViewStore;Username=postgres;Password=postgres")
