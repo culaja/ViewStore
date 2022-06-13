@@ -183,9 +183,9 @@ namespace ViewStore.Postgres
         {
             var sql = $@"
                 CREATE TABLE IF NOT EXISTS {schemaName}.{tableName}(
-                    id varchar(128) PRIMARY KEY NOT NULL,
+                    id varchar(256) PRIMARY KEY NOT NULL,
                     view jsonb NOT NULL,
-                    viewType varchar(256) NOT NULL,
+                    viewType varchar(1024) NOT NULL,
                     metadata jsonb NOT NULL,
                     globalVersion bigint NOT NULL,
                     lastChangeTimeStamp timestamp NOT NULL);";
