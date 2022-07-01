@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using ViewStore.Abstractions;
 
@@ -31,6 +32,19 @@ namespace ViewStore.Cache
                 _currentCache.AddOrUpdate(viewEnvelope);
             }
         }
+        
+        public void AddOrUpdate(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            lock (_sync)
+            {
+                if (_currentCache.Count > _throttleAfterCacheCount)
+                {
+                    ThrottleForOneSecond();
+                }
+                
+                _currentCache.AddOrUpdate(viewEnvelopes);
+            }
+        }
 
         private void ThrottleForOneSecond()
         {
@@ -45,6 +59,14 @@ namespace ViewStore.Cache
             lock (_sync)
             {
                 _currentCache.Remove(viewId, globalVersion);
+            }
+        }
+        
+        public void Remove(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        {
+            lock (_sync)
+            {
+                _currentCache.Remove(viewIds, globalVersion);
             }
         }
 

@@ -22,11 +22,29 @@ namespace ViewStore.Cache
             _deleted.Remove(viewEnvelope.Id);
             _addedOrUpdated[viewEnvelope.Id] = viewEnvelope;
         }
+        
+        public void AddOrUpdate(IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                _deleted.Remove(viewEnvelope.Id);
+                _addedOrUpdated[viewEnvelope.Id] = viewEnvelope;    
+            }
+        }
 
         public void Remove(string viewId, GlobalVersion globalVersion)
         {
             _addedOrUpdated.Remove(viewId);
             _deleted[viewId] = globalVersion;
+        }
+        
+        public void Remove(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        {
+            foreach (var viewId in viewIds)
+            {
+                _addedOrUpdated.Remove(viewId);
+                _deleted[viewId] = globalVersion;    
+            }
         }
         
         public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)

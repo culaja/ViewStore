@@ -74,18 +74,13 @@ namespace ViewStore.Cache
 
         public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
-            foreach (var viewEnvelope in viewEnvelopes)
-            {
-                Save(viewEnvelope);
-            }
+            _outgoingCache.AddOrUpdate(viewEnvelopes);
         }
 
-        public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
-            foreach (var viewEnvelope in viewEnvelopes)
-            {
-                await SaveAsync(viewEnvelope);
-            }
+            Save(viewEnvelopes);
+            return Task.CompletedTask;
         }
 
         public void Delete(string viewId, GlobalVersion globalVersion)
@@ -101,18 +96,13 @@ namespace ViewStore.Cache
 
         public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            foreach (var viewId in viewIds)
-            {
-                Delete(viewId, globalVersion);
-            }
+            _outgoingCache.Remove(viewIds, globalVersion);
         }
 
-        public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        public Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
-            foreach (var viewId in viewIds)
-            {
-                await DeleteAsync(viewId, globalVersion);
-            }
+            _outgoingCache.Remove(viewIds, globalVersion);
+            return Task.CompletedTask;
         }
     }
 }
