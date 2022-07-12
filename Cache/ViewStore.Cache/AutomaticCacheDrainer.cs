@@ -12,20 +12,21 @@ namespace ViewStore.Cache
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly TimeSpan _drainPeriod;
         private readonly Thread _worker;
-        private bool _isStopRequested;
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         public event OnSendingExceptionDelegate? OnSendingExceptionEvent;
         public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public AutomaticCacheDrainer(
             ManualCacheDrainer manualCacheDrainer,
-            TimeSpan drainPeriod)
+            TimeSpan drainPeriod,
+            bool isBackgroundWorker)
         {
             _manualCacheDrainer = manualCacheDrainer;
             manualCacheDrainer.OnSendingExceptionEvent += exception => OnSendingExceptionEvent?.Invoke(exception);
             manualCacheDrainer.OnDrainFinishedEvent += views => OnDrainFinishedEvent?.Invoke(views);
             _drainPeriod = drainPeriod;
-            _worker = new Thread(Work);
+            _worker = new Thread(Work) { IsBackground = isBackgroundWorker };
             _worker.Start();
         }
 
@@ -33,19 +34,24 @@ namespace ViewStore.Cache
         {
             while (true)
             {
-                Thread.Sleep(_drainPeriod);
+                Sleep();
                 
                 var drainedItems = _manualCacheDrainer.DrainCacheUntilEmpty();
-                if (_isStopRequested && drainedItems == 0)
+                if (_cancellationTokenSource.IsCancellationRequested && drainedItems == 0)
                 {
                     break;
                 }
             }
         }
 
+        private void Sleep()
+        {
+            _cancellationTokenSource.Token.WaitHandle.WaitOne(_drainPeriod);
+        }
+
         public void Dispose()
         {
-            _isStopRequested = true;
+            _cancellationTokenSource.Cancel();
             _worker.Join();
         }
     }

@@ -13,6 +13,7 @@ namespace ViewStore.Cache
         private Action<DrainStatistics>? _cacheDrainedCallback;
         private Action<ThrottleStatistics>? _throttlingCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
+        private bool _isBackgroundWorker;
         
         private MemoryCache _memoryCache = MemoryCache.Default;
         private TimeSpan _readCacheExpirationPeriod = TimeSpan.FromSeconds(10);
@@ -51,6 +52,12 @@ namespace ViewStore.Cache
             }
 
             _cacheDrainBatchSize = batchSize;
+            return this;
+        }
+        
+        public ViewStoreCacheBuilder UseBackgroundWorker()
+        {
+            _isBackgroundWorker = true;
             return this;
         }
 
@@ -94,7 +101,8 @@ namespace ViewStore.Cache
 
             var automaticCacheDrainer = new AutomaticCacheDrainer(
                 new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
-                _cacheDrainPeriod);
+                _cacheDrainPeriod,
+                _isBackgroundWorker);
 
             automaticCacheDrainer.OnDrainFinishedEvent += ds => _cacheDrainedCallback?.Invoke(ds);
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
