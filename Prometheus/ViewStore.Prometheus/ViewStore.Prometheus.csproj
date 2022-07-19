@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cache\ViewStore.Cache\ViewStore.Cache.csproj" />
+      <ProjectReference Include="..\..\Cache\ViewStore.Cache\ViewStore.Cache.csproj" />
     </ItemGroup>
 
 </Project>
