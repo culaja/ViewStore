@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>ViewStore.Prometheus</RootNamespace>
+        <LangVersion>9</LangVersion>
+        <Nullable>enable</Nullable>
+        <AssemblyName>ViewStore.Prometheus</AssemblyName>
+        <PackageId>ViewStore.Prometheus</PackageId>
+        <PackageDescription>Prometheus metrics for View Store Cache implementation.</PackageDescription>
+        <Version>1.3.4-rc1</Version>
+        <Authors>Stanko Culaja</Authors>
+        <PackageTags>Prometheus;Prometheus View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="prometheus-net" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Cache\ViewStore.Cache\ViewStore.Cache.csproj" />
+    </ItemGroup>
+
+</Project>

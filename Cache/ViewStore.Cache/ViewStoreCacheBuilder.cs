@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Caching;
 using ViewStore.Abstractions;
 
@@ -10,7 +11,7 @@ namespace ViewStore.Cache
         private TimeSpan _cacheDrainPeriod = TimeSpan.FromSeconds(5);
         private int _cacheDrainBatchSize = 1000;
         private int _throttleAfterCacheCount = 50000;
-        private Action<DrainStatistics>? _cacheDrainedCallback;
+        private readonly List<Action<DrainStatistics>> _cacheDrainedCallbacks = new();
         private Action<ThrottleStatistics>? _throttlingCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
         private bool _isBackgroundWorker;
@@ -74,7 +75,7 @@ namespace ViewStore.Cache
 
         public ViewStoreCacheBuilder UseCallbackWhenDrainFinished(Action<DrainStatistics> callback)
         {
-            _cacheDrainedCallback = callback;
+            _cacheDrainedCallbacks.Add(callback);
             return this;
         }
         
@@ -104,7 +105,13 @@ namespace ViewStore.Cache
                 _cacheDrainPeriod,
                 _isBackgroundWorker);
 
-            automaticCacheDrainer.OnDrainFinishedEvent += ds => _cacheDrainedCallback?.Invoke(ds);
+            automaticCacheDrainer.OnDrainFinishedEvent += ds =>
+            {
+                foreach (var callback in _cacheDrainedCallbacks)
+                {
+                    callback(ds);
+                }
+            };
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
             var readThroughViewStoreCache = new ReadThroughViewStoreCache(
