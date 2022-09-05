@@ -78,6 +78,7 @@ namespace ViewStore.Postgres
                 select
                     (view)::text,
                     viewType,
+                    shortViewType,
                     (metadata)::text,
                     globalVersion
                 from {_schemaName}.{_tableName}
@@ -93,7 +94,8 @@ namespace ViewStore.Postgres
                     reader.GetString(0),
                     reader.GetString(1),
                     reader.GetString(2),
-                    reader.GetInt64(3)).ToViewEnvelope()
+                    reader.GetString(3),
+                    reader.GetInt64(4)).ToViewEnvelope()
                 : null;
             
             return globalVersion;
@@ -108,6 +110,7 @@ namespace ViewStore.Postgres
                 select
                     (view)::text,
                     viewType,
+                    shortViewType,
                     (metadata)::text,
                     globalVersion
                 from {_schemaName}.{_tableName}
@@ -123,7 +126,8 @@ namespace ViewStore.Postgres
                     reader.GetString(0),
                     reader.GetString(1),
                     reader.GetString(2),
-                    reader.GetInt64(3)).ToViewEnvelope()
+                    reader.GetString(3),
+                    reader.GetInt64(4)).ToViewEnvelope()
                 : null;
             
             return globalVersion;
@@ -148,6 +152,7 @@ namespace ViewStore.Postgres
                     id,
                     view,
                     viewType,
+                    shortViewType,
                     metadata,
                     globalVersion,
                     lastChangeTimeStamp
@@ -157,6 +162,7 @@ namespace ViewStore.Postgres
                     @viewId,
                     @view,
                     @viewType,
+                    @shortViewType,
                     @metadata,
                     @globalVersion,
                     @lastChangeTimeStamp
@@ -165,6 +171,7 @@ namespace ViewStore.Postgres
                 SET 
                     view = @view,
                     viewType = @viewType,
+                    shortViewType = @shortViewType,
                     metadata = @metadata,
                     globalVersion = @globalVersion,
                     lastChangeTimeStamp = @lastChangeTimeStamp";
@@ -174,6 +181,7 @@ namespace ViewStore.Postgres
             cmd.Parameters.AddWithValue("viewId", viewEnvelopeInternal.Id);
             cmd.Parameters.AddWithValue("view", NpgsqlDbType.Jsonb, viewEnvelopeInternal.View);
             cmd.Parameters.AddWithValue("viewType", viewEnvelopeInternal.ViewType);
+            cmd.Parameters.AddWithValue("shortViewType", viewEnvelopeInternal.ShortViewType);
             cmd.Parameters.AddWithValue("metadata", NpgsqlDbType.Jsonb, viewEnvelopeInternal.Metadata);
             cmd.Parameters.AddWithValue("globalVersion", viewEnvelopeInternal.GlobalVersion);
             cmd.Parameters.AddWithValue("lastChangeTimeStamp", DateTime.UtcNow);
@@ -200,6 +208,7 @@ namespace ViewStore.Postgres
                     id,
                     view,
                     viewType,
+                    shortViewType,
                     metadata,
                     globalVersion,
                     lastChangeTimeStamp
@@ -209,6 +218,7 @@ namespace ViewStore.Postgres
                     @viewId,
                     @view,
                     @viewType,
+                    @shortViewType,
                     @metadata,
                     @globalVersion,
                     @lastChangeTimeStamp
@@ -217,6 +227,7 @@ namespace ViewStore.Postgres
                 SET 
                     view = @view,
                     viewType = @viewType,
+                    shortViewType = @shortViewType,
                     metadata = @metadata,
                     globalVersion = @globalVersion,
                     lastChangeTimeStamp = @lastChangeTimeStamp";
@@ -226,6 +237,7 @@ namespace ViewStore.Postgres
             cmd.Parameters.AddWithValue("viewId", viewEnvelopeInternal.Id);
             cmd.Parameters.AddWithValue("view", NpgsqlDbType.Jsonb, viewEnvelopeInternal.View);
             cmd.Parameters.AddWithValue("viewType", viewEnvelopeInternal.ViewType);
+            cmd.Parameters.AddWithValue("shortViewType", viewEnvelopeInternal.ShortViewType);
             cmd.Parameters.AddWithValue("metadata", NpgsqlDbType.Jsonb, viewEnvelopeInternal.Metadata);
             cmd.Parameters.AddWithValue("globalVersion", viewEnvelopeInternal.GlobalVersion);
             cmd.Parameters.AddWithValue("lastChangeTimeStamp", DateTime.UtcNow);

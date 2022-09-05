@@ -10,7 +10,7 @@ namespace ViewStore.Prometheus
     
         public static ViewStoreCacheBuilder AddMetrics(this ViewStoreCacheBuilder viewStoreCacheBuilder, string namePrefix)
         {
-            var durationCounter = Metrics.CreateHistogram($"{namePrefix}:DurationInMs", "View Store Cache drain duration into the final view store");
+            var durationHistogram = Metrics.CreateHistogram($"{namePrefix}:DurationInMs", "View Store Cache drain duration into the final view store");
             var totalDrainedViewCounter = Metrics.CreateCounter($"{namePrefix}:TotalDrainedViews", "Count of added, updated or deleted views drained into final view store");
             var addedOrUpdatedViewCounter = Metrics.CreateCounter($"{namePrefix}:AddedOrUpdatedViews", "Count of added or updated views drained into final view store");
             var addedOrUpdatedRetryCounter = Metrics.CreateCounter($"{namePrefix}:AddedOrUpdatedRetryCount", "Number of retries when attempting to add or update views in final view store");
@@ -25,7 +25,7 @@ namespace ViewStore.Prometheus
 
             void OnNewDrainStatistics(DrainStatistics drainStatistics)
             {
-                durationCounter.Observe(drainStatistics.Duration.TotalMilliseconds);
+                durationHistogram.Observe(drainStatistics.Duration.TotalMilliseconds);
                 totalDrainedViewCounter.Inc(drainStatistics.Count);
                 addedOrUpdatedViewCounter.Inc(drainStatistics.AddedOrUpdatedViewCount);
                 addedOrUpdatedRetryCounter.Inc(drainStatistics.AddedOrUpdatedRetryCount);

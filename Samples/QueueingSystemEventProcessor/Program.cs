@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;

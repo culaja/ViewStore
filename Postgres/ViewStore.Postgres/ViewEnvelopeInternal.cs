@@ -13,6 +13,7 @@ namespace ViewStore.Postgres
         public string Id { get; }
         public string View { get; }
         public string ViewType { get; }
+        public string ShortViewType { get; }
         public string Metadata { get; }
         public long GlobalVersion { get; }
 
@@ -20,12 +21,14 @@ namespace ViewStore.Postgres
             string id,
             string view,
             string viewType,
+            string shortViewType,
             string metadata,
             long globalVersion)
         {
             Id = id;
             View = view;
             ViewType = viewType;
+            ShortViewType = shortViewType;
             Metadata = metadata;
             GlobalVersion = globalVersion;
         }
@@ -34,6 +37,7 @@ namespace ViewStore.Postgres
             viewEnvelope.Id,
             JsonConvert.SerializeObject(viewEnvelope.View, JsonSerializerSettings),
             viewEnvelope.View.GetType().AssemblyQualifiedName,
+            viewEnvelope.View.GetType().Name,
             JsonConvert.SerializeObject(viewEnvelope.MetaData, JsonSerializerSettings),
             viewEnvelope.GlobalVersion.Value)
             {

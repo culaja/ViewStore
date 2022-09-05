@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Npgsql;
@@ -186,6 +185,7 @@ namespace ViewStore.Postgres
                     id varchar(256) PRIMARY KEY NOT NULL,
                     view jsonb NOT NULL,
                     viewType varchar(1024) NOT NULL,
+                    shortViewType varchar(128) NOT NULL,
                     metadata jsonb NOT NULL,
                     globalVersion bigint NOT NULL,
                     lastChangeTimeStamp timestamp NOT NULL);";
