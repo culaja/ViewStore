@@ -80,7 +80,9 @@ namespace ViewStore.Postgres
                     viewType,
                     shortViewType,
                     (metadata)::text,
-                    globalVersion
+                    globalVersion,
+                    tenantId,
+                    createdAt
                 from {_schemaName}.{_tableName}
                     where id = @viewId";
             
@@ -95,7 +97,9 @@ namespace ViewStore.Postgres
                     reader.GetString(1),
                     reader.GetString(2),
                     reader.GetString(3),
-                    reader.GetInt64(4)).ToViewEnvelope()
+                    reader.GetInt64(4),
+                    reader.GetString(5),
+                    reader.GetDateTime(6)).ToViewEnvelope()
                 : null;
             
             return globalVersion;
@@ -112,7 +116,9 @@ namespace ViewStore.Postgres
                     viewType,
                     shortViewType,
                     (metadata)::text,
-                    globalVersion
+                    globalVersion,
+                    tenantId,
+                    createdAt
                 from {_schemaName}.{_tableName}
                     where id = @viewId";
 
@@ -127,7 +133,9 @@ namespace ViewStore.Postgres
                     reader.GetString(1),
                     reader.GetString(2),
                     reader.GetString(3),
-                    reader.GetInt64(4)).ToViewEnvelope()
+                    reader.GetInt64(4),
+                    reader.GetString(5),
+                    reader.GetDateTime(6)).ToViewEnvelope()
                 : null;
             
             return globalVersion;
@@ -155,7 +163,9 @@ namespace ViewStore.Postgres
                     shortViewType,
                     metadata,
                     globalVersion,
-                    lastChangeTimeStamp
+                    lastChangeTimeStamp,
+                    tenantId,
+                    createdAt
                 ) 
                 VALUES
                 (
@@ -165,16 +175,20 @@ namespace ViewStore.Postgres
                     @shortViewType,
                     @metadata,
                     @globalVersion,
-                    @lastChangeTimeStamp
+                    @lastChangeTimeStamp,
+                    @tenantId,
+                    @createdAt
                 )
-                ON CONFLICT (id) DO UPDATE
+                ON CONFLICT (id,tenantId,createdAt) DO UPDATE
                 SET 
                     view = @view,
                     viewType = @viewType,
                     shortViewType = @shortViewType,
                     metadata = @metadata,
                     globalVersion = @globalVersion,
-                    lastChangeTimeStamp = @lastChangeTimeStamp";
+                    lastChangeTimeStamp = @lastChangeTimeStamp,
+                    tenantId = @tenantId,
+                    createdAt = @createdAt";
             
             using var cmd = new NpgsqlCommand(sql, connection, transaction);
             var viewEnvelopeInternal = new ViewEnvelopeInternal(viewEnvelope);
@@ -185,6 +199,8 @@ namespace ViewStore.Postgres
             cmd.Parameters.AddWithValue("metadata", NpgsqlDbType.Jsonb, viewEnvelopeInternal.Metadata);
             cmd.Parameters.AddWithValue("globalVersion", viewEnvelopeInternal.GlobalVersion);
             cmd.Parameters.AddWithValue("lastChangeTimeStamp", DateTime.UtcNow);
+            cmd.Parameters.AddWithValue("tenantId", viewEnvelopeInternal.TenantId);
+            cmd.Parameters.AddWithValue("createdAt", viewEnvelopeInternal.CreatedAt);
             
             cmd.ExecuteNonQuery();
         }
@@ -211,7 +227,9 @@ namespace ViewStore.Postgres
                     shortViewType,
                     metadata,
                     globalVersion,
-                    lastChangeTimeStamp
+                    lastChangeTimeStamp,
+                    tenantId,
+                    createdAt
                 ) 
                 VALUES
                 (
@@ -221,16 +239,20 @@ namespace ViewStore.Postgres
                     @shortViewType,
                     @metadata,
                     @globalVersion,
-                    @lastChangeTimeStamp
+                    @lastChangeTimeStamp,
+                    @tenantId,
+                    @createdAt
                 ) 
-                ON CONFLICT (id) DO UPDATE
+                ON CONFLICT (id,tenantId,createdAt) DO UPDATE
                 SET 
                     view = @view,
                     viewType = @viewType,
                     shortViewType = @shortViewType,
                     metadata = @metadata,
                     globalVersion = @globalVersion,
-                    lastChangeTimeStamp = @lastChangeTimeStamp";
+                    lastChangeTimeStamp = @lastChangeTimeStamp,
+                    tenantId = @tenantId,
+                    createdAt = @createdAt";
 
             await using var cmd = new NpgsqlCommand(sql, connection, transaction);
             var viewEnvelopeInternal = new ViewEnvelopeInternal(viewEnvelope);
@@ -241,6 +263,8 @@ namespace ViewStore.Postgres
             cmd.Parameters.AddWithValue("metadata", NpgsqlDbType.Jsonb, viewEnvelopeInternal.Metadata);
             cmd.Parameters.AddWithValue("globalVersion", viewEnvelopeInternal.GlobalVersion);
             cmd.Parameters.AddWithValue("lastChangeTimeStamp", DateTime.UtcNow);
+            cmd.Parameters.AddWithValue("tenantId", viewEnvelopeInternal.TenantId);
+            cmd.Parameters.AddWithValue("createdAt", viewEnvelopeInternal.CreatedAt);
             
             await cmd.ExecuteNonQueryAsync();
         }

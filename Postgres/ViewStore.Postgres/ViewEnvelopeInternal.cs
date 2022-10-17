@@ -16,6 +16,8 @@ namespace ViewStore.Postgres
         public string ShortViewType { get; }
         public string Metadata { get; }
         public long GlobalVersion { get; }
+        public string TenantId { get; }
+        public DateTime CreatedAt { get; }
 
         public ViewEnvelopeInternal(
             string id,
@@ -23,7 +25,9 @@ namespace ViewStore.Postgres
             string viewType,
             string shortViewType,
             string metadata,
-            long globalVersion)
+            long globalVersion,
+            string tenantId,
+            DateTime createdAt)
         {
             Id = id;
             View = view;
@@ -31,6 +35,8 @@ namespace ViewStore.Postgres
             ShortViewType = shortViewType;
             Metadata = metadata;
             GlobalVersion = globalVersion;
+            TenantId = tenantId;
+            CreatedAt = createdAt;
         }
 
         public ViewEnvelopeInternal(ViewEnvelope viewEnvelope) : this(
@@ -39,7 +45,9 @@ namespace ViewStore.Postgres
             viewEnvelope.View.GetType().AssemblyQualifiedName,
             viewEnvelope.View.GetType().Name,
             JsonConvert.SerializeObject(viewEnvelope.MetaData, JsonSerializerSettings),
-            viewEnvelope.GlobalVersion.Value)
+            viewEnvelope.GlobalVersion.Value,
+            viewEnvelope.TenantId ?? "",
+            viewEnvelope.CreatedAt ?? DateTime.MinValue)
             {
             }
 
@@ -47,6 +55,8 @@ namespace ViewStore.Postgres
             Id,
             (JsonConvert.DeserializeObject(View, Type.GetType(ViewType)!) as IView)!, 
             Abstractions.GlobalVersion.Of(GlobalVersion),
-            JsonConvert.DeserializeObject<MetaData>(Metadata));
+            JsonConvert.DeserializeObject<MetaData>(Metadata),
+            TenantId == "" ? null : TenantId,
+            CreatedAt == DateTime.MinValue ? null : CreatedAt);
     }
 }

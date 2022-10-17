@@ -29,7 +29,9 @@ namespace ViewStore.MongoDb
                     cm.MapProperty(m => m.View);
                     cm.MapProperty(m => m.GlobalVersion);
                     cm.MapProperty(m => m.MetaData);
-                    cm.MapCreator(m => new ViewEnvelopeInternal(m.Id, m.View, m.GlobalVersion, m.MetaData));
+                    cm.MapProperty(m => m.TenantId);
+                    cm.MapProperty(m => m.CreatedAt);
+                    cm.MapCreator(m => new ViewEnvelopeInternal(m.Id, m.View, m.GlobalVersion, m.MetaData, m.TenantId, m.CreatedAt));
                 });    
             }
         }

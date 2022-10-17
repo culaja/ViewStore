@@ -166,5 +166,17 @@ namespace ViewStore.Abstractions
 
             (await viewStore.ReadLastGlobalVersionAsync()).Should().Be(GlobalVersion.Of(3));
         }
+        
+        [Fact]
+        public void saved_view_with_optional_data_is_correctly_retrieved_from_store()
+        {
+            var viewStore = BuildViewStore();
+            
+            viewStore.Save(TestViewEnvelopeWithOptionalData);
+
+            var actualView = viewStore.Read(TestViewEnvelopeWithOptionalData.Id);
+            actualView!.TenantId.Should().Be(TestViewEnvelopeWithOptionalData.TenantId);
+            actualView.CreatedAt.Should().Be(TestViewEnvelopeWithOptionalData.CreatedAt);
+        }
     }
 }

@@ -9,17 +9,23 @@ namespace ViewStore.Abstractions
         public IView View { get; }
         public GlobalVersion GlobalVersion { get; private set; }
         public MetaData MetaData { get; }
-        
+        public string? TenantId { get; }
+        public DateTime? CreatedAt { get; }
+
         public ViewEnvelope(
             string id,
             IView view,
             GlobalVersion globalVersion,
-            MetaData metaData)
+            MetaData metaData,
+            string? tenantId = null,
+            DateTime? createdAt = null)
         {
             Id = id;
             View = view;
             GlobalVersion = globalVersion;
             MetaData = metaData;
+            TenantId = tenantId;
+            CreatedAt = createdAt;
         }
 
         public static ViewEnvelope NewOf(string id, IView view) => new(
@@ -79,13 +85,22 @@ namespace ViewStore.Abstractions
             return this;
         }
 
-        public bool Equals(ViewEnvelope other) => 
-            Id == other.Id && View.Equals(other.View) && GlobalVersion.Equals(other.GlobalVersion);
+        public bool Equals(ViewEnvelope? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Id == other.Id && View.Equals(other.View) && GlobalVersion.Equals(other.GlobalVersion) && TenantId == other.TenantId && Nullable.Equals(CreatedAt, other.CreatedAt);
+        }
 
-        public override bool Equals(object? obj) => 
-            ReferenceEquals(this, obj) || obj is ViewEnvelope other && Equals(other);
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ViewEnvelope other && Equals(other);
+        }
 
-        public override int GetHashCode() => Id.GetHashCode();
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, TenantId, CreatedAt);
+        }
 
         public override string ToString() => 
             $"{nameof(Id)}: {Id}, {nameof(View)}: {View}, {nameof(GlobalVersion)}: {GlobalVersion}";

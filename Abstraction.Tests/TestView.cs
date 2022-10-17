@@ -1,9 +1,12 @@
-﻿namespace ViewStore.Abstractions
+﻿using System;
+
+namespace ViewStore.Abstractions
 {
     public sealed class TestView : IView
     {
         public static readonly ViewEnvelope TestViewEnvelope1 = new("1", new TestView(1), GlobalVersion.Of(1), MetaData.New());
         public static readonly ViewEnvelope TestViewEnvelope2 = new("2", new TestView(2), GlobalVersion.Of(2), MetaData.New());
+        public static readonly ViewEnvelope TestViewEnvelopeWithOptionalData = new("3", new TestView(3), GlobalVersion.Of(2), MetaData.New(), "Tenant1", DateTime.UtcNow.Date);
         
         public static ViewEnvelope NewTestViewEnvelopeWith(int number) => new(number.ToString(), new TestView(number), GlobalVersion.Of(1), MetaData.New());
 

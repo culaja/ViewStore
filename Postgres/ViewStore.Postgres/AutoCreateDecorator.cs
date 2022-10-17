@@ -188,13 +188,16 @@ namespace ViewStore.Postgres
         {
             var sql = $@"
                 CREATE TABLE IF NOT EXISTS {schemaName}.{tableName}(
-                    id varchar(256) PRIMARY KEY NOT NULL,
+                    id varchar(256) NOT NULL,
                     view jsonb NOT NULL,
                     viewType varchar(1024) NOT NULL,
                     shortViewType varchar(128) NOT NULL,
                     metadata jsonb NOT NULL,
                     globalVersion bigint NOT NULL,
-                    lastChangeTimeStamp timestamp NOT NULL);";
+                    lastChangeTimeStamp timestamp NOT NULL,
+                    tenantId varchar(64) NOT NULL,
+                    createdAt timestamp NOT NULL,
+                    CONSTRAINT pkey PRIMARY KEY (id,tenantId,createdAt));";
             
             using var cmd = new NpgsqlCommand(sql, connection, transaction);
             
