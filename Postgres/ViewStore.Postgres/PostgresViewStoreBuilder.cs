@@ -8,7 +8,7 @@ namespace ViewStore.Postgres
         private string? _connectionString;
         private string _schemaName = "public";
         private string? _tableName;
-        private PostCreationScriptProvider? _postCreationScriptProvider = null;
+        private AutoCreateOptions? _autoCreateOptions;
         private bool _shouldAutoCreate;
         
         public static PostgresViewStoreBuilder New() => new();
@@ -40,10 +40,10 @@ namespace ViewStore.Postgres
             return this;
         }
         
-        public PostgresViewStoreBuilder ShouldAutoCreate(bool shouldAutoCreate, PostCreationScriptProvider? postCreationScriptProvider = null)
+        public PostgresViewStoreBuilder ShouldAutoCreate(bool shouldAutoCreate, AutoCreateOptions? autoCreateOptions = null)
         {
             _shouldAutoCreate = shouldAutoCreate;
-            _postCreationScriptProvider = postCreationScriptProvider;
+            _autoCreateOptions = autoCreateOptions;
             return this;
         }
         
@@ -62,7 +62,7 @@ namespace ViewStore.Postgres
                     _connectionString,
                     _schemaName,
                     _tableName,
-                    _postCreationScriptProvider,
+                    _autoCreateOptions ?? new AutoCreateOptions(true, true, null),
                     viewStore)
                 : viewStore;
         }

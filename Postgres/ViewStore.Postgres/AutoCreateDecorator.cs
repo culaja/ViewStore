@@ -14,20 +14,20 @@ namespace ViewStore.Postgres
         private readonly string _connectionString;
         private readonly string _schemaName;
         private readonly string _tableName;
-        private readonly PostCreationScriptProvider? _postCreationScriptProvider;
+        private readonly AutoCreateOptions _autoCreateOptions;
         private readonly IViewStore _next;
 
         public AutoCreateDecorator(
             string connectionString,
             string schemaName,
             string tableName,
-            PostCreationScriptProvider? postCreationScriptProvider,
+            AutoCreateOptions autoCreateOptions,
             IViewStore next)
         {
             _connectionString = connectionString;
             _schemaName = schemaName;
             _tableName = tableName;
-            _postCreationScriptProvider = postCreationScriptProvider;
+            _autoCreateOptions = autoCreateOptions;
             _next = next;
         }
         
@@ -169,9 +169,9 @@ namespace ViewStore.Postgres
             connection.Open();
             
             using var transaction = connection.BeginTransaction();
-            CreateSchema(connection, transaction, schemaName);
-            CreateTable(connection, transaction, schemaName, tableName);
-            _postCreationScriptProvider?.Invoke(connection, transaction, schemaName, tableName);
+            if (_autoCreateOptions.ShouldCreateSchema) CreateSchema(connection, transaction, schemaName);
+            if (_autoCreateOptions.ShouldCreateTable) CreateTable(connection, transaction, schemaName, tableName);
+            _autoCreateOptions.PostCreationScriptProvider?.Invoke(connection, transaction, schemaName, tableName);
             transaction.Commit();
             
             connection.Close();
