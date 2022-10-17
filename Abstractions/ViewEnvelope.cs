@@ -83,7 +83,9 @@ namespace ViewStore.Abstractions
                     Id,
                     newView,
                     transformationGlobalVersion,
-                    MetaData);
+                    MetaData,
+                    TenantId,
+                    CreatedAt);
             }
 
             return this;
