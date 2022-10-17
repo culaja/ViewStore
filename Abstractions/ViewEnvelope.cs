@@ -28,17 +28,21 @@ namespace ViewStore.Abstractions
             CreatedAt = createdAt;
         }
 
-        public static ViewEnvelope NewOf(string id, IView view) => new(
+        public static ViewEnvelope NewOf(string id, IView view, string? tenantId = null, DateTime? createdAt = null) => new(
             id,
             view,
             GlobalVersion.Start,
-            new MetaData(new Dictionary<string, string>()));
+            new MetaData(new Dictionary<string, string>()),
+            tenantId,
+            createdAt);
         
-        public static ViewEnvelope EmptyWith(string id, GlobalVersion globalVersion) => new(
+        public static ViewEnvelope EmptyWith(string id, GlobalVersion globalVersion, string? tenantId = null, DateTime? createdAt = null) => new(
             id,
             new EmptyView(),
             globalVersion,
-            new MetaData(new Dictionary<string, string>()));
+            new MetaData(new Dictionary<string, string>()),
+            tenantId,
+            createdAt);
         
         public bool Transform<T>(
             GlobalVersion transformationGlobalVersion,
