@@ -197,7 +197,7 @@ namespace ViewStore.Postgres
                     lastChangeTimeStamp timestamp NOT NULL,
                     tenantId varchar(64) NOT NULL,
                     createdAt timestamp NOT NULL,
-                    CONSTRAINT pkey PRIMARY KEY (id,tenantId,createdAt));";
+                    CONSTRAINT {schemaName}_{tableName}_pkey PRIMARY KEY (id,tenantId,createdAt));";
             
             using var cmd = new NpgsqlCommand(sql, connection, transaction);
             
