@@ -4,7 +4,7 @@ using Xunit;
 namespace ViewStore.MongoDb
 {
     [Collection("Database collection")]
-    public sealed class MongoDbViewStoreAsyncTests : ViewStoreAsyncTests
+    internal sealed class MongoDbViewStoreAsyncTests : ViewStoreAsyncTests
     {
         private readonly DatabaseFixture _databaseFixture;
 
