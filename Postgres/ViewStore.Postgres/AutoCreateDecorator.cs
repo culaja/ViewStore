@@ -170,7 +170,7 @@ namespace ViewStore.Postgres
             
             using var transaction = connection.BeginTransaction();
             if (_autoCreateOptions.ShouldCreateSchema) CreateSchema(connection, transaction, schemaName);
-            if (_autoCreateOptions.ShouldCreateTable) CreateTable(connection, transaction, schemaName, tableName);
+            if (_autoCreateOptions.ShouldCreateTable) CreateTable(connection, transaction, schemaName, tableName, _autoCreateOptions.ShouldCreateUnLoggedTable);
             _autoCreateOptions.PostCreationScriptProvider?.Invoke(connection, transaction, schemaName, tableName);
             transaction.Commit();
             
@@ -184,10 +184,11 @@ namespace ViewStore.Postgres
             cmd.ExecuteNonQuery();
         }
 
-        private void CreateTable(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName, string tableName)
+        private void CreateTable(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName, string tableName, bool shouldCreateUnLoggedTable)
         {
+            var unloggedSqlPart = shouldCreateUnLoggedTable ? " UNLOGGED " : "";
             var sql = $@"
-                CREATE TABLE IF NOT EXISTS {schemaName}.{tableName}(
+                CREATE {unloggedSqlPart} TABLE IF NOT EXISTS {schemaName}.{tableName}(
                     id varchar(256) NOT NULL,
                     view jsonb NOT NULL,
                     viewType varchar(1024) NOT NULL,
