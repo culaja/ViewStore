@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>ViewStore.Abstractions</AssemblyName>
         <RootNamespace>ViewStore.Abstractions</RootNamespace>
         <PackageId>ViewStore.Abstractions</PackageId>
         <PackageDescription>Contains core View Store model.</PackageDescription>
-        <Version>2.0.0-rc01</Version>
+        <Version>2.0.0-rc02</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>

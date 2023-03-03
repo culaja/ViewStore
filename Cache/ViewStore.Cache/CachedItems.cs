@@ -50,7 +50,7 @@ namespace ViewStore.Cache
         public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)
         {
             isDeleted = _deleted.ContainsKey(viewId);
-            return _addedOrUpdated.TryGetValue(viewId, out viewEnvelope);
+            return _addedOrUpdated.TryGetValue(viewId, out viewEnvelope!);
         }
 
         public GlobalVersion? LastGlobalVersion() =>

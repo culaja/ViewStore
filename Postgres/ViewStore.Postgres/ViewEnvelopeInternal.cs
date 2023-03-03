@@ -42,7 +42,7 @@ namespace ViewStore.Postgres
         public ViewEnvelopeInternal(ViewEnvelope viewEnvelope) : this(
             viewEnvelope.Id,
             JsonConvert.SerializeObject(viewEnvelope.View, JsonSerializerSettings),
-            viewEnvelope.View.GetType().AssemblyQualifiedName,
+            viewEnvelope.View.GetType().AssemblyQualifiedName!,
             viewEnvelope.View.GetType().Name,
             JsonConvert.SerializeObject(viewEnvelope.MetaData, JsonSerializerSettings),
             viewEnvelope.GlobalVersion.Value,

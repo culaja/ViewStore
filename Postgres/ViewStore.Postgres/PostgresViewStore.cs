@@ -14,6 +14,7 @@ namespace ViewStore.Postgres
         private readonly string _connectionString;
         private readonly string _schemaName;
         private readonly string _tableName;
+        private readonly string _tablePath;
 
         public PostgresViewStore(
             string connectionString,
@@ -23,6 +24,7 @@ namespace ViewStore.Postgres
             _connectionString = connectionString;
             _schemaName = schemaName;
             _tableName = tableName;
+            _tablePath = $"{schemaName}.{tableName}";
         }
         
         public GlobalVersion? ReadLastGlobalVersion()
@@ -30,14 +32,7 @@ namespace ViewStore.Postgres
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
             
-            var sql = @$"
-                select 
-                    globalVersion 
-                from {_schemaName}.{_tableName}
-                    order by globalVersion desc
-                limit 1";
-            
-            using var cmd = new NpgsqlCommand(sql, connection);
+            using var cmd = connection.ToReadLastGlobalVersionCommandOn(_tablePath);
             using var reader = cmd.ExecuteReader();
 
             GlobalVersion? globalVersion = reader.Read()
@@ -52,14 +47,7 @@ namespace ViewStore.Postgres
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var sql = @$"
-                select 
-                    globalVersion 
-                from {_schemaName}.{_tableName}
-                    order by globalVersion desc
-                limit 1";
-
-            await using var cmd = new NpgsqlCommand(sql, connection);
+            await using var cmd = connection.ToReadLastGlobalVersionCommandOn(_tablePath);
             await using var reader = await cmd.ExecuteReaderAsync();
 
             GlobalVersion? globalVersion = await reader.ReadAsync()
@@ -73,33 +61,20 @@ namespace ViewStore.Postgres
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
-            
-            var sql = @$"
-                select
-                    (view)::text,
-                    viewType,
-                    shortViewType,
-                    (metadata)::text,
-                    globalVersion,
-                    tenantId,
-                    createdAt
-                from {_schemaName}.{_tableName}
-                    where id = @viewId";
-            
-            using var cmd = new NpgsqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("viewId", viewId);
+
+            using var cmd = connection.ToReadViewIdCommandOn(viewId, _tablePath);
             using var reader = cmd.ExecuteReader();
 
             ViewEnvelope? globalVersion = reader.Read()
                 ? new ViewEnvelopeInternal(
-                    viewId,
-                    reader.GetString(0),
-                    reader.GetString(1),
-                    reader.GetString(2),
-                    reader.GetString(3),
-                    reader.GetInt64(4),
-                    reader.GetString(5),
-                    reader.GetDateTime(6)).ToViewEnvelope()
+                    id: viewId,
+                    view: reader.GetString(0),
+                    viewType: reader.GetString(1),
+                    shortViewType: reader.GetString(2),
+                    metadata: reader.GetString(3),
+                    globalVersion: reader.GetInt64(4),
+                    tenantId: reader.GetString(5),
+                    createdAt: reader.GetDateTime(6)).ToViewEnvelope()
                 : null;
             
             return globalVersion;
@@ -110,178 +85,49 @@ namespace ViewStore.Postgres
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var sql = @$"
-                select
-                    (view)::text,
-                    viewType,
-                    shortViewType,
-                    (metadata)::text,
-                    globalVersion,
-                    tenantId,
-                    createdAt
-                from {_schemaName}.{_tableName}
-                    where id = @viewId";
-
-            await using var cmd = new NpgsqlCommand(sql, connection);
+            await using var cmd = connection.ToReadViewIdCommandOn(viewId, _tablePath);
             cmd.Parameters.AddWithValue("viewId", viewId);
             await using var reader = await cmd.ExecuteReaderAsync();
 
             ViewEnvelope? globalVersion = await reader.ReadAsync()
                 ? new ViewEnvelopeInternal(
-                    viewId,
-                    reader.GetString(0),
-                    reader.GetString(1),
-                    reader.GetString(2),
-                    reader.GetString(3),
-                    reader.GetInt64(4),
-                    reader.GetString(5),
-                    reader.GetDateTime(6)).ToViewEnvelope()
+                    id: viewId,
+                    view: reader.GetString(0),
+                    viewType: reader.GetString(1),
+                    shortViewType: reader.GetString(2),
+                    metadata: reader.GetString(3),
+                    globalVersion: reader.GetInt64(4),
+                    tenantId: reader.GetString(5),
+                    createdAt: reader.GetDateTime(6)).ToViewEnvelope()
                 : null;
             
             return globalVersion;
         }
 
-        public void Save(ViewEnvelope viewEnvelope)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-            
-            SaveInternal(connection, null, viewEnvelope);
-        }
+        public void Save(ViewEnvelope viewEnvelope) => Save(new[] { viewEnvelope });
 
-        private void SaveInternal(
-            NpgsqlConnection connection, 
-            NpgsqlTransaction? transaction,
-            ViewEnvelope viewEnvelope)
-        {
-            var sql = @$"
-                INSERT INTO {_schemaName}.{_tableName}
-                (
-                    id,
-                    view,
-                    viewType,
-                    shortViewType,
-                    metadata,
-                    globalVersion,
-                    lastChangeTimeStamp,
-                    tenantId,
-                    createdAt
-                ) 
-                VALUES
-                (
-                    @viewId,
-                    @view,
-                    @viewType,
-                    @shortViewType,
-                    @metadata,
-                    @globalVersion,
-                    @lastChangeTimeStamp,
-                    @tenantId,
-                    @createdAt
-                )
-                ON CONFLICT (id,tenantId,createdAt) DO UPDATE
-                SET 
-                    view = @view,
-                    viewType = @viewType,
-                    shortViewType = @shortViewType,
-                    metadata = @metadata,
-                    globalVersion = @globalVersion,
-                    lastChangeTimeStamp = @lastChangeTimeStamp,
-                    tenantId = @tenantId,
-                    createdAt = @createdAt";
-            
-            using var cmd = new NpgsqlCommand(sql, connection, transaction);
-            var viewEnvelopeInternal = new ViewEnvelopeInternal(viewEnvelope);
-            cmd.Parameters.AddWithValue("viewId", viewEnvelopeInternal.Id);
-            cmd.Parameters.AddWithValue("view", NpgsqlDbType.Jsonb, viewEnvelopeInternal.View);
-            cmd.Parameters.AddWithValue("viewType", viewEnvelopeInternal.ViewType);
-            cmd.Parameters.AddWithValue("shortViewType", viewEnvelopeInternal.ShortViewType);
-            cmd.Parameters.AddWithValue("metadata", NpgsqlDbType.Jsonb, viewEnvelopeInternal.Metadata);
-            cmd.Parameters.AddWithValue("globalVersion", viewEnvelopeInternal.GlobalVersion);
-            cmd.Parameters.AddWithValue("lastChangeTimeStamp", DateTime.UtcNow);
-            cmd.Parameters.AddWithValue("tenantId", viewEnvelopeInternal.TenantId);
-            cmd.Parameters.AddWithValue("createdAt", viewEnvelopeInternal.CreatedAt);
-            
-            cmd.ExecuteNonQuery();
-        }
-
-        public async Task SaveAsync(ViewEnvelope viewEnvelope)
-        {
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            await SaveInternalAsync(connection, null, viewEnvelope);
-        }
-
-        private async Task SaveInternalAsync(
-            NpgsqlConnection connection,
-            NpgsqlTransaction? transaction,
-            ViewEnvelope viewEnvelope)
-        {
-            var sql = @$"
-                INSERT INTO {_schemaName}.{_tableName}
-                (
-                    id,
-                    view,
-                    viewType,
-                    shortViewType,
-                    metadata,
-                    globalVersion,
-                    lastChangeTimeStamp,
-                    tenantId,
-                    createdAt
-                ) 
-                VALUES
-                (
-                    @viewId,
-                    @view,
-                    @viewType,
-                    @shortViewType,
-                    @metadata,
-                    @globalVersion,
-                    @lastChangeTimeStamp,
-                    @tenantId,
-                    @createdAt
-                ) 
-                ON CONFLICT (id,tenantId,createdAt) DO UPDATE
-                SET 
-                    view = @view,
-                    viewType = @viewType,
-                    shortViewType = @shortViewType,
-                    metadata = @metadata,
-                    globalVersion = @globalVersion,
-                    lastChangeTimeStamp = @lastChangeTimeStamp,
-                    tenantId = @tenantId,
-                    createdAt = @createdAt";
-
-            await using var cmd = new NpgsqlCommand(sql, connection, transaction);
-            var viewEnvelopeInternal = new ViewEnvelopeInternal(viewEnvelope);
-            cmd.Parameters.AddWithValue("viewId", viewEnvelopeInternal.Id);
-            cmd.Parameters.AddWithValue("view", NpgsqlDbType.Jsonb, viewEnvelopeInternal.View);
-            cmd.Parameters.AddWithValue("viewType", viewEnvelopeInternal.ViewType);
-            cmd.Parameters.AddWithValue("shortViewType", viewEnvelopeInternal.ShortViewType);
-            cmd.Parameters.AddWithValue("metadata", NpgsqlDbType.Jsonb, viewEnvelopeInternal.Metadata);
-            cmd.Parameters.AddWithValue("globalVersion", viewEnvelopeInternal.GlobalVersion);
-            cmd.Parameters.AddWithValue("lastChangeTimeStamp", DateTime.UtcNow);
-            cmd.Parameters.AddWithValue("tenantId", viewEnvelopeInternal.TenantId);
-            cmd.Parameters.AddWithValue("createdAt", viewEnvelopeInternal.CreatedAt);
-            
-            await cmd.ExecuteNonQueryAsync();
-        }
-        
+        public Task SaveAsync(ViewEnvelope viewEnvelope) => SaveAsync(new[] { viewEnvelope });
 
         public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
             using var transaction = connection.BeginTransaction();
-            
-            foreach (var viewEnvelope in viewEnvelopes)
-            {
-                SaveInternal(connection, transaction, viewEnvelope);
-            }
+
+            SaveInternal(connection, transaction, viewEnvelopes);
             
             transaction.Commit();
+        }
+        
+        private void SaveInternal(NpgsqlConnection connection, NpgsqlTransaction transaction, IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var batch = new NpgsqlBatch(connection, transaction);
+            foreach (var viewEnvelope in viewEnvelopes)
+            {
+                batch.BatchCommands.Add(viewEnvelope.ToInternal().ToBatchCommandOn(_tablePath));
+            }
+
+            batch.ExecuteNonQuery();
         }
 
         public async Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
@@ -289,54 +135,26 @@ namespace ViewStore.Postgres
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
             await using var transaction = await connection.BeginTransactionAsync();
+
+            await SaveInternalAsync(connection, transaction, viewEnvelopes);
             
+            await transaction.CommitAsync();
+        }
+        
+        private Task SaveInternalAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, IEnumerable<ViewEnvelope> viewEnvelopes)
+        {
+            using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewEnvelope in viewEnvelopes)
             {
-                await SaveInternalAsync(connection, transaction, viewEnvelope);
+                batch.BatchCommands.Add(viewEnvelope.ToInternal().ToBatchCommandOn(_tablePath));
             }
-            
-            await transaction.CommitAsync();
+
+            return batch.ExecuteNonQueryAsync();
         }
 
-        public void Delete(string viewId, GlobalVersion globalVersion)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-            
-            var sql = @$"
-                DELETE FROM {_schemaName}.{_tableName}
-                WHERE id = @viewId";
-            
-            using var cmd = new NpgsqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("viewId", viewId);
-            
-            cmd.ExecuteNonQuery();
-            
-            SaveInternal(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
-            
-            transaction.Commit();
-        }
+        public void Delete(string viewId, GlobalVersion globalVersion) => Delete(new[] { viewId }, globalVersion);
 
-        public async Task DeleteAsync(string viewId, GlobalVersion globalVersion)
-        {
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-            await using var transaction = await connection.BeginTransactionAsync();
-            
-            var sql = @$"
-                DELETE FROM {_schemaName}.{_tableName}
-                WHERE id = @viewId";
-
-            await using var cmd = new NpgsqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("viewId", viewId);
-            
-            await cmd.ExecuteNonQueryAsync();
-            
-            await SaveInternalAsync(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
-            
-            await transaction.CommitAsync();
-        }
+        public Task DeleteAsync(string viewId, GlobalVersion globalVersion) => DeleteAsync(new[] { viewId }, globalVersion);
 
         public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
@@ -344,18 +162,15 @@ namespace ViewStore.Postgres
             connection.Open();
             using var transaction = connection.BeginTransaction();
             
-            var sql = @$"
-                DELETE FROM {_schemaName}.{_tableName}
-                WHERE id = @viewId";
-
+            using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewId in viewIds)
             {
-                using var cmd = new NpgsqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue("viewId", viewId);
-                cmd.ExecuteNonQuery();
+                batch.BatchCommands.Add(viewId.ToBatchCommandOn(_tablePath));
             }
+
+            batch.ExecuteNonQuery();
             
-            SaveInternal(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
+            SaveInternal(connection, transaction, new [] { ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion) });
             
             transaction.Commit();
         }
@@ -363,21 +178,18 @@ namespace ViewStore.Postgres
         public async Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            connection.Open();
             await using var transaction = await connection.BeginTransactionAsync();
-            
-            var sql = @$"
-                DELETE FROM {_schemaName}.{_tableName}
-                WHERE id = @viewId";
 
+            await using var batch = new NpgsqlBatch(connection, transaction);
             foreach (var viewId in viewIds)
             {
-                await using var cmd = new NpgsqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue("viewId", viewId);
-                await cmd.ExecuteNonQueryAsync();
+                batch.BatchCommands.Add(viewId.ToBatchCommandOn(_tablePath));
             }
+
+            await batch.ExecuteNonQueryAsync();
             
-            await SaveInternalAsync(connection, transaction, ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion));
+            await SaveInternalAsync(connection, transaction, new [] { ViewEnvelope.EmptyWith(LastDeletedViewId, globalVersion) });
             
             await transaction.CommitAsync();
         }
