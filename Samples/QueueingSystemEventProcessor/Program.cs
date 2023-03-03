@@ -58,7 +58,7 @@ namespace QueueingSystemEventProcessor
                         : Position.Start;
 
                     EventStoreClient.SubscribeToAllAsync(
-                        startPosition,
+                        FromAll.After(startPosition),
                         (_, resolvedEvent, _) =>
                         {
                             progressTask.Increment(1);

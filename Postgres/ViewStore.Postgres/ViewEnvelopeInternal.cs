@@ -55,7 +55,7 @@ namespace ViewStore.Postgres
             Id,
             (JsonConvert.DeserializeObject(View, Type.GetType(ViewType)!) as IView)!, 
             Abstractions.GlobalVersion.Of(GlobalVersion),
-            JsonConvert.DeserializeObject<MetaData>(Metadata),
+            JsonConvert.DeserializeObject<MetaData>(Metadata)!,
             TenantId == "" ? null : TenantId,
             CreatedAt == DateTime.MinValue ? null : CreatedAt);
     }
