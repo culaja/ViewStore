@@ -5,7 +5,7 @@ using ViewStore.Abstractions;
 
 namespace ViewStore.Postgres
 {
-    public delegate void PostCreationScriptProvider(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName, string tableName);
+    public delegate void PostCreationScriptProvider(NpgsqlConnection connection, string schemaName, string tableName);
     
     internal sealed class AutoCreateDecorator : IViewStore
     {
@@ -168,23 +168,21 @@ namespace ViewStore.Postgres
             using var connection = new NpgsqlConnection(connectionString);
             connection.Open();
             
-            using var transaction = connection.BeginTransaction();
-            if (_autoCreateOptions.ShouldCreateSchema) CreateSchema(connection, transaction, schemaName);
-            if (_autoCreateOptions.ShouldCreateTable) CreateTable(connection, transaction, schemaName, tableName, _autoCreateOptions.ShouldCreateUnLoggedTable);
-            _autoCreateOptions.PostCreationScriptProvider?.Invoke(connection, transaction, schemaName, tableName);
-            transaction.Commit();
+            if (_autoCreateOptions.ShouldCreateSchema) CreateSchema(connection, schemaName);
+            if (_autoCreateOptions.ShouldCreateTable) CreateTable(connection, schemaName, tableName, _autoCreateOptions.ShouldCreateUnLoggedTable);
+            _autoCreateOptions.PostCreationScriptProvider?.Invoke(connection, schemaName, tableName);
             
             connection.Close();
         }
 
-        private void CreateSchema(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName)
+        private void CreateSchema(NpgsqlConnection connection, string schemaName)
         {
             var sql = $"CREATE SCHEMA IF NOT EXISTS {schemaName}";
-            using var cmd = new NpgsqlCommand(sql, connection, transaction);
+            using var cmd = new NpgsqlCommand(sql, connection);
             cmd.ExecuteNonQuery();
         }
 
-        private void CreateTable(NpgsqlConnection connection, NpgsqlTransaction transaction, string schemaName, string tableName, bool shouldCreateUnLoggedTable)
+        private void CreateTable(NpgsqlConnection connection, string schemaName, string tableName, bool shouldCreateUnLoggedTable)
         {
             var unloggedSqlPart = shouldCreateUnLoggedTable ? " UNLOGGED " : "";
             var sql = $@"
@@ -200,7 +198,7 @@ namespace ViewStore.Postgres
                     createdAt timestamp NOT NULL,
                     CONSTRAINT {schemaName}_{tableName}_pkey PRIMARY KEY (id,tenantId,createdAt));";
             
-            using var cmd = new NpgsqlCommand(sql, connection, transaction);
+            using var cmd = new NpgsqlCommand(sql, connection);
             
             cmd.ExecuteNonQuery();
         }
