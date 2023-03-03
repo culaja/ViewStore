@@ -15,6 +15,8 @@ var viewStore = ViewStoreCacheBuilder.New()
                 postCreationScriptProvider: null,
                 shouldCreateUnLoggedTable: true))
         .Build())
+    .WithCacheDrainBatchSize(500)
+    .WithThrottleAfterCacheCount(1000)
     .WithCacheDrainPeriod(TimeSpan.FromSeconds(1))
     .UseCallbackWhenDrainFinished(drainStatistics => Console.WriteLine($"[CACHE] Cache drained into DB ({JsonConvert.SerializeObject(drainStatistics)})"))
     .UseCallbackOnThrottling(throttlingStatistics => Console.WriteLine($"[CACHE] Throttling since cache draining is too slow for incoming traffic ({JsonConvert.SerializeObject(throttlingStatistics)})"))
