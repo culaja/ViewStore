@@ -49,13 +49,15 @@ namespace ViewStore.Cache
                 var cachedItems = _outgoingCache.Renew();
                 var drainAddedOrUpdatedCacheRetryCount = DrainAddedOrUpdatedCache(cachedItems);
                 var drainDeletedCacheRetryCount = DrainDeletedCache(cachedItems);
+                var lastGlobalVersion = cachedItems.LastGlobalVersion();
                 StoreCacheMetadata(cachedItems.LastGlobalVersion());
                 return new DrainStatistics(
                     _stopwatch.Elapsed,
                     cachedItems.AddedOrUpdated.Count,
                     drainAddedOrUpdatedCacheRetryCount,
                     cachedItems.Deleted.Count,
-                    drainDeletedCacheRetryCount);
+                    drainDeletedCacheRetryCount,
+                    lastGlobalVersion);
             }
             finally
             {
