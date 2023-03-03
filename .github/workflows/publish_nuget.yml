@@ -2,9 +2,9 @@ name: PublishNugets
 
 on:
   push:
-    branches: [ published, release-1.3.X ]
+    branches: [ release-1.3.X, release-2.0.X ]
   pull_request:
-    branches: [ published ]
+    branches: [ release-1.3.X, release-2.0.X ]
 
 jobs:
   build:
