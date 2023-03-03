@@ -9,8 +9,8 @@ namespace ViewStore.Cache
     {
         private IViewStore? _realViewStore;
         private TimeSpan _cacheDrainPeriod = TimeSpan.FromSeconds(5);
-        private int _cacheDrainBatchSize = 1000;
-        private int _throttleAfterCacheCount = 50000;
+        private int _cacheDrainBatchSize = 100;
+        private int _throttleAfterCacheCount = 1000;
         private readonly List<Action<DrainStatistics>> _cacheDrainedCallbacks = new();
         private Action<ThrottleStatistics>? _throttlingCallback;
         private Action<Exception>? _onDrainAttemptFailedCallback;
