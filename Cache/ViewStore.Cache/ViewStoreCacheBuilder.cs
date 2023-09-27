@@ -7,7 +7,7 @@ namespace ViewStore.Cache
 {
     public sealed class ViewStoreCacheBuilder
     {
-        private IViewStore? _realViewStore;
+        private IViewStoreFlusher? _viewStoreFlusher;
         private TimeSpan _cacheDrainPeriod = TimeSpan.FromSeconds(5);
         private int _cacheDrainBatchSize = 1000;
         private int _throttleAfterCacheCount = 50000;
@@ -21,9 +21,9 @@ namespace ViewStore.Cache
 
         public static ViewStoreCacheBuilder New() => new();
 
-        public ViewStoreCacheBuilder For(IViewStore viewStore)
+        public ViewStoreCacheBuilder WithFlusher(IViewStoreFlusher viewStoreFlusher)
         {
-            _realViewStore = viewStore;
+            _viewStoreFlusher = viewStoreFlusher;
             return this;
         }
 
@@ -93,15 +93,15 @@ namespace ViewStore.Cache
 
         public ViewStoreCache Build()
         {
-            if (_realViewStore == null)
+            if (_viewStoreFlusher == null)
             {
-                throw new ArgumentException(nameof(_realViewStore));
+                throw new ArgumentException(nameof(_viewStoreFlusher));
             }
             
             var outgoingCache = new OutgoingCache(_throttleAfterCacheCount, _throttlingCallback);
 
             var automaticCacheDrainer = new AutomaticCacheDrainer(
-                new ManualCacheDrainer(_realViewStore, outgoingCache, _cacheDrainBatchSize),
+                new ManualCacheDrainer(_viewStoreFlusher, outgoingCache, _cacheDrainBatchSize),
                 _cacheDrainPeriod,
                 _isBackgroundWorker);
 
@@ -114,10 +114,10 @@ namespace ViewStore.Cache
             };
             automaticCacheDrainer.OnSendingExceptionEvent += exception => _onDrainAttemptFailedCallback?.Invoke(exception);
 
-            var readThroughViewStoreCache = new ReadThroughViewStoreCache(
+            var readThroughViewStoreCache = new ReadThroughViewStoreFlusherCache(
                 _memoryCache,
                 _readCacheExpirationPeriod,
-                _realViewStore);
+                _viewStoreFlusher);
 
             var viewStoreCacheInternal = new ViewStoreCacheInternal(
                 readThroughViewStoreCache,

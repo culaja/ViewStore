@@ -5,22 +5,14 @@ namespace ViewStore.Abstractions
 {
     public interface IViewStore
     {
-        GlobalVersion? ReadLastGlobalVersion();
-        Task<GlobalVersion?> ReadLastGlobalVersionAsync();
+        Task<long?> ReadLastGlobalVersion();
         
-        ViewEnvelope? Read(string viewId);
-        Task<ViewEnvelope?> ReadAsync(string viewId);
+        Task<ViewRecord?> Read(string viewId);
 
-        void Save(ViewEnvelope viewEnvelope);
-        Task SaveAsync(ViewEnvelope viewEnvelope);
+        void Save(ViewRecord viewRecord);
+        void Save(IEnumerable<ViewRecord> viewRecords);
 
-        void Save(IEnumerable<ViewEnvelope> viewEnvelopes);
-        Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes);
-
-        void Delete(string viewId, GlobalVersion globalVersion);
-        Task DeleteAsync(string viewId, GlobalVersion globalVersion);
-        
-        void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion);
-        Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion);
+        void Delete(string viewId, long globalVersion = 0L);
+        void Delete(IEnumerable<string> viewIds, long globalVersion = 0L);
     }
 }

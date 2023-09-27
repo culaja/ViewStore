@@ -10,7 +10,7 @@ namespace ViewStore.Cache
     internal sealed class ManualCacheDrainer
     {
         private readonly Stopwatch _stopwatch = new();
-        private readonly IViewStore _destinationViewStore;
+        private readonly IViewStoreFlusher _viewStoreFlusher;
         private readonly OutgoingCache _outgoingCache;
         private readonly int _batchSize;
         
@@ -18,11 +18,11 @@ namespace ViewStore.Cache
         public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public ManualCacheDrainer(
-            IViewStore destinationViewStore,
+            IViewStoreFlusher viewStoreFlusher,
             OutgoingCache outgoingCache,
             int batchSize)
         {
-            _destinationViewStore = destinationViewStore;
+            _viewStoreFlusher = viewStoreFlusher;
             _outgoingCache = outgoingCache;
             _batchSize = batchSize;
         }
@@ -76,11 +76,11 @@ namespace ViewStore.Cache
             return numberOfRetries;
         }
 
-        private int SaveBatch(IReadOnlyList<ViewEnvelope> batch, int numberOfRetries = 0)
+        private int SaveBatch(IReadOnlyList<ViewRecord> batch, int numberOfRetries = 0)
         {
             try
             {
-                _destinationViewStore.Save(batch);
+                var upsertCount = _viewStoreFlusher.UpsertAsync(batch).Result;
             }
             catch (Exception e)
             {
@@ -94,7 +94,7 @@ namespace ViewStore.Cache
         
         private int DrainDeletedCache(CachedItems cachedItems)
         {
-            var deletedViewEnvelopeBatches = new DeletedViewEnvelopeBatches(cachedItems.Deleted, _batchSize);
+            var deletedViewEnvelopeBatches = new DeletedViewRecordBatches(cachedItems.Deleted, _batchSize);
             var numberOfRetries = 0;
             foreach (var batch in deletedViewEnvelopeBatches)
             {
@@ -104,13 +104,11 @@ namespace ViewStore.Cache
             return numberOfRetries;
         }
 
-        private int DeleteBatch(IReadOnlyList<DeletedViewEnvelope> batch, int numberOfRetries = 0)
+        private int DeleteBatch(IReadOnlyList<DeletedViewRecord> batch, int numberOfRetries = 0)
         {
             try
             {
-                _destinationViewStore.Delete(
-                    batch.Select(i => i.ViewId),
-                    batch.Max(i => i.GlobalVersion));
+                var deletedCount = _viewStoreFlusher.DeleteAsync(batch.Select(i => i.ViewId)).Result;
             }
             catch (Exception e)
             {
@@ -122,13 +120,13 @@ namespace ViewStore.Cache
             return numberOfRetries;
         }
 
-        private void StoreCacheMetadata(GlobalVersion? largestGlobalVersion)
+        private void StoreCacheMetadata(long? largestGlobalVersion)
         {
             try
             {
                 if (largestGlobalVersion != null)
                 {
-                    _destinationViewStore.Save(ViewMetaData.MetaDataEnvelopeFor(largestGlobalVersion.Value));
+                    _viewStoreFlusher.SaveLastGlobalVersionAsync(largestGlobalVersion.Value).Wait();
                 }
             }
             catch (Exception e)

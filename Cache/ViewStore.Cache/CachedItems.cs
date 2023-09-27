@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ViewStore.Abstractions;
@@ -6,24 +7,24 @@ namespace ViewStore.Cache
 {
     internal sealed class CachedItems
     {
-        private readonly Dictionary<string, ViewEnvelope> _addedOrUpdated = new();
-        private readonly Dictionary<string, GlobalVersion> _deleted = new();
+        private readonly Dictionary<string, ViewRecord> _addedOrUpdated = new();
+        private readonly Dictionary<string, long> _deleted = new();
 
-        public IReadOnlyCollection<ViewEnvelope> AddedOrUpdated => _addedOrUpdated.Values;
+        public IReadOnlyCollection<ViewRecord> AddedOrUpdated => _addedOrUpdated.Values;
 
-        public IReadOnlyCollection<DeletedViewEnvelope> Deleted => _deleted
-            .Select(d => new DeletedViewEnvelope(d.Key, d.Value))
+        public IReadOnlyCollection<DeletedViewRecord> Deleted => _deleted
+            .Select(d => new DeletedViewRecord(d.Key, d.Value))
             .ToList();
 
         public long Count => _addedOrUpdated.Count + _deleted.Count;
 
-        public void AddOrUpdate(ViewEnvelope viewEnvelope)
+        public void AddOrUpdate(ViewRecord viewRecord)
         {
-            _deleted.Remove(viewEnvelope.Id);
-            _addedOrUpdated[viewEnvelope.Id] = viewEnvelope;
+            _deleted.Remove(viewRecord.Id);
+            _addedOrUpdated[viewRecord.Id] = viewRecord;
         }
         
-        public void AddOrUpdate(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public void AddOrUpdate(IEnumerable<ViewRecord> viewEnvelopes)
         {
             foreach (var viewEnvelope in viewEnvelopes)
             {
@@ -32,13 +33,13 @@ namespace ViewStore.Cache
             }
         }
 
-        public void Remove(string viewId, GlobalVersion globalVersion)
+        public void Remove(string viewId, long globalVersion)
         {
             _addedOrUpdated.Remove(viewId);
             _deleted[viewId] = globalVersion;
         }
         
-        public void Remove(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        public void Remove(IEnumerable<string> viewIds, long globalVersion)
         {
             foreach (var viewId in viewIds)
             {
@@ -47,15 +48,22 @@ namespace ViewStore.Cache
             }
         }
         
-        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)
+        public bool TryGetValue(string viewId, out ViewRecord viewRecord, out bool isDeleted)
         {
             isDeleted = _deleted.ContainsKey(viewId);
-            return _addedOrUpdated.TryGetValue(viewId, out viewEnvelope!);
+            return _addedOrUpdated.TryGetValue(viewId, out viewRecord!);
         }
 
-        public GlobalVersion? LastGlobalVersion() =>
-            GlobalVersion.Max(
-                _addedOrUpdated.Count > 0 ?_addedOrUpdated.Values.Max(ve => ve.GlobalVersion) : null,
-                _deleted.Count > 0 ? _deleted.Values.Max() : null);
+        public long? LastGlobalVersion()
+        {
+            if (_addedOrUpdated.Count == 0 && _deleted.Count == 0)
+            {
+                return null;
+            }
+
+            return Math.Max(
+                _addedOrUpdated.Count > 0 ? _addedOrUpdated.Values.Max(ve => ve.GlobalVersion) : 0L,
+                _deleted.Count > 0 ? _deleted.Values.Max() : 0L);
+        }
     }
 }

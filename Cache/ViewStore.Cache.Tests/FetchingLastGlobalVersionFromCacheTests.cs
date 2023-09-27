@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using ViewStore.Abstractions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using ViewStore.InMemory;
 using Xunit;
 using static ViewStore.Abstractions.TestView;
@@ -8,15 +8,15 @@ namespace ViewStore.Cache
 {
     public sealed class FetchingLastGlobalVersionFromCacheTests
     {
-        private readonly InMemoryViewStore _finalStore = new();
+        private readonly InMemoryViewStoreFlusher _finalStoreFlusher = new();
         private readonly OutgoingCache _outgoingCache = new(1000, null);
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly ViewStoreCacheInternal _viewStoreCacheInternal;
 
         public FetchingLastGlobalVersionFromCacheTests()
         {
-            _manualCacheDrainer = new ManualCacheDrainer(_finalStore, _outgoingCache, 10);
-            _viewStoreCacheInternal = new ViewStoreCacheInternal(_finalStore, _outgoingCache);
+            _manualCacheDrainer = new ManualCacheDrainer(_finalStoreFlusher, _outgoingCache, 10);
+            _viewStoreCacheInternal = new ViewStoreCacheInternal(_finalStoreFlusher, _outgoingCache);
         }
         
         /// <remarks>
@@ -27,17 +27,17 @@ namespace ViewStore.Cache
         [Theory]
         [InlineData(2, 1, 2)]
         [InlineData(1,5, 5)]
-        public void check_last_global_version_after_adding_two_views_and_when_drain_is_not_triggered(
+        public async Task check_last_global_version_after_adding_two_views_and_when_drain_is_not_triggered(
             long view1Position,
             long view2Position,
             long expectedPosition)
         {
-            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1Position)));
-            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2Position)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(view1Position));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(view2Position));
 
-            _viewStoreCacheInternal.ReadLastGlobalVersion()
+            (await _viewStoreCacheInternal.ReadLastGlobalVersion())
                 .Should()
-                .Be(GlobalVersion.Of(expectedPosition));
+                .Be(expectedPosition);
         }
         
         
@@ -49,19 +49,19 @@ namespace ViewStore.Cache
         [Theory]
         [InlineData(2, 1, 2)]
         [InlineData(1,5, 5)]
-        public void check_last_global_version_after_adding_two_views_and_when_drain_is_triggered(
+        public async Task check_last_global_version_after_adding_two_views_and_when_drain_is_triggered(
             long view1Position,
             long view2Position,
             long expectedPosition)
         {
-            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1Position)));
-            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2Position)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(view1Position));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(view2Position));
 
             _manualCacheDrainer.DrainCacheUntilEmpty();
 
-            _viewStoreCacheInternal.ReadLastGlobalVersion()
+            (await _viewStoreCacheInternal.ReadLastGlobalVersion())
                 .Should()
-                .Be(GlobalVersion.Of(expectedPosition));
+                .Be(expectedPosition);
         }
         
         /// <remarks>
@@ -72,18 +72,18 @@ namespace ViewStore.Cache
         [Theory]
         [InlineData(2, 1, 2)]
         [InlineData(1,5, 5)]
-        public void check_last_global_version_after_adding_two_views_and_when_drain_is_triggered_between_two_saves(
+        public async Task check_last_global_version_after_adding_two_views_and_when_drain_is_triggered_between_two_saves(
             long view1Position,
             long view2Position,
             long expectedPosition)
         {
-            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1Position)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(view1Position));
             _manualCacheDrainer.DrainCacheUntilEmpty();
-            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2Position)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(view2Position));
 
-            _viewStoreCacheInternal.ReadLastGlobalVersion()
+            (await _viewStoreCacheInternal.ReadLastGlobalVersion())
                 .Should()
-                .Be(GlobalVersion.Of(expectedPosition));
+                .Be(expectedPosition);
         }
         
         /// <remarks>
@@ -94,30 +94,30 @@ namespace ViewStore.Cache
         [Theory]
         [InlineData(2, 1, 2)]
         [InlineData(1,5, 5)]
-        public void check_last_global_version_after_adding_two_views_and_after_two_consecutive_drains(
+        public async Task check_last_global_version_after_adding_two_views_and_after_two_consecutive_drains(
             long view1Position,
             long view2Position,
             long expectedPosition)
         {
-            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(view1Position)));
-            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(GlobalVersion.Of(view2Position)));
+            _viewStoreCacheInternal.Save(TestViewEnvelope1.WithGlobalVersion(view1Position));
+            _viewStoreCacheInternal.Save(TestViewEnvelope2.WithGlobalVersion(view2Position));
 
             _manualCacheDrainer.DrainCacheUntilEmpty();
             _manualCacheDrainer.DrainCacheUntilEmpty();
 
-            _viewStoreCacheInternal.ReadLastGlobalVersion()
+            (await _viewStoreCacheInternal.ReadLastGlobalVersion())
                 .Should()
-                .Be(GlobalVersion.Of(expectedPosition));
+                .Be(expectedPosition);
         }
         
         [Fact]
-        public void check_last_global_version_after_adding_a_view_to_final_store_without_caching()
+        public async Task check_last_global_version_after_adding_a_view_to_final_store_without_caching()
         {
-            _finalStore.Save(TestViewEnvelope1.WithGlobalVersion(GlobalVersion.Of(5)));
+            await _finalStoreFlusher.SaveLastGlobalVersionAsync(5);
 
-            _viewStoreCacheInternal.ReadLastGlobalVersion()
+            (await _viewStoreCacheInternal.ReadLastGlobalVersion())
                 .Should()
-                .Be(GlobalVersion.Of(5));
+                .Be(5);
         }
     }
 }

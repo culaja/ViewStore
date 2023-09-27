@@ -6,103 +6,55 @@ namespace ViewStore.Cache
 {
     internal sealed class ViewStoreCacheInternal : IViewStore
     {
-        private readonly IViewStore _next;
+        private readonly IViewStoreFlusher _viewStoreFlusher;
         private readonly OutgoingCache _outgoingCache;
 
         public ViewStoreCacheInternal(
-            IViewStore next,
+            IViewStoreFlusher viewStoreFlusher,
             OutgoingCache outgoingCache)
         {
-            _next = next;
+            _viewStoreFlusher = viewStoreFlusher;
             _outgoingCache = outgoingCache;
         }
 
-        public GlobalVersion? ReadLastGlobalVersion() =>
-            GlobalVersion.Max(
-                _outgoingCache.LastGlobalVersion(),
-                ReadLastGlobalVersionFromNextStore());
-        
-        private GlobalVersion? ReadLastGlobalVersionFromNextStore()
+        public Task<long?> ReadLastGlobalVersion()
         {
-            var lastGlobalVersion = _next.Read(ViewMetaData.MetaDataId)?.GlobalVersion;
-            if (lastGlobalVersion != null)
+            if (_outgoingCache.LastGlobalVersion() is { } lastGlobalVersion)
             {
-                return lastGlobalVersion;
+                return Task.FromResult<long?>(lastGlobalVersion);
             }
 
-            return _next.ReadLastGlobalVersion();
+            return _viewStoreFlusher.ReadLastGlobalVersionAsync();
         }
 
-        public async Task<GlobalVersion?> ReadLastGlobalVersionAsync() =>
-            GlobalVersion.Max(
-                _outgoingCache.LastGlobalVersion(),
-                await ReadLastGlobalVersionFromNextStoreAsync());
-
-        private async Task<GlobalVersion?> ReadLastGlobalVersionFromNextStoreAsync()
-        {
-            var lastGlobalVersion = (await _next.ReadAsync(ViewMetaData.MetaDataId))?.GlobalVersion;
-            if (lastGlobalVersion != null)
-            {
-                return lastGlobalVersion;
-            }
-
-            return await _next.ReadLastGlobalVersionAsync();
-        }
-
-        public ViewEnvelope? Read(string viewId)
+        public async Task<ViewRecord?> Read(string viewId)
         {
             if (_outgoingCache.TryGetValue(viewId, out var view, out var isDeleted))
             {
                 return view;
             }
             
-            return isDeleted ? null : _next.Read(viewId);
+            return isDeleted ? null : await _viewStoreFlusher.ReadAsync(viewId);
         }
 
-        public Task<ViewEnvelope?> ReadAsync(string viewId) => Task.FromResult(Read(viewId));
-
-        public void Save(ViewEnvelope viewEnvelope)
+        public void Save(ViewRecord viewRecord)
         {
-            _outgoingCache.AddOrUpdate(viewEnvelope);
+            _outgoingCache.AddOrUpdate(viewRecord);
         }
 
-        public Task SaveAsync(ViewEnvelope viewEnvelope)
+        public void Save(IEnumerable<ViewRecord> viewRecords)
         {
-            Save(viewEnvelope);
-            return Task.CompletedTask;
+            _outgoingCache.AddOrUpdate(viewRecords);
         }
 
-        public void Save(IEnumerable<ViewEnvelope> viewEnvelopes)
-        {
-            _outgoingCache.AddOrUpdate(viewEnvelopes);
-        }
-
-        public Task SaveAsync(IEnumerable<ViewEnvelope> viewEnvelopes)
-        {
-            Save(viewEnvelopes);
-            return Task.CompletedTask;
-        }
-
-        public void Delete(string viewId, GlobalVersion globalVersion)
+        public void Delete(string viewId, long globalVersion = 0)
         {
             _outgoingCache.Remove(viewId, globalVersion);
         }
 
-        public Task DeleteAsync(string viewId, GlobalVersion globalVersion)
-        {
-            _outgoingCache.Remove(viewId, globalVersion);
-            return Task.CompletedTask;
-        }
-
-        public void Delete(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        public void Delete(IEnumerable<string> viewIds, long globalVersion = 0)
         {
             _outgoingCache.Remove(viewIds, globalVersion);
-        }
-
-        public Task DeleteAsync(IEnumerable<string> viewIds, GlobalVersion globalVersion)
-        {
-            _outgoingCache.Remove(viewIds, globalVersion);
-            return Task.CompletedTask;
         }
     }
 }

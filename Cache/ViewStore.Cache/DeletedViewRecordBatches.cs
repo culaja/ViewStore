@@ -1,17 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
-using ViewStore.Abstractions;
 
 namespace ViewStore.Cache
 {
-    internal sealed class DeletedViewEnvelopeBatches : IReadOnlyList<IReadOnlyList<DeletedViewEnvelope>>
+    internal sealed class DeletedViewRecordBatches : IReadOnlyList<IReadOnlyList<DeletedViewRecord>>
     {
-        private readonly IReadOnlyList<IReadOnlyList<DeletedViewEnvelope>> _batches;
-        public GlobalVersion? LargestGlobalVersion { get; }
+        private readonly IReadOnlyList<IReadOnlyList<DeletedViewRecord>> _batches;
+        public long? LargestGlobalVersion { get; }
         public int CountOfAllViewEnvelopes { get; }
 
 
-        public DeletedViewEnvelopeBatches(IEnumerable<DeletedViewEnvelope> deletedViewEnvelopes, int batchSize)
+        public DeletedViewRecordBatches(IEnumerable<DeletedViewRecord> deletedViewEnvelopes, int batchSize)
         {
             _batches = Batch(
                 deletedViewEnvelopes,
@@ -22,30 +21,30 @@ namespace ViewStore.Cache
             CountOfAllViewEnvelopes = countOfAllViews;
         }
 
-        public IEnumerator<IReadOnlyList<DeletedViewEnvelope>> GetEnumerator() => _batches.GetEnumerator();
+        public IEnumerator<IReadOnlyList<DeletedViewRecord>> GetEnumerator() => _batches.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public int Count => _batches.Count;
 
-        public IReadOnlyList<DeletedViewEnvelope> this[int index] => _batches[index];
+        public IReadOnlyList<DeletedViewRecord> this[int index] => _batches[index];
         
         // Copied from https://github.com/morelinq/MoreLINQ
-        private static IReadOnlyList<IReadOnlyList<DeletedViewEnvelope>> Batch(
-            IEnumerable<DeletedViewEnvelope> source, 
+        private static IReadOnlyList<IReadOnlyList<DeletedViewRecord>> Batch(
+            IEnumerable<DeletedViewRecord> source, 
             int batchSize,
-            out GlobalVersion? largestGlobalVersion,
+            out long? largestGlobalVersion,
             out int countOfAllViews)
         {
-            List<DeletedViewEnvelope>? bucket = null;
+            List<DeletedViewRecord>? bucket = null;
             largestGlobalVersion = null;
             countOfAllViews = 0;
 
-            var resultList = new List<List<DeletedViewEnvelope>>();
+            var resultList = new List<List<DeletedViewRecord>>();
             foreach (var item in source)
             {
                 if (bucket == null)
-                    bucket = new List<DeletedViewEnvelope>(batchSize);
+                    bucket = new List<DeletedViewRecord>(batchSize);
 
                 bucket.Add(item);
                 largestGlobalVersion = 

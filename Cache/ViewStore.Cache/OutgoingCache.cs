@@ -20,7 +20,7 @@ namespace ViewStore.Cache
             _throttlingCallback = throttlingCallback;
         }
 
-        public void AddOrUpdate(ViewEnvelope viewEnvelope)
+        public void AddOrUpdate(ViewRecord viewRecord)
         {
             lock (_sync)
             {
@@ -29,11 +29,11 @@ namespace ViewStore.Cache
                     ThrottleForOneSecond();
                 }
                 
-                _currentCache.AddOrUpdate(viewEnvelope);
+                _currentCache.AddOrUpdate(viewRecord);
             }
         }
         
-        public void AddOrUpdate(IEnumerable<ViewEnvelope> viewEnvelopes)
+        public void AddOrUpdate(IEnumerable<ViewRecord> viewEnvelopes)
         {
             lock (_sync)
             {
@@ -54,7 +54,7 @@ namespace ViewStore.Cache
             Thread.Sleep(1000);
         }
 
-        public void Remove(string viewId, GlobalVersion globalVersion)
+        public void Remove(string viewId, long globalVersion)
         {
             lock (_sync)
             {
@@ -62,7 +62,7 @@ namespace ViewStore.Cache
             }
         }
         
-        public void Remove(IEnumerable<string> viewIds, GlobalVersion globalVersion)
+        public void Remove(IEnumerable<string> viewIds, long globalVersion)
         {
             lock (_sync)
             {
@@ -70,22 +70,29 @@ namespace ViewStore.Cache
             }
         }
 
-        public bool TryGetValue(string viewId, out ViewEnvelope viewEnvelope, out bool isDeleted)
+        public bool TryGetValue(string viewId, out ViewRecord viewRecord, out bool isDeleted)
         {
             lock (_sync)
             {
-                return _currentCache.TryGetValue(viewId, out viewEnvelope, out isDeleted) || 
-                       (isDeleted == false && _drainedCache.TryGetValue(viewId, out viewEnvelope, out isDeleted));
+                return _currentCache.TryGetValue(viewId, out viewRecord, out isDeleted) || 
+                       (isDeleted == false && _drainedCache.TryGetValue(viewId, out viewRecord, out isDeleted));
             }
         }
 
-        public GlobalVersion? LastGlobalVersion()
+        public long? LastGlobalVersion()
         {
             lock (_sync)
             {
-                return GlobalVersion.Max(
-                    _currentCache.LastGlobalVersion(),
-                    _drainedCache.LastGlobalVersion());
+                var currentCacheLastGlobalVersion = _currentCache.LastGlobalVersion();
+                var drainedCacheLastGlobalVersion = _drainedCache.LastGlobalVersion();
+                if (currentCacheLastGlobalVersion == null && drainedCacheLastGlobalVersion == null)
+                {
+                    return null;
+                }
+                    
+                return Math.Max(
+                    currentCacheLastGlobalVersion ?? 0L,
+                    drainedCacheLastGlobalVersion ?? 0L);
             }
         }
 
