@@ -1,6 +1,6 @@
 using System;
 
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 public sealed class ThrottleStatistics
 {

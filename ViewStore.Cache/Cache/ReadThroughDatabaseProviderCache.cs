@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 internal sealed class ReadThroughDatabaseProviderCache : IDatabaseProvider
 {

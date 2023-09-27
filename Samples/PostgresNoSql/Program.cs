@@ -1,5 +1,6 @@
-﻿using ViewStore;
+﻿using PostgresNoSql;
 using ViewStore.Cache;
+using ViewStore.Cache.Cache;
 using ViewStore.DatabaseProviders.PostgresNoSql;
 
 var databaseProvider = PostgresDatabaseProviderBuilder.New()
@@ -18,7 +19,10 @@ cache.Save(new User(Id: "2", Name: "Marko", Age: 35).ToRecord(v => v.Id));
 cache.Save(new User(Id: "3", Name: "Milenko", Age: 34).ToRecord(v => v.Id));
 cache.Delete("2");
 
-internal sealed record User(
-    string Id,
-    string Name,
-    int Age) : IView;
+namespace PostgresNoSql
+{
+    internal sealed record User(
+        string Id,
+        string Name,
+        int Age) : IView;
+}

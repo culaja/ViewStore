@@ -5,6 +5,7 @@
         <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>true</IsPackable>
         <PackageId>ViewStore.DatabaseProviders.PostgresNoSql</PackageId>
         <PackageDescription>NoSql Postgres database provider for ViewStore which stores views as jsonb type.</PackageDescription>
         <Version>3.0.0-rc01</Version>
@@ -18,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\ViewStore\ViewStore.csproj" />
+      <ProjectReference Include="..\..\ViewStore.Cache\ViewStore.Cache.csproj" />
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Caching;
 
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 public sealed class ViewStoreCacheBuilder
 {

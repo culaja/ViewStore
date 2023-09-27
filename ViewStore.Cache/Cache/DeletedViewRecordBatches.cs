@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 internal sealed class DeletedViewRecordBatches : IReadOnlyList<IReadOnlyList<DeletedViewRecord>>
 {

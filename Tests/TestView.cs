@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ViewStore.Cache;
 
-namespace ViewStore.Abstractions;
+namespace Tests;
 
 public sealed class TestView : IView
 {

@@ -5,6 +5,7 @@
         <RootNamespace>ViewStore.Prometheus</RootNamespace>
         <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
         <AssemblyName>ViewStore.Prometheus</AssemblyName>
         <PackageId>ViewStore.Prometheus</PackageId>
         <PackageDescription>Prometheus metrics for View Store Cache implementation.</PackageDescription>
@@ -19,7 +20,7 @@
 
 
     <ItemGroup>
-      <ProjectReference Include="..\ViewStore\ViewStore.csproj" />
+      <ProjectReference Include="..\ViewStore.Cache\ViewStore.Cache.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using ViewStore.Cache;
+using ViewStore.Cache.Cache;
 using Xunit;
-using static ViewStore.Abstractions.TestView;
+using static Tests.TestView;
 
 namespace Tests;
 

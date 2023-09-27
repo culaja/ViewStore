@@ -1,4 +1,4 @@
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 internal readonly struct DeletedViewRecord
 {

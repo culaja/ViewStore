@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Npgsql;
 using NpgsqlTypes;
+using ViewStore.Cache;
 
 namespace ViewStore.DatabaseProviders.PostgresNoSql;
 

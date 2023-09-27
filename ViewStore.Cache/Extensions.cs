@@ -1,6 +1,6 @@
 using System;
 
-namespace ViewStore;
+namespace ViewStore.Cache;
 
 public static class Extensions
 {

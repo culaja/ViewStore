@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ViewStore;
+namespace ViewStore.Cache;
 
 public sealed class ViewRecord : IEquatable<ViewRecord>
 {

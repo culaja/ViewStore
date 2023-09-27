@@ -1,3 +1,5 @@
+using ViewStore.Cache;
+
 namespace ViewStore.DatabaseProviders.PostgresNoSql;
 
 public sealed class PostgresDatabaseProviderBuilder

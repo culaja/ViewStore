@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 internal sealed class OutgoingCache
 {

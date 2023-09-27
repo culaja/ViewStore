@@ -3,10 +3,10 @@ using System.Runtime.Caching;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ViewStore;
-using ViewStore.Abstractions;
 using ViewStore.Cache;
+using ViewStore.Cache.Cache;
 using Xunit;
-using static ViewStore.Abstractions.TestView;
+using static Tests.TestView;
 
 namespace Tests;
 

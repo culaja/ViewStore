@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ViewStore.Cache;
+namespace ViewStore.Cache.Cache;
 
 public sealed class ViewStoreCache : IViewStore, IDisposable
 {

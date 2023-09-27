@@ -4,6 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
         <PackageId>ViewStore.Cache</PackageId>
         <PackageDescription>Write bihind cache for View Store. It can be used as a decorator for any View Store implementation (e.g. MongoDb View Store).</PackageDescription>
         <Version>3.0.0-rc01</Version>

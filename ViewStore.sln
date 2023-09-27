@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewStore.Prometheus", "ViewStore.Prometheus\ViewStore.Prometheus.csproj", "{341FCF4D-1113-4D0B-875C-3AB9CABE2C40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewStore", "ViewStore\ViewStore.csproj", "{F110EE1D-A9C0-4D45-B8D2-1EA929DBAFE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewStore.Cache", "ViewStore.Cache\ViewStore.Cache.csproj", "{F110EE1D-A9C0-4D45-B8D2-1EA929DBAFE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{830A693D-BE53-4C8F-B5F6-840FC583F4A2}"
 EndProject

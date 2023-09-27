@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ViewStore;
+using ViewStore.Cache;
 
 namespace Tests;
 

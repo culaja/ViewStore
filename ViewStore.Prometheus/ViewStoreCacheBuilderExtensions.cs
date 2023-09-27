@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Prometheus;
 using ViewStore.Cache;
+using ViewStore.Cache.Cache;
 
 namespace ViewStore.Prometheus;
 
