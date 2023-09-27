@@ -9,7 +9,7 @@ namespace ViewStore.Cache
     internal sealed class ManualCacheDrainer
     {
         private readonly Stopwatch _stopwatch = new();
-        private readonly IViewStoreFlusher _viewStoreFlusher;
+        private readonly IDatabaseProvider _databaseProvider;
         private readonly OutgoingCache _outgoingCache;
         private readonly int _batchSize;
         
@@ -17,11 +17,11 @@ namespace ViewStore.Cache
         public event OnDrainFinishedDelegate? OnDrainFinishedEvent;
 
         public ManualCacheDrainer(
-            IViewStoreFlusher viewStoreFlusher,
+            IDatabaseProvider databaseProvider,
             OutgoingCache outgoingCache,
             int batchSize)
         {
-            _viewStoreFlusher = viewStoreFlusher;
+            _databaseProvider = databaseProvider;
             _outgoingCache = outgoingCache;
             _batchSize = batchSize;
         }
@@ -79,7 +79,7 @@ namespace ViewStore.Cache
         {
             try
             {
-                var upsertCount = _viewStoreFlusher.UpsertAsync(batch).Result;
+                var upsertCount = _databaseProvider.UpsertAsync(batch).Result;
             }
             catch (Exception e)
             {
@@ -107,7 +107,7 @@ namespace ViewStore.Cache
         {
             try
             {
-                var deletedCount = _viewStoreFlusher.DeleteAsync(batch.Select(i => i.ViewId)).Result;
+                var deletedCount = _databaseProvider.DeleteAsync(batch.Select(i => i.ViewId)).Result;
             }
             catch (Exception e)
             {
@@ -125,7 +125,7 @@ namespace ViewStore.Cache
             {
                 if (largestGlobalVersion != null)
                 {
-                    _viewStoreFlusher.SaveLastGlobalVersionAsync(largestGlobalVersion.Value).Wait();
+                    _databaseProvider.SaveLastGlobalVersionAsync(largestGlobalVersion.Value).Wait();
                 }
             }
             catch (Exception e)

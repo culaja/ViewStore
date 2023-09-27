@@ -5,14 +5,14 @@ namespace ViewStore.Cache
 {
     internal sealed class ViewStoreCacheInternal : IViewStore
     {
-        private readonly IViewStoreFlusher _viewStoreFlusher;
+        private readonly IDatabaseProvider _databaseProvider;
         private readonly OutgoingCache _outgoingCache;
 
         public ViewStoreCacheInternal(
-            IViewStoreFlusher viewStoreFlusher,
+            IDatabaseProvider databaseProvider,
             OutgoingCache outgoingCache)
         {
-            _viewStoreFlusher = viewStoreFlusher;
+            _databaseProvider = databaseProvider;
             _outgoingCache = outgoingCache;
         }
 
@@ -23,7 +23,7 @@ namespace ViewStore.Cache
                 return Task.FromResult<long?>(lastGlobalVersion);
             }
 
-            return _viewStoreFlusher.ReadLastGlobalVersionAsync();
+            return _databaseProvider.ReadLastGlobalVersionAsync();
         }
 
         public async Task<ViewRecord?> Read(string viewId)
@@ -33,7 +33,7 @@ namespace ViewStore.Cache
                 return view;
             }
             
-            return isDeleted ? null : await _viewStoreFlusher.ReadAsync(viewId);
+            return isDeleted ? null : await _databaseProvider.ReadAsync(viewId);
         }
 
         public void Save(ViewRecord viewRecord)

@@ -6,7 +6,7 @@ using ViewStore;
 
 namespace Tests
 {
-    public sealed class InMemoryViewStoreFlusher : IViewStoreFlusher
+    public sealed class InMemoryDatabaseProvider : IDatabaseProvider
     {
         private const string LastGlobalVersionViewId = "LastGlobalVersionViewId-b24ae98262724d27bd8e31c34ff11f1a";
         private readonly ReaderWriterLockSlim _lock = new();

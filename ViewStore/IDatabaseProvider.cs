@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ViewStore
 {
-    public interface IViewStoreFlusher
+    public interface IDatabaseProvider
     {
         Task<long?> ReadLastGlobalVersionAsync();
         Task SaveLastGlobalVersionAsync(long globalVersion);

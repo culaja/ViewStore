@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace ViewStore.Cache
 {
-    internal sealed class ReadThroughViewStoreFlusherCache : IViewStoreFlusher
+    internal sealed class ReadThroughDatabaseProviderCache : IDatabaseProvider
     {
         private readonly MemoryCache _memoryCache;
         private readonly TimeSpan _readCacheExpirationPeriod;
-        private readonly IViewStoreFlusher _next;
+        private readonly IDatabaseProvider _next;
 
-        public ReadThroughViewStoreFlusherCache(
+        public ReadThroughDatabaseProviderCache(
             MemoryCache memoryCache,
             TimeSpan readCacheExpirationPeriod,
-            IViewStoreFlusher next)
+            IDatabaseProvider next)
         {
             _memoryCache = memoryCache;
             _readCacheExpirationPeriod = readCacheExpirationPeriod;

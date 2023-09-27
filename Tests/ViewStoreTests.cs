@@ -13,7 +13,7 @@ namespace Tests
     public sealed class ViewStoreTests : IDisposable
     {
         private readonly ViewStoreCache _cache = ViewStoreCacheBuilder.New()
-                .WithFlusher(new InMemoryViewStoreFlusher())
+                .WithDatabaseProvider(new InMemoryDatabaseProvider())
                 .WithCacheDrainPeriod(TimeSpan.Zero)
                 .WithReadMemoryCache(new MemoryCache(Guid.NewGuid().ToString()))
                 .Build();

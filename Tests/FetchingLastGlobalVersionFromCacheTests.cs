@@ -8,19 +8,19 @@ namespace Tests
 {
     public sealed class FetchingLastGlobalVersionFromCacheTests
     {
-        private readonly InMemoryViewStoreFlusher _finalStoreFlusher = new();
+        private readonly InMemoryDatabaseProvider _databaseProvider = new();
         private readonly OutgoingCache _outgoingCache = new(1000, null);
         private readonly ManualCacheDrainer _manualCacheDrainer;
         private readonly ViewStoreCacheInternal _viewStoreCacheInternal;
 
         public FetchingLastGlobalVersionFromCacheTests()
         {
-            _manualCacheDrainer = new ManualCacheDrainer(_finalStoreFlusher, _outgoingCache, 10);
-            _viewStoreCacheInternal = new ViewStoreCacheInternal(_finalStoreFlusher, _outgoingCache);
+            _manualCacheDrainer = new ManualCacheDrainer(_databaseProvider, _outgoingCache, 10);
+            _viewStoreCacheInternal = new ViewStoreCacheInternal(_databaseProvider, _outgoingCache);
         }
         
         /// <remarks>
-        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        /// ----- Current cache -----*----- Drained cache -----*----- Database -----
         ///           V1, V2
         /// -------------------------*-------------------------*---------------------- 
         /// </remarks>
@@ -42,7 +42,7 @@ namespace Tests
         
         
         /// <remarks>
-        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        /// ----- Current cache -----*----- Drained cache -----*----- Database -----
         ///                                    V1 V2                    V1 V2
         /// -------------------------*-------------------------*---------------------- 
         /// </remarks>
@@ -65,7 +65,7 @@ namespace Tests
         }
         
         /// <remarks>
-        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        /// ----- Current cache -----*----- Drained cache -----*----- Database -----
         ///              V2                       V1                      V1
         /// -------------------------*-------------------------*---------------------- 
         /// </remarks>
@@ -87,7 +87,7 @@ namespace Tests
         }
         
         /// <remarks>
-        /// ----- Current cache -----*----- Drained cache -----*----- Real Store -----
+        /// ----- Current cache -----*----- Drained cache -----*----- Database -----
         ///                                                             V1, V2
         /// -------------------------*-------------------------*---------------------- 
         /// </remarks>
@@ -113,7 +113,7 @@ namespace Tests
         [Fact]
         public async Task check_last_global_version_after_adding_a_view_to_final_store_without_caching()
         {
-            await _finalStoreFlusher.SaveLastGlobalVersionAsync(5);
+            await _databaseProvider.SaveLastGlobalVersionAsync(5);
 
             (await _viewStoreCacheInternal.ReadLastGlobalVersion())
                 .Should()
