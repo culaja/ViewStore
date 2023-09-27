@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ViewStore.Abstractions;
+using ViewStore;
 
-namespace ViewStore.InMemory
+namespace Tests
 {
     public sealed class InMemoryViewStoreFlusher : IViewStoreFlusher
     {

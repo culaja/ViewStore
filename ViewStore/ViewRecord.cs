@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ViewStore.Abstractions
+namespace ViewStore
 {
     public sealed class ViewRecord : IEquatable<ViewRecord>
     {

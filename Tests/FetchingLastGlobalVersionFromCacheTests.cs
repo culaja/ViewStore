@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using ViewStore.InMemory;
+using ViewStore.Cache;
 using Xunit;
 using static ViewStore.Abstractions.TestView;
 
-namespace ViewStore.Cache
+namespace Tests
 {
     public sealed class FetchingLastGlobalVersionFromCacheTests
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ViewStore.Abstractions
+namespace ViewStore
 {
     public interface IViewStore
     {

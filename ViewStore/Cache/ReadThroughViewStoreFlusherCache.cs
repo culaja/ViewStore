@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
-using ViewStore.Abstractions;
 
 namespace ViewStore.Cache
 {

@@ -8,7 +8,7 @@
         <AssemblyName>ViewStore.Prometheus</AssemblyName>
         <PackageId>ViewStore.Prometheus</PackageId>
         <PackageDescription>Prometheus metrics for View Store Cache implementation.</PackageDescription>
-        <Version>2.0.0-rc02</Version>
+        <Version>3.0.0-rc01</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>Prometheus;Prometheus View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>
@@ -17,8 +17,9 @@
         <PackageReference Include="prometheus-net" Version="6.0.0" />
     </ItemGroup>
 
+
     <ItemGroup>
-      <ProjectReference Include="..\..\Cache\ViewStore.Cache\ViewStore.Cache.csproj" />
+      <ProjectReference Include="..\ViewStore\ViewStore.csproj" />
     </ItemGroup>
 
 </Project>

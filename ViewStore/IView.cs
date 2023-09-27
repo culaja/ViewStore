@@ -1,4 +1,4 @@
-﻿namespace ViewStore.Abstractions
+﻿namespace ViewStore
 {
     public interface IView
     {
