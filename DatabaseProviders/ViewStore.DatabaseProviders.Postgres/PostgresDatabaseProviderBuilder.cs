@@ -1,4 +1,4 @@
-namespace ViewStore.Postgres;
+namespace ViewStore.DatabaseProviders.Postgres;
 
 public sealed class PostgresDatabaseProviderBuilder
 {

@@ -2,7 +2,7 @@
 
 using ViewStore;
 using ViewStore.Cache;
-using ViewStore.Postgres;
+using ViewStore.DatabaseProviders.Postgres;
 
 var databaseProvider = PostgresDatabaseProviderBuilder.New()
     .WithConnectionString("host=localhost;port=5432;database=viewstore;password=o;username=postgres")

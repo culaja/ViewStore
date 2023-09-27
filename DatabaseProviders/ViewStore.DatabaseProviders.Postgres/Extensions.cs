@@ -2,7 +2,7 @@ using System.Data.Common;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace ViewStore.Postgres;
+namespace ViewStore.DatabaseProviders.Postgres;
 
 internal static class Extensions
 {
