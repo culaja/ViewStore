@@ -48,7 +48,7 @@ internal sealed class ManualCacheDrainer
             var cachedItems = _outgoingCache.Renew();
             var drainAddedOrUpdatedCacheRetryCount = DrainAddedOrUpdatedCache(cachedItems);
             var drainDeletedCacheRetryCount = DrainDeletedCache(cachedItems);
-            StoreCacheMetadata(cachedItems.LastGlobalVersion());
+            StoreCacheMetadataIfUsingVersioning(cachedItems.LastGlobalVersion());
             return new DrainStatistics(
                 _stopwatch.Elapsed,
                 cachedItems.AddedOrUpdated.Count,
@@ -119,11 +119,11 @@ internal sealed class ManualCacheDrainer
         return numberOfRetries;
     }
 
-    private void StoreCacheMetadata(long? largestGlobalVersion)
+    private void StoreCacheMetadataIfUsingVersioning(long? largestGlobalVersion)
     {
         try
         {
-            if (largestGlobalVersion != null)
+            if (largestGlobalVersion is > 0)
             {
                 _databaseProvider.SaveLastGlobalVersionAsync(largestGlobalVersion.Value).Wait();
             }
@@ -132,7 +132,7 @@ internal sealed class ManualCacheDrainer
         {
             OnSendingExceptionEvent?.Invoke(e);
             Thread.Sleep(1000);
-            StoreCacheMetadata(largestGlobalVersion);
+            StoreCacheMetadataIfUsingVersioning(largestGlobalVersion);
         }
     }
 }
