@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace ViewStore.DatabaseProviders.Postgres;
+namespace ViewStore.DatabaseProviders.PostgresNoSql;
 
 internal sealed class ViewRecordInternal
 {

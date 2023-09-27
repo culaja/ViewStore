@@ -1,6 +1,6 @@
 ﻿using ViewStore;
 using ViewStore.Cache;
-using ViewStore.DatabaseProviders.Postgres;
+using ViewStore.DatabaseProviders.PostgresNoSql;
 
 var databaseProvider = PostgresDatabaseProviderBuilder.New()
     .WithConnectionString("host=localhost;port=5432;database=viewstore;password=o;username=postgres")

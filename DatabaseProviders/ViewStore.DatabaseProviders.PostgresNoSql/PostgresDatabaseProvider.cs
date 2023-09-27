@@ -1,6 +1,6 @@
 using Npgsql;
 
-namespace ViewStore.DatabaseProviders.Postgres;
+namespace ViewStore.DatabaseProviders.PostgresNoSql;
 
 internal sealed class PostgresDatabaseProvider : IDatabaseProvider
 {

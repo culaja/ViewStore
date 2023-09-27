@@ -1,6 +1,6 @@
 using Npgsql;
 
-namespace ViewStore.DatabaseProviders.Postgres;
+namespace ViewStore.DatabaseProviders.PostgresNoSql;
 
 public delegate void PostCreationScriptProvider(NpgsqlConnection connection, string schemaName, string tableName);
 
