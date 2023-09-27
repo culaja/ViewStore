@@ -23,24 +23,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test
-    - name: Publish ViewStore
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: ViewStore/ViewStore.csproj
-        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
-        TAG_FORMAT: '*'
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.DatabaseProviders.PostgresNoSql
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: DatabaseProviders/ViewStore.DatabaseProviders.PostgresNoSql/ViewStore.DatabaseProviders.PostgresNoSql.csproj
-        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
-        TAG_FORMAT: '*'
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.Prometheus
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: ViewStore.Prometheus/ViewStore.Prometheus.csproj
-        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
-        TAG_FORMAT: '*'
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack nugets
+      run: dotnet pack -c Release --no-build --output .
+    - name: Push to NuGet
+      run: dotnet nuget push "*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
