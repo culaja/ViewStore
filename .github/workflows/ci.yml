@@ -2,9 +2,8 @@ name: PublishNugets
 
 on:
   push:
-    branches: [ * ]
-  pull_request:
-    branches: [ * ]
+    branches:
+      - '*'
 
 jobs:
   build:
