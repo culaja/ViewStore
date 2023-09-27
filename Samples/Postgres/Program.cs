@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using ViewStore;
+﻿using ViewStore;
 using ViewStore.Cache;
 using ViewStore.DatabaseProviders.Postgres;
 
@@ -18,6 +16,7 @@ using var cache = ViewStoreCacheBuilder.New()
 cache.Save(new User(Id: "1", Name: "Stanko", Age: 35).ToRecord(v => v.Id));
 cache.Save(new User(Id: "2", Name: "Marko", Age: 35).ToRecord(v => v.Id));
 cache.Save(new User(Id: "3", Name: "Milenko", Age: 34).ToRecord(v => v.Id));
+cache.Delete("2");
 
 internal sealed record User(
     string Id,

@@ -19,7 +19,7 @@ public sealed class ViewStoreCache : IViewStore, IDisposable
     public Task<ViewRecord?> Read(string viewId) => _viewStoreCacheInternal.Read(viewId);
     public void Save(ViewRecord viewRecord) => _viewStoreCacheInternal.Save(viewRecord);
     public void Save(IEnumerable<ViewRecord> viewRecords) => _viewStoreCacheInternal.Save(viewRecords);
-    public void Delete(string viewId, long globalVersion) => _viewStoreCacheInternal.Delete(viewId, globalVersion);
+    public void Delete(string viewId, long globalVersion = 0) => _viewStoreCacheInternal.Delete(viewId, globalVersion);
     public void Delete(IEnumerable<string> viewIds, long globalVersion) => _viewStoreCacheInternal.Delete(viewIds, globalVersion);
         
     public void Dispose()
