@@ -2,9 +2,9 @@ name: PublishNugets
 
 on:
   push:
-    branches: [ release-1.3.X, release-2.0.X ]
+    branches: [ release-1.3.X, release-2.0.X, release-3.0.X ]
   pull_request:
-    branches: [ release-1.3.X, release-2.0.X ]
+    branches: [ release-1.3.X, release-2.0.X, release-3.0.X ]
 
 jobs:
   build:
@@ -16,45 +16,31 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.100
+        dotnet-version: 7.0.100
     - name: Install dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test
-    - name: Publish ViewStore.Abstractions
+    - name: Publish ViewStore
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: Abstractions/Abstractions.csproj
+        PROJECT_FILE_PATH: ViewStore/ViewStore.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.Cache
+    - name: Publish ViewStore.DatabaseProviders.PostgresNoSql
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: Cache/ViewStore.Cache/ViewStore.Cache.csproj
-        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
-        TAG_FORMAT: '*'
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.MongoDb
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: MongoDb/ViewStore.MongoDb/ViewStore.MongoDb.csproj
-        VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
-        TAG_FORMAT: '*'
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish ViewStore.Postgres
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: Postgres/ViewStore.Postgres/ViewStore.Postgres.csproj
+        PROJECT_FILE_PATH: DatabaseProviders/ViewStore.DatabaseProviders.PostgresNoSql/ViewStore.DatabaseProviders.PostgresNoSql.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
     - name: Publish ViewStore.Prometheus
       uses: brandedoutcast/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: Prometheus/ViewStore.Prometheus/ViewStore.Prometheus.csproj
+        PROJECT_FILE_PATH: ViewStore.Prometheus/ViewStore.Prometheus.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
