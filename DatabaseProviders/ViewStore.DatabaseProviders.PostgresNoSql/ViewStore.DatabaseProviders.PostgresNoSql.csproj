@@ -8,7 +8,7 @@
         <IsPackable>true</IsPackable>
         <PackageId>ViewStore.DatabaseProviders.PostgresNoSql</PackageId>
         <PackageDescription>NoSql Postgres database provider for ViewStore which stores views as jsonb type.</PackageDescription>
-        <Version>3.0.0-rc01</Version>
+        <Version>3.0.0-rc02</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>Cache View Store;Postgres;Database Provider</PackageTags>
     </PropertyGroup>
