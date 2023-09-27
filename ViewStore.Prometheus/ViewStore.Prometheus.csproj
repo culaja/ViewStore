@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <RootNamespace>ViewStore.Prometheus</RootNamespace>
-        <LangVersion>9</LangVersion>
+        <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>ViewStore.Prometheus</AssemblyName>
         <PackageId>ViewStore.Prometheus</PackageId>

@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ViewStore
+namespace ViewStore;
+
+public interface IDatabaseProvider
 {
-    public interface IDatabaseProvider
-    {
-        Task<long?> ReadLastGlobalVersionAsync();
-        Task SaveLastGlobalVersionAsync(long globalVersion);
+    Task<long?> ReadLastGlobalVersionAsync();
+    Task SaveLastGlobalVersionAsync(long globalVersion);
         
-        Task<ViewRecord?> ReadAsync(string viewId);
+    Task<ViewRecord?> ReadAsync(string viewId);
         
-        Task<long> UpsertAsync(IEnumerable<ViewRecord> viewRecords);
-        Task<long> DeleteAsync(IEnumerable<string> viewIds);
-    }
+    Task<long> UpsertAsync(IEnumerable<ViewRecord> viewRecords);
+    Task<long> DeleteAsync(IEnumerable<string> viewIds);
 }

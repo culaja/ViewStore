@@ -1,6 +1,5 @@
-namespace ViewStore
+namespace ViewStore;
+
+public sealed class EmptyView : IView
 {
-    public sealed class EmptyView : IView
-    {
-    }
 }

@@ -2,107 +2,106 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ViewStore.Cache
+namespace ViewStore.Cache;
+
+internal sealed class OutgoingCache
 {
-    internal sealed class OutgoingCache
+    private readonly object _sync = new();
+    private CachedItems _currentCache = new();
+    private CachedItems _drainedCache = new();
+        
+    private readonly int _throttleAfterCacheCount;
+    private readonly Action<ThrottleStatistics>? _throttlingCallback;
+
+    public OutgoingCache(int throttleAfterCacheCount, Action<ThrottleStatistics>? throttlingCallback)
     {
-        private readonly object _sync = new();
-        private CachedItems _currentCache = new();
-        private CachedItems _drainedCache = new();
-        
-        private readonly int _throttleAfterCacheCount;
-        private readonly Action<ThrottleStatistics>? _throttlingCallback;
+        _throttleAfterCacheCount = throttleAfterCacheCount;
+        _throttlingCallback = throttlingCallback;
+    }
 
-        public OutgoingCache(int throttleAfterCacheCount, Action<ThrottleStatistics>? throttlingCallback)
+    public void AddOrUpdate(ViewRecord viewRecord)
+    {
+        lock (_sync)
         {
-            _throttleAfterCacheCount = throttleAfterCacheCount;
-            _throttlingCallback = throttlingCallback;
-        }
-
-        public void AddOrUpdate(ViewRecord viewRecord)
-        {
-            lock (_sync)
+            if (_currentCache.Count > _throttleAfterCacheCount)
             {
-                if (_currentCache.Count > _throttleAfterCacheCount)
-                {
-                    ThrottleForOneSecond();
-                }
+                ThrottleForOneSecond();
+            }
                 
-                _currentCache.AddOrUpdate(viewRecord);
-            }
+            _currentCache.AddOrUpdate(viewRecord);
         }
+    }
         
-        public void AddOrUpdate(IEnumerable<ViewRecord> viewEnvelopes)
+    public void AddOrUpdate(IEnumerable<ViewRecord> viewEnvelopes)
+    {
+        lock (_sync)
         {
-            lock (_sync)
+            if (_currentCache.Count > _throttleAfterCacheCount)
             {
-                if (_currentCache.Count > _throttleAfterCacheCount)
-                {
-                    ThrottleForOneSecond();
-                }
+                ThrottleForOneSecond();
+            }
                 
-                _currentCache.AddOrUpdate(viewEnvelopes);
-            }
+            _currentCache.AddOrUpdate(viewEnvelopes);
         }
+    }
 
-        private void ThrottleForOneSecond()
-        {
-            var throttlingPeriod = TimeSpan.FromSeconds(1);
-            var throttleDetails = new ThrottleStatistics(_currentCache.Count, _throttleAfterCacheCount, throttlingPeriod);
-            _throttlingCallback?.Invoke(throttleDetails);
-            Thread.Sleep(1000);
-        }
+    private void ThrottleForOneSecond()
+    {
+        var throttlingPeriod = TimeSpan.FromSeconds(1);
+        var throttleDetails = new ThrottleStatistics(_currentCache.Count, _throttleAfterCacheCount, throttlingPeriod);
+        _throttlingCallback?.Invoke(throttleDetails);
+        Thread.Sleep(1000);
+    }
 
-        public void Remove(string viewId, long globalVersion)
+    public void Remove(string viewId, long globalVersion)
+    {
+        lock (_sync)
         {
-            lock (_sync)
-            {
-                _currentCache.Remove(viewId, globalVersion);
-            }
+            _currentCache.Remove(viewId, globalVersion);
         }
+    }
         
-        public void Remove(IEnumerable<string> viewIds, long globalVersion)
+    public void Remove(IEnumerable<string> viewIds, long globalVersion)
+    {
+        lock (_sync)
         {
-            lock (_sync)
-            {
-                _currentCache.Remove(viewIds, globalVersion);
-            }
+            _currentCache.Remove(viewIds, globalVersion);
         }
+    }
 
-        public bool TryGetValue(string viewId, out ViewRecord viewRecord, out bool isDeleted)
+    public bool TryGetValue(string viewId, out ViewRecord viewRecord, out bool isDeleted)
+    {
+        lock (_sync)
         {
-            lock (_sync)
-            {
-                return _currentCache.TryGetValue(viewId, out viewRecord, out isDeleted) || 
-                       (isDeleted == false && _drainedCache.TryGetValue(viewId, out viewRecord, out isDeleted));
-            }
+            return _currentCache.TryGetValue(viewId, out viewRecord, out isDeleted) || 
+                   (isDeleted == false && _drainedCache.TryGetValue(viewId, out viewRecord, out isDeleted));
         }
+    }
 
-        public long? LastGlobalVersion()
+    public long? LastGlobalVersion()
+    {
+        lock (_sync)
         {
-            lock (_sync)
+            var currentCacheLastGlobalVersion = _currentCache.LastGlobalVersion();
+            var drainedCacheLastGlobalVersion = _drainedCache.LastGlobalVersion();
+            if (currentCacheLastGlobalVersion == null && drainedCacheLastGlobalVersion == null)
             {
-                var currentCacheLastGlobalVersion = _currentCache.LastGlobalVersion();
-                var drainedCacheLastGlobalVersion = _drainedCache.LastGlobalVersion();
-                if (currentCacheLastGlobalVersion == null && drainedCacheLastGlobalVersion == null)
-                {
-                    return null;
-                }
+                return null;
+            }
                     
-                return Math.Max(
-                    currentCacheLastGlobalVersion ?? 0L,
-                    drainedCacheLastGlobalVersion ?? 0L);
-            }
+            return Math.Max(
+                currentCacheLastGlobalVersion ?? 0L,
+                drainedCacheLastGlobalVersion ?? 0L);
         }
+    }
 
-        public CachedItems Renew()
+    public CachedItems Renew()
+    {
+        lock (_sync)
         {
-            lock (_sync)
-            {
-                _drainedCache = _currentCache;
-                _currentCache = new();
-                return _drainedCache;
-            }
+            _drainedCache = _currentCache;
+            _currentCache = new();
+            return _drainedCache;
         }
     }
 }

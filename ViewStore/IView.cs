@@ -1,6 +1,5 @@
-﻿namespace ViewStore
+﻿namespace ViewStore;
+
+public interface IView
 {
-    public interface IView
-    {
-    }
 }

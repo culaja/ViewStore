@@ -1,72 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ViewStore.Cache
+namespace ViewStore.Cache;
+
+internal sealed class DeletedViewRecordBatches : IReadOnlyList<IReadOnlyList<DeletedViewRecord>>
 {
-    internal sealed class DeletedViewRecordBatches : IReadOnlyList<IReadOnlyList<DeletedViewRecord>>
+    private readonly IReadOnlyList<IReadOnlyList<DeletedViewRecord>> _batches;
+    public long? LargestGlobalVersion { get; }
+    public int CountOfAllViewEnvelopes { get; }
+
+
+    public DeletedViewRecordBatches(IEnumerable<DeletedViewRecord> deletedViewEnvelopes, int batchSize)
     {
-        private readonly IReadOnlyList<IReadOnlyList<DeletedViewRecord>> _batches;
-        public long? LargestGlobalVersion { get; }
-        public int CountOfAllViewEnvelopes { get; }
+        _batches = Batch(
+            deletedViewEnvelopes,
+            batchSize,
+            out var largestGlobalVersion,
+            out var countOfAllViews);
+        LargestGlobalVersion = largestGlobalVersion;
+        CountOfAllViewEnvelopes = countOfAllViews;
+    }
 
+    public IEnumerator<IReadOnlyList<DeletedViewRecord>> GetEnumerator() => _batches.GetEnumerator();
 
-        public DeletedViewRecordBatches(IEnumerable<DeletedViewRecord> deletedViewEnvelopes, int batchSize)
-        {
-            _batches = Batch(
-                deletedViewEnvelopes,
-                batchSize,
-                out var largestGlobalVersion,
-                out var countOfAllViews);
-            LargestGlobalVersion = largestGlobalVersion;
-            CountOfAllViewEnvelopes = countOfAllViews;
-        }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IEnumerator<IReadOnlyList<DeletedViewRecord>> GetEnumerator() => _batches.GetEnumerator();
+    public int Count => _batches.Count;
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public int Count => _batches.Count;
-
-        public IReadOnlyList<DeletedViewRecord> this[int index] => _batches[index];
+    public IReadOnlyList<DeletedViewRecord> this[int index] => _batches[index];
         
-        // Copied from https://github.com/morelinq/MoreLINQ
-        private static IReadOnlyList<IReadOnlyList<DeletedViewRecord>> Batch(
-            IEnumerable<DeletedViewRecord> source, 
-            int batchSize,
-            out long? largestGlobalVersion,
-            out int countOfAllViews)
+    // Copied from https://github.com/morelinq/MoreLINQ
+    private static IReadOnlyList<IReadOnlyList<DeletedViewRecord>> Batch(
+        IEnumerable<DeletedViewRecord> source, 
+        int batchSize,
+        out long? largestGlobalVersion,
+        out int countOfAllViews)
+    {
+        List<DeletedViewRecord>? bucket = null;
+        largestGlobalVersion = null;
+        countOfAllViews = 0;
+
+        var resultList = new List<List<DeletedViewRecord>>();
+        foreach (var item in source)
         {
-            List<DeletedViewRecord>? bucket = null;
-            largestGlobalVersion = null;
-            countOfAllViews = 0;
+            if (bucket == null)
+                bucket = new List<DeletedViewRecord>(batchSize);
 
-            var resultList = new List<List<DeletedViewRecord>>();
-            foreach (var item in source)
-            {
-                if (bucket == null)
-                    bucket = new List<DeletedViewRecord>(batchSize);
+            bucket.Add(item);
+            largestGlobalVersion = 
+                largestGlobalVersion < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersion
+                    ?? item.GlobalVersion;
 
-                bucket.Add(item);
-                largestGlobalVersion = 
-                    largestGlobalVersion < item.GlobalVersion ? item.GlobalVersion : largestGlobalVersion
-                                                                                     ?? item.GlobalVersion;
+            if (bucket.Count != batchSize)
+                continue;
 
-                if (bucket.Count != batchSize)
-                    continue;
-
-                resultList.Add(bucket);
-                countOfAllViews += bucket.Count;
-                bucket = null;
-            }
-
-            // Return the last bucket with all remaining elements
-            if (bucket != null && bucket.Count > 0)
-            {
-                resultList.Add(bucket);
-                countOfAllViews += bucket.Count;
-            }
-
-            return resultList;
+            resultList.Add(bucket);
+            countOfAllViews += bucket.Count;
+            bucket = null;
         }
+
+        // Return the last bucket with all remaining elements
+        if (bucket != null && bucket.Count > 0)
+        {
+            resultList.Add(bucket);
+            countOfAllViews += bucket.Count;
+        }
+
+        return resultList;
     }
 }

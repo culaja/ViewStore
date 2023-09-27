@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ViewStore
+namespace ViewStore;
+
+public interface IViewStore
 {
-    public interface IViewStore
-    {
-        Task<long?> ReadLastGlobalVersion();
+    Task<long?> ReadLastGlobalVersion();
         
-        Task<ViewRecord?> Read(string viewId);
+    Task<ViewRecord?> Read(string viewId);
 
-        void Save(ViewRecord viewRecord);
-        void Save(IEnumerable<ViewRecord> viewRecords);
+    void Save(ViewRecord viewRecord);
+    void Save(IEnumerable<ViewRecord> viewRecords);
 
-        void Delete(string viewId, long globalVersion = 0L);
-        void Delete(IEnumerable<string> viewIds, long globalVersion = 0L);
-    }
+    void Delete(string viewId, long globalVersion = 0L);
+    void Delete(IEnumerable<string> viewIds, long globalVersion = 0L);
 }
