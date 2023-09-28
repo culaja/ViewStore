@@ -22,7 +22,7 @@ public sealed class ViewStoreCacheBuilder
 
     public ViewStoreCacheBuilder WithDatabaseProvider(IDatabaseProvider databaseProvider)
     {
-        _databaseProvider = databaseProvider;
+        _databaseProvider = new DatabaseProviderPreparationDecorator(databaseProvider);
         return this;
     }
 

@@ -7,7 +7,7 @@
         <IsPackable>true</IsPackable>
         <PackageId>ViewStore.Cache</PackageId>
         <PackageDescription>Write bihind cache for View Store. It can be used as a decorator for any View Store implementation (e.g. MongoDb View Store).</PackageDescription>
-        <Version>3.0.0-rc02</Version>
+        <Version>3.0.0-rc03</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>Write behind cache;Read through cache;Cache View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>

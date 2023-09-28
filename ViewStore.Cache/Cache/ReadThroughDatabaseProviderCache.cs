@@ -9,21 +9,23 @@ internal sealed class ReadThroughDatabaseProviderCache : IDatabaseProvider
 {
     private readonly MemoryCache _memoryCache;
     private readonly TimeSpan _readCacheExpirationPeriod;
-    private readonly IDatabaseProvider _next;
+    private readonly IDatabaseProvider _databaseProvider;
 
     public ReadThroughDatabaseProviderCache(
         MemoryCache memoryCache,
         TimeSpan readCacheExpirationPeriod,
-        IDatabaseProvider next)
+        IDatabaseProvider databaseProvider)
     {
         _memoryCache = memoryCache;
         _readCacheExpirationPeriod = readCacheExpirationPeriod;
-        _next = next;
+        _databaseProvider = databaseProvider;
     }
 
-    public Task<long?> ReadLastGlobalVersionAsync() => _next.ReadLastGlobalVersionAsync();
+    public Task PrepareSchema() => _databaseProvider.PrepareSchema();
 
-    public Task SaveLastGlobalVersionAsync(long globalVersion) => _next.SaveLastGlobalVersionAsync(globalVersion);
+    public Task<long?> ReadLastGlobalVersionAsync() => _databaseProvider.ReadLastGlobalVersionAsync();
+
+    public Task SaveLastGlobalVersionAsync(long globalVersion) => _databaseProvider.SaveLastGlobalVersionAsync(globalVersion);
 
     public async Task<ViewRecord?> ReadAsync(string viewId)
     {
@@ -33,7 +35,7 @@ internal sealed class ReadThroughDatabaseProviderCache : IDatabaseProvider
             return (ViewRecord)optionalCacheItem.Value;
         }
         
-        var viewEnvelope = await _next.ReadAsync(viewId);
+        var viewEnvelope = await _databaseProvider.ReadAsync(viewId);
         if (viewEnvelope != null)
         {
             _memoryCache.Set(new CacheItem(viewId, viewEnvelope), new CacheItemPolicy {SlidingExpiration = _readCacheExpirationPeriod});
@@ -51,7 +53,7 @@ internal sealed class ReadThroughDatabaseProviderCache : IDatabaseProvider
             list.Add(viewEnvelope);
         }
             
-        return _next.UpsertAsync(list);
+        return _databaseProvider.UpsertAsync(list);
     }
 
     public Task<long> DeleteAsync(IEnumerable<string> viewIds)
@@ -63,6 +65,6 @@ internal sealed class ReadThroughDatabaseProviderCache : IDatabaseProvider
             list.Add(viewId);
         }
             
-        return _next.DeleteAsync(list);
+        return _databaseProvider.DeleteAsync(list);
     }
 }

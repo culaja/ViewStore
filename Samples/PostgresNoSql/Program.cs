@@ -1,17 +1,14 @@
 ﻿using PostgresNoSql;
 using ViewStore.Cache;
 using ViewStore.Cache.Cache;
-using ViewStore.DatabaseProviders.PostgresNoSql;
-
-var databaseProvider = PostgresDatabaseProviderBuilder.New()
-    .WithConnectionString("host=localhost;port=5432;database=viewstore;password=o;username=postgres")
-    .WithTablePath("public.test_view")
-    .WithAutoCreateOptions(new AutoCreateOptions(shouldCreateSchema: false, shouldCreateTable: true))
-    .Build();
 
 using var cache = ViewStoreCacheBuilder.New()
-    .WithDatabaseProvider(databaseProvider)
+    .WithDatabaseProvider(new PostgresDatabaseProvider(
+        connectionString: "host=localhost;port=5432;database=viewstore;password=o;username=postgres",
+        schemaName: "public",
+        tableName: "test_view"))
     .UseCallbackWhenDrainFinished(ds => Console.WriteLine(ds.ToString()))
+    .UseCallbackOnDrainAttemptFailed(Console.WriteLine)
     .Build();
 
 cache.Save(new User(Id: "1", Name: "Stanko", Age: 35).ToRecord(v => v.Id));

@@ -5,6 +5,8 @@ namespace ViewStore.Cache;
 
 public interface IDatabaseProvider
 {
+    Task PrepareSchema();
+    
     Task<long?> ReadLastGlobalVersionAsync();
     Task SaveLastGlobalVersionAsync(long globalVersion);
         

@@ -13,6 +13,8 @@ public sealed class InMemoryDatabaseProvider : IDatabaseProvider
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly Dictionary<string, ViewRecord> _dictionary = new();
 
+    public Task PrepareSchema() => Task.CompletedTask;
+
     public Task<long?> ReadLastGlobalVersionAsync()
     {
         _lock.EnterReadLock();
