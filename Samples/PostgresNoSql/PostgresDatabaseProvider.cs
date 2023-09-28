@@ -7,7 +7,7 @@ namespace PostgresNoSql;
 
 internal sealed class PostgresDatabaseProvider : IDatabaseProvider
 {
-    private const string LastDeletedViewId = "LastGlobalPosition-b24ae98262724d27bd8e31c34ff11f1a";
+    private const string LastGlobalPosition = "LastGlobalPosition-b24ae98262724d27bd8e31c34ff11f1a";
     
     private readonly string _connectionString;
     private readonly string _schemaName;
@@ -59,7 +59,7 @@ internal sealed class PostgresDatabaseProvider : IDatabaseProvider
                 select 
                     globalVersion 
                 from {_tablePath}
-                    where globalVersion = '{LastDeletedViewId}'
+                    where globalVersion = '{LastGlobalPosition}'
                 limit 1", connection);
         await using var reader = await cmd.ExecuteReaderAsync();
 
@@ -71,7 +71,7 @@ internal sealed class PostgresDatabaseProvider : IDatabaseProvider
     }
 
     public Task SaveLastGlobalVersionAsync(long globalVersion) => 
-        UpsertAsync(new[] { ViewRecord.EmptyWith(LastDeletedViewId, globalVersion) });
+        UpsertAsync(new[] { ViewRecord.EmptyWith(LastGlobalPosition, globalVersion) });
 
     public async Task<ViewRecord?> ReadAsync(string viewId)
     {
