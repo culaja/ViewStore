@@ -9,7 +9,7 @@
         <AssemblyName>ViewStore.Prometheus</AssemblyName>
         <PackageId>ViewStore.Prometheus</PackageId>
         <PackageDescription>Prometheus metrics for View Store Cache implementation.</PackageDescription>
-        <Version>3.0.0-rc03</Version>
+        <Version>3.0.0-rc04</Version>
         <Authors>Stanko Culaja</Authors>
         <PackageTags>Prometheus;Prometheus View Store;ViewStore;View Store;CQRS;Event Sourcing;Projection</PackageTags>
     </PropertyGroup>

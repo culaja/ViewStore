@@ -11,12 +11,12 @@ public static class ViewStoreCacheBuilderExtensions
     
     public static ViewStoreCacheBuilder AddMetrics(this ViewStoreCacheBuilder viewStoreCacheBuilder, string namePrefix)
     {
-        var durationHistogram = Metrics.CreateHistogram($"{namePrefix}:DurationInMs", "View Store Cache drain duration into the final view store");
-        var totalDrainedViewCounter = Metrics.CreateCounter($"{namePrefix}:TotalDrainedViews", "Count of added, updated or deleted views drained into final view store");
-        var addedOrUpdatedViewCounter = Metrics.CreateCounter($"{namePrefix}:AddedOrUpdatedViews", "Count of added or updated views drained into final view store");
-        var addedOrUpdatedRetryCounter = Metrics.CreateCounter($"{namePrefix}:AddedOrUpdatedRetryCount", "Number of retries when attempting to add or update views in final view store");
-        var deletedViewCounter = Metrics.CreateCounter($"{namePrefix}:DeletedViews", "Count of deleted views drained into final view store");
-        var deletedRetryCounter = Metrics.CreateCounter($"{namePrefix}:DeletedRetryCount", "Number of retries when attempting to delete views in final view store");
+        var durationHistogram = Metrics.CreateHistogram($"{namePrefix}_DurationInMs", "View Store Cache drain duration into the final view store");
+        var totalDrainedViewCounter = Metrics.CreateCounter($"{namePrefix}_TotalDrainedViews", "Count of added, updated or deleted views drained into final view store");
+        var addedOrUpdatedViewCounter = Metrics.CreateCounter($"{namePrefix}_AddedOrUpdatedViews", "Count of added or updated views drained into final view store");
+        var addedOrUpdatedRetryCounter = Metrics.CreateCounter($"{namePrefix}_AddedOrUpdatedRetryCount", "Number of retries when attempting to add or update views in final view store");
+        var deletedViewCounter = Metrics.CreateCounter($"{namePrefix}_DeletedViews", "Count of deleted views drained into final view store");
+        var deletedRetryCounter = Metrics.CreateCounter($"{namePrefix}_DeletedRetryCount", "Number of retries when attempting to delete views in final view store");
         
         Counters.Add(totalDrainedViewCounter);
         Counters.Add(addedOrUpdatedViewCounter);
