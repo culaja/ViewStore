@@ -42,7 +42,7 @@ namespace ViewStore.Postgres
         public ViewEnvelopeInternal(ViewEnvelope viewEnvelope) : this(
             viewEnvelope.Id,
             JsonConvert.SerializeObject(viewEnvelope.View, JsonSerializerSettings),
-            viewEnvelope.View.GetType().AssemblyQualifiedName,
+            viewEnvelope.View.GetType().AssemblyQualifiedName ?? throw new NotSupportedException($"Unable to get AssemblyQualifiedName for type: {viewEnvelope.View.GetType().Name}"),
             viewEnvelope.View.GetType().Name,
             JsonConvert.SerializeObject(viewEnvelope.MetaData, JsonSerializerSettings),
             viewEnvelope.GlobalVersion.Value,
@@ -55,7 +55,7 @@ namespace ViewStore.Postgres
             Id,
             (JsonConvert.DeserializeObject(View, Type.GetType(ViewType)!) as IView)!, 
             Abstractions.GlobalVersion.Of(GlobalVersion),
-            JsonConvert.DeserializeObject<MetaData>(Metadata),
+            JsonConvert.DeserializeObject<MetaData>(Metadata) ?? throw new InvalidOperationException($"Unable to deserialize metadata string: {Metadata}"),
             TenantId == "" ? null : TenantId,
             CreatedAt == DateTime.MinValue ? null : CreatedAt);
     }

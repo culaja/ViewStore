@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ViewStore.Abstractions;
 
-namespace ViewStore.InMemory
+namespace ViewStore.Cache
 {
     public sealed class InMemoryViewStore : IViewStore
     {

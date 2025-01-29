@@ -48,7 +48,7 @@ namespace ViewStore.Abstractions
         
         public static bool operator !=(GlobalVersion p1, GlobalVersion p2) => !(p1 == p2);
         
-        public override bool Equals(object obj) => 
+        public override bool Equals(object? obj) => 
             obj is GlobalVersion && Equals((GlobalVersion)obj);
 
         public bool Equals(GlobalVersion other) => this == other;

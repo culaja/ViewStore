@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Caching;
 using ViewStore.Abstractions;
-using ViewStore.InMemory;
 
 namespace ViewStore.Cache
 {

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using ViewStore.Abstractions;
-using ViewStore.InMemory;
 using Xunit;
 using static ViewStore.Abstractions.TestView;
 
