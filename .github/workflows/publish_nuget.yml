@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 9.0.102
     - name: Install dependencies
@@ -24,28 +24,28 @@ jobs:
     - name: Test
       run: dotnet test
     - name: Publish ViewStore.Abstractions
-      uses: brandedoutcast/publish-nuget@v2
+      uses: brandedoutcast/publish-nuget@v3
       with:
         PROJECT_FILE_PATH: Abstractions/Abstractions.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
     - name: Publish ViewStore.Cache
-      uses: brandedoutcast/publish-nuget@v2
+      uses: brandedoutcast/publish-nuget@v3
       with:
         PROJECT_FILE_PATH: Cache/ViewStore.Cache/ViewStore.Cache.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
     - name: Publish ViewStore.Postgres
-      uses: brandedoutcast/publish-nuget@v2
+      uses: brandedoutcast/publish-nuget@v3
       with:
         PROJECT_FILE_PATH: Postgres/ViewStore.Postgres/ViewStore.Postgres.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
         TAG_FORMAT: '*'
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
     - name: Publish ViewStore.Prometheus
-      uses: brandedoutcast/publish-nuget@v2
+      uses: brandedoutcast/publish-nuget@v3
       with:
         PROJECT_FILE_PATH: Prometheus/ViewStore.Prometheus/ViewStore.Prometheus.csproj
         VERSION_REGEX: '^\s*<Version>(.*)<\/Version>\s*$'
